@@ -1,0 +1,33 @@
+{
+  "name": "steemit_helper",
+  "version": "0.0.1",
+  "description": "Steemit task helper",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/raserrano/goalsapp.git"
+  },
+  "keywords": [
+    "steemit",
+    "task",
+    "bot",
+    "helper",
+    "steem"
+  ],
+  "author": "raserrano",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/raserrano/goalsapp/issues"
+  },
+  "homepage": "https://github.com/raserrano/goalsapp#readme",
+  "dependencies": {
+    "express": "^4.15.5",
+    "mongoose": "^4.11.13",
+    "pug": "^2.0.0-rc.4",
+    "steem": "^0.6.4",
+    "wait.for": "^0.6.6"
+  }
+}
