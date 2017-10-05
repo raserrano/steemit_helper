@@ -86,11 +86,11 @@ function getContent(post){
       var post = post_url[post_url.length-1];
 
       // Debug
-      debug('Payer: '+payer);
-      debug('Amount: '+amount);
-      debug('Author: '+author);
-      debug('Post: '+post);
-      debug('Memo: '+memo);
+      // debug('Payer: '+payer);
+      // debug('Amount: '+amount);
+      // debug('Author: '+author);
+      // debug('Post: '+post);
+      // debug('Memo: '+memo);
 
       if(post != undefined && author != undefined 
         && post != null && author != null){
