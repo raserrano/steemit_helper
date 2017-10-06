@@ -1,10 +1,16 @@
 const
   steem = require('steem'),
-  wait = require('wait.for');
+  wait = require('wait.for'),
+  request = require('request');
 
 const 
-  ACCOUNT_NAME = 'treeplanter';
-  DEBUG = false;
+  VOTE_PERC = 100,
+  VOTE_POWER_1_PC = 100,
+  MIN_VOTING_POWER = 70,
+  DEBUG = true;
+
+var globalData,
+  conversionInfo = new Object();
 
 var configs = [
   "wss://steemd.steemit.com",
@@ -43,41 +49,86 @@ steem.config.set('websocket',configs[0]);
 //  globals = result;
 // });
 
-// SP calculation
 
+// Voting for high bids
 wait.launchFiber(function(){
-  var max = 15000;
-  var limit = 1000;
-  var results = wait.for(getTransfers,ACCOUNT_NAME,max,limit);
-  getVotesReport(results);
+  var max = 10000000;
+  var limit = 50;
+  globalData = wait.for(steem_getSteemGlobaleProperties_wrapper);
+  var accounts = wait.for(steem_getAccounts_wrapper,[process.env.ACCOUNT_NAME]);
+  var results_booster = wait.for(getTransfers,process.env.VOTING_ACCS[0],max,limit);
+  init_conversion();
+  // debug(conversionInfo);
+  var weight = calculateVoteWeight(accounts[0]);
+  startVotingProcess(process.env.VOTING_ACCS[0],results_booster,weight);
+
+  var results_belly = wait.for(getTransfers,process.env.VOTING_ACCS[1],max,limit);
+  startVotingProcess(process.env.VOTING_ACCS[1],results_belly,weight);
+
+  var results_minnow = wait.for(getTransfers,process.env.VOTING_ACCS[2],max,limit);
+  startVotingProcess(process.env.VOTING_ACCS[2],results_minnow,weight);
+  // var results_belly = wait.for(getTransfers,process.env.VOTING_ACCS[1],max,limit);
+  // var results_minnowbooster = wait.for(getTransfers,process.env.VOTING_ACCS[2],max,limit);
 });
 
-function getVotesReport(data){
+//var max = wait.for(steem_getAccountHistory_wrapper, 10000000, 1);
+
+
+
+// SP calculation
+
+// wait.launchFiber(function(){
+//   var max = 15000;
+//   var limit = 1000;
+//   var results = wait.for(getTransfers,process.env.ACCOUNT_NAME,max,limit);
+//   getVotesReport(results);
+// });
+
+function getVotesReport(account,data){
   debug('Starting report...');
   for(var i=0; i<data.length;i++){
     if(data[i][1].op[0]=='transfer'){
-      if(data[i][1].op[1].to == ACCOUNT_NAME){
-        getContent(data[i]);
+      if(data[i][1].op[1].to == process.env.ACCOUNT_NAME){
+        console.log(JSON.stringify(getContent(account,data[i])));
       }
     }
   }
 }
 
+function startVotingProcess(account,data,weight){
+  var posts = new Array();
+  for(var i=0; i<data.length;i++){
+    if(data[i][1].op[0]=='transfer'){
+      if(data[i][1].op[1].to == account){
+        var post = getContent([account,process.env.ACCOUNT_NAME],data[i]);
+        if(post !== null){
+          console.log(JSON.stringify(post));
+          posts.push(post);
+        }
+      }
+    }
+  }
+  posts.sort(function(a,b) {
+    return (a.amount > b.amount) ? 1 : ((b.amount > a.amount) ? -1 : 0);
+  });
+  //debug(posts[posts.length-1]);
+  votePost(posts[posts.length-1].author,posts[posts.length-1].post,weight);
+}
+
 function getTransfers(name,max,limit,callback){
-  debug('Getting transfers');
-  // 1000000,10000
+  debug('Getting transfers for: '+name);
   steem.api.getAccountHistory(name,max,limit,function(err,result){
     callback(err,result);
   });
 }
-function getContent(post){
-  // debug(post);
-  debug(post[1].op[1]);
 
+function getContent(account,post){
+  var obj = null;
   var number = post[0];
   var payer = post[1].op[1].from;
   var memo = post[1].op[1].memo;
-  var amount = post[1].op[1].amount;
+  var amount_parts = post[1].op[1].amount.split(' ');
+  var amount = parseFloat(amount_parts[0]);
   if(memo.indexOf('/') != -1){
     if(memo.indexOf('#') == -1){
       var post_url = post[1].op[1].memo.split('/');
@@ -96,9 +147,8 @@ function getContent(post){
         && post != null && author != null){
         var result = wait.for(steem_getContent,author,post);
         var created = result.created;
-        if(!getTreeplanterVote(result)){
-          var obj = {number,payer,memo,amount,author,post,created};
-          console.log(JSON.stringify(obj));
+        if(!verifyAccountHasVoted(account,result)){
+           obj = {number,payer,memo,amount,author,post,created};
         }
       }else{
         debug(JSON.stringify(post[1].op[1]));
@@ -109,28 +159,136 @@ function getContent(post){
   }else{
     debug('URL not found, donation');
   }
+  return obj;
 }
 
-function getTreeplanterVote(result){
+function verifyAccountHasVoted(account,result){
   var pos = false;
   var votes = new Array();
   if(result.active_votes.length > 0){
     for(var i=0; i< result.active_votes.length;i++){
       votes.push(result.active_votes[i].voter);
     }
-    pos = (votes.indexOf(ACCOUNT_NAME) != -1);
-  }
-  if(DEBUG){
-    if(!pos){
-      debug(JSON.stringify(votes));
-    }    
+    // debug(votes);
+    // debug(account[0]+'found '+(votes.indexOf(account[0])!= -1));
+    // debug(account[1]+'found '+(votes.indexOf(account[1])!= -1));
+    pos = ((votes.indexOf(account[0]) != -1)&&(votes.indexOf(account[1]) != -1));
+    //debug(pos);
   }
   return pos;
+}
+
+function votePost(author,permlink,weight){
+  return wait.for(
+    steem.broadcast.vote,
+    process.env.POSTING_KEY_PRV,
+    process.env.ACCOUNT_NAME,
+    author,
+    permlink,
+    weight);
+}
+
+function calculateVoteWeight(account){
+  var vp = account.voting_power;
+  var vestingSharesParts = account.vesting_shares.split(" ");
+  var vestingSharesNum = Number(vestingSharesParts[0]);
+  var receivedSharesParts = account.received_vesting_shares.split(" ");
+  var receivedSharesNum = Number(receivedSharesParts[0]);
+  var totalVests = vestingSharesNum + receivedSharesNum;
+
+  var steempower = getSteemPowerFromVest(totalVests);
+  var sp_scaled_vests = steempower / conversionInfo.steem_per_vest;
+
+  var voteweight = 100;
+
+  var oneval = (0.1 * 52) / (sp_scaled_vests * 100
+    * conversionInfo.reward_pool * conversionInfo.sbd_per_steem);
+
+  var votingpower = (oneval / (100 * (100 * voteweight) / VOTE_POWER_1_PC)) * 100;
+
+  if (votingpower > 100) {
+    votingpower = 100;
+  }
+
+  return votingpower*VOTE_POWER_1_PC;
+}
+
+function init_conversion(callback) {
+  // get some info first
+  var headBlock = wait.for(steem_getBlockHeader_wrapper, globalData.head_block_number);
+  latestBlockMoment = new Date(headBlock.timestamp);
+  debug("Latest block :"+latestBlockMoment);
+  conversionInfo.rewardfund_info = wait.for(steem_getRewardFund_wrapper, "post");
+  conversionInfo.price_info = wait.for(steem_getCurrentMedianHistoryPrice_wrapper);
+
+  conversionInfo.reward_balance = conversionInfo.rewardfund_info.reward_balance;
+  conversionInfo.recent_claims = conversionInfo.rewardfund_info.recent_claims;
+  conversionInfo.reward_pool = conversionInfo.reward_balance.replace(" STEEM", "")
+    / conversionInfo.recent_claims;
+
+  conversionInfo.sbd_per_steem = conversionInfo.price_info.base.replace(" SBD", "")
+    / conversionInfo.price_info.quote.replace(" STEEM", "");
+  debug("sbd_per_steem = "+conversionInfo.sbd_per_steem);
+
+  conversionInfo.steem_per_vest = globalData.total_vesting_fund_steem.replace(" STEEM", "")
+    / globalData.total_vesting_shares.replace(" VESTS", "");
+  request('https://api.coinmarketcap.com/v1/ticker/steem/', function (err, response, body) {
+    if (err) {
+      debug("error getting price of steem from coinmarketcap");
+      conversionInfo.steem_to_dollar = 1;
+    } else {
+      var data = JSON.parse("{\"data\":"+body+"}");
+      conversionInfo.steem_to_dollar = data["data"][0]["price_usd"];
+      debug("got price of steem: "+conversionInfo.steem_to_dollar);
+    }
+  });
+}
+
+function getSteemPowerFromVest(vest) {
+  try {
+    return steem.formatter.vestToSteem(
+      vest,
+      parseFloat(globalData.total_vesting_shares),
+      parseFloat(globalData.total_vesting_fund_steem)
+    );
+  } catch(err) {
+    return 0;
+  }
 }
 
 function steem_getContent(author,post,callback){
   steem.api.getContent(author, post,function(err,result){
     callback(err,result);
+  });
+}
+
+function steem_getAccounts_wrapper(accounts, callback) {
+  steem.api.getAccounts(accounts, function(err, result) {
+    callback(err, result);
+  });
+}
+
+function steem_getSteemGlobaleProperties_wrapper(callback) {
+  steem.api.getDynamicGlobalProperties(function(err, properties) {
+    callback(err, properties);
+  });
+}
+
+function steem_getBlockHeader_wrapper(blockNum, callback) {
+  steem.api.getBlockHeader(blockNum, function(err, result) {
+    callback(err, result);
+  });
+}
+
+function steem_getRewardFund_wrapper(type, callback) {
+  steem.api.getRewardFund(type, function (err, data) {
+    callback(err, data);
+  });
+}
+
+function steem_getCurrentMedianHistoryPrice_wrapper(callback) {
+  steem.api.getCurrentMedianHistoryPrice(function(err, result) {
+    callback(err, result);
   });
 }
 
