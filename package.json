@@ -4,7 +4,8 @@
   "description": "Steemit task helper",
   "main": "index.js",
   "scripts": {
-    "test": "mocha test"
+    "test": "mocha test",
+    "start": "node server.js"
   },
   "repository": {
     "type": "git",
