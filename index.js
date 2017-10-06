@@ -56,19 +56,20 @@ wait.launchFiber(function(){
   var limit = 50;
   globalData = wait.for(steem_getSteemGlobaleProperties_wrapper);
   var accounts = wait.for(steem_getAccounts_wrapper,[process.env.ACCOUNT_NAME]);
-  var results_booster = wait.for(getTransfers,process.env.VOTING_ACCS[0],max,limit);
+  var accounts = process.env.VOTING_ACCS.split(',');
+  var results_booster = wait.for(getTransfers,account[0],max,limit);
   init_conversion();
   // debug(conversionInfo);
   var weight = calculateVoteWeight(accounts[0]);
-  startVotingProcess(process.env.VOTING_ACCS[0],results_booster,weight);
+  startVotingProcess(account[0],results_booster,weight);
 
-  var results_belly = wait.for(getTransfers,process.env.VOTING_ACCS[1],max,limit);
-  startVotingProcess(process.env.VOTING_ACCS[1],results_belly,weight);
+  var results_belly = wait.for(getTransfers,account[1],max,limit);
+  startVotingProcess(account[1],results_belly,weight);
 
-  var results_minnow = wait.for(getTransfers,process.env.VOTING_ACCS[2],max,limit);
-  startVotingProcess(process.env.VOTING_ACCS[2],results_minnow,weight);
-  // var results_belly = wait.for(getTransfers,process.env.VOTING_ACCS[1],max,limit);
-  // var results_minnowbooster = wait.for(getTransfers,process.env.VOTING_ACCS[2],max,limit);
+  var results_minnow = wait.for(getTransfers,account[2],max,limit);
+  startVotingProcess(account[2],results_minnow,weight);
+  // var results_belly = wait.for(getTransfers,account[1],max,limit);
+  // var results_minnowbooster = wait.for(getTransfers,account[2],max,limit);
 });
 
 //var max = wait.for(steem_getAccountHistory_wrapper, 10000000, 1);
