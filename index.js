@@ -7,7 +7,7 @@ const
   VOTE_PERC = 100,
   VOTE_POWER_1_PC = 100,
   MIN_VOTING_POWER = 70,
-  DEBUG = true;
+  DEBUG = false;
 
 var globalData,
   conversionInfo = new Object();
@@ -50,6 +50,13 @@ steem.config.set('websocket',configs[0]);
 // });
 
 
+// wait.launchFiber(function(){
+//   var max = 20000;
+//   var limit = 10000;
+//   var results = wait.for(getTransfers,'treeplanter',max,limit);
+//   getVotesReport(['treeplanter'],results);
+// });
+
 // Voting for high bids
 wait.launchFiber(function(){
   var max = 10000000;
@@ -89,8 +96,11 @@ function getVotesReport(account,data){
   debug('Starting report...');
   for(var i=0; i<data.length;i++){
     if(data[i][1].op[0]=='transfer'){
-      if(data[i][1].op[1].to == process.env.ACCOUNT_NAME){
-        console.log(JSON.stringify(getContent(account,data[i])));
+      if(data[i][1].op[1].to == account[0]){
+        var res = getContent(account,data[i]);
+        if(res !== null){
+          console.log(JSON.stringify(res));          
+        }
       }
     }
   }
@@ -138,19 +148,19 @@ function getContent(account,post){
       var post = post_url[post_url.length-1];
 
       // Debug
-      // debug('Payer: '+payer);
-      // debug('Amount: '+amount);
-      // debug('Author: '+author);
-      // debug('Post: '+post);
-      // debug('Memo: '+memo);
+      debug('Payer: '+payer);
+      debug('Amount: '+amount);
+      debug('Author: '+author);
+      debug('Post: '+post);
+      debug('Memo: '+memo);
 
       if(post != undefined && author != undefined 
         && post != null && author != null){
         var result = wait.for(steem_getContent,author,post);
         var created = result.created;
-        if(!verifyAccountHasVoted(account,result)){
-           obj = {number,payer,memo,amount,author,post,created};
-        }
+        //if(!verifyAccountHasVoted(account,result)){
+        obj = {number,payer,memo,amount,author,post,created};
+        //}
       }else{
         debug(JSON.stringify(post[1].op[1]));
       }   
@@ -170,10 +180,12 @@ function verifyAccountHasVoted(account,result){
     for(var i=0; i< result.active_votes.length;i++){
       votes.push(result.active_votes[i].voter);
     }
-    // debug(votes);
-    // debug(account[0]+'found '+(votes.indexOf(account[0])!= -1));
+    // TODO: verify that account is an array and iterate it for votes
+    //debug(JSON.stringify(votes));
+    //debug(account[0]+'found '+(votes.indexOf(account[0])!= -1));
     // debug(account[1]+'found '+(votes.indexOf(account[1])!= -1));
-    pos = ((votes.indexOf(account[0]) != -1)&&(votes.indexOf(account[1]) != -1));
+    pos = (votes.indexOf(account[0]) != -1);
+    //pos = ((votes.indexOf(account[0]) != -1)&&(votes.indexOf(account[1]) != -1));
     //debug(pos);
   }
   return pos;
