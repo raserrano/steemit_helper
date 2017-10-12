@@ -84,7 +84,13 @@ module.exports = {
         votes.push(result.active_votes[i].voter);
       }
       for(var j=0;j<account.length;j++){
-        if(votes.indexOf(account[j]()) != -1){
+        var match = "";
+        if(account[j] instanceof Function){
+          match = account[j]();
+        }else{
+          match = account[j];
+        }
+        if(votes.indexOf(match) != -1){
           pos++;
           break;
         }
