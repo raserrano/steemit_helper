@@ -1,6 +1,6 @@
 const 
   wait = require('wait.for'),
-  conf = require('../config/current'),
+  conf = require('../config/dev'),
   steem_api = require('./steem_api');
 module.exports = {
   getTransfersToVoteReport: function(account,data){
@@ -34,6 +34,25 @@ module.exports = {
       });
       this.debug(posts[posts.length-1]);
       steem_api.votePost(posts[posts.length-1].author,posts[posts.length-1].post,weight);
+    }
+  },
+  commentOnNewUserPost: function(posts,weight){
+    for(var i=0; i<posts.length;i++){
+      var author = posts[i].author;
+      var account = wait.for(steem_api.steem_getAccounts_wrapper,[author]);
+      var created = account[0].created;
+      if(this.dateDiff(created) < (86400*7)){
+        if(!steem_api.verifyAccountHasVoted([conf.env.ACCOUNT_NAME],posts[i])){
+          steem_api.votePost(posts[i].author,posts[i].permlink,weight);
+          wait.for(this.timeout_wrapper,5000);
+          steem_api.commentPost(posts[i].author,posts[i].permlink);
+          wait.for(this.timeout_wrapper,20000);
+        }else{
+          this.debug('Account was already voted')
+        }
+      }else{
+        this.debug('Account is old')
+      }
     }
   },
   getContent: function(account,post,type){
@@ -85,9 +104,19 @@ module.exports = {
     }
     return obj;
   },
+  dateDiff: function(when){
+    var then = new Date(when);
+    var now = new Date();
+    return (now - then)/1000;
+  },
   debug: function(message){
     if(conf.env.DEBUG() === true){
       console.log(message);
     }
+  },
+  timeout_wrapper: function(delay, callback) {
+    setTimeout(function() {
+      callback(null, true);
+    }, delay);
   }
 }
