@@ -50,34 +50,34 @@ steem.config.set('websocket',configs[0]);
 // });
 
 
-// wait.launchFiber(function(){
-//   var max = 20000;
-//   var limit = 10000;
-//   var results = wait.for(getTransfers,'treeplanter',max,limit);
-//   getVotesReport(['treeplanter'],results);
-// });
-
-// Voting for high bids
 wait.launchFiber(function(){
-  var max = 10000000;
-  var limit = 50;
-  globalData = wait.for(steem_getSteemGlobaleProperties_wrapper);
-  var accounts = wait.for(steem_getAccounts_wrapper,[process.env.ACCOUNT_NAME]);
-  var accounts_to = process.env.VOTING_ACCS.split(',');
-  var results_booster = wait.for(getTransfers,accounts_to[0],max,limit);
-  init_conversion();
-  // debug(conversionInfo);
-  var weight = calculateVoteWeight(accounts[0]);
-  startVotingProcess(accounts_to[0],results_booster,weight);
-
-  var results_belly = wait.for(getTransfers,accounts_to[1],max,limit);
-  startVotingProcess(accounts_to[1],results_belly,weight);
-
-  var results_minnow = wait.for(getTransfers,accounts_to[2],max,limit);
-  startVotingProcess(accounts_to[2],results_minnow,weight);
-  // var results_belly = wait.for(getTransfers,accounts_to[1],max,limit);
-  // var results_minnowbooster = wait.for(getTransfers,accounts_to[2],max,limit);
+  var max = 20000;
+  var limit = 10000;
+  var results = wait.for(getTransfers,'treeplanter',max,limit);
+  getVotesReport(['treeplanter'],results);
 });
+
+// // Voting for high bids
+// wait.launchFiber(function(){
+//   var max = 10000000;
+//   var limit = 50;
+//   globalData = wait.for(steem_getSteemGlobaleProperties_wrapper);
+//   var accounts = wait.for(steem_getAccounts_wrapper,[process.env.ACCOUNT_NAME]);
+//   var accounts_to = process.env.VOTING_ACCS.split(',');
+//   var results_booster = wait.for(getTransfers,accounts_to[0],max,limit);
+//   init_conversion();
+//   // debug(conversionInfo);
+//   var weight = calculateVoteWeight(accounts[0]);
+//   startVotingProcess(accounts_to[0],results_booster,weight);
+
+//   var results_belly = wait.for(getTransfers,accounts_to[1],max,limit);
+//   startVotingProcess(accounts_to[1],results_belly,weight);
+
+//   var results_minnow = wait.for(getTransfers,accounts_to[2],max,limit);
+//   startVotingProcess(accounts_to[2],results_minnow,weight);
+//   // var results_belly = wait.for(getTransfers,accounts_to[1],max,limit);
+//   // var results_minnowbooster = wait.for(getTransfers,accounts_to[2],max,limit);
+// });
 
 //var max = wait.for(steem_getAccountHistory_wrapper, 10000000, 1);
 
@@ -140,6 +140,7 @@ function getContent(account,post){
   var memo = post[1].op[1].memo;
   var amount_parts = post[1].op[1].amount.split(' ');
   var amount = parseFloat(amount_parts[0]);
+  var currency = amount_parts[1];
   if(memo.indexOf('/') != -1){
     if(memo.indexOf('#') == -1){
       var post_url = post[1].op[1].memo.split('/');
@@ -158,9 +159,18 @@ function getContent(account,post){
         && post != null && author != null){
         var result = wait.for(steem_getContent,author,post);
         var created = result.created;
-        //if(!verifyAccountHasVoted(account,result)){
-        obj = {number,payer,memo,amount,author,post,created};
-        //}
+        if(!verifyAccountHasVoted(account,result)){
+          if(amount >= 0.1){
+            if(amount <= 0.5){
+              obj = {number,payer,memo,amount,currency,author,post,created};
+            }else{
+              amount = 0.5;
+              obj = {number,payer,memo,amount,currency,author,post,created};
+            }
+          }else{
+            debug('Send less than min');
+          }
+        }
       }else{
         debug(JSON.stringify(post[1].op[1]));
       }   
