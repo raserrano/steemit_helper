@@ -1,7 +1,7 @@
 const steem = require('steem'),
   wait = require('wait.for'),
   request = require('request'),
-  conf = require('../config/current');
+  conf = require('../config/dev');
 
 var conversionInfo = new Object()
 
@@ -16,11 +16,30 @@ module.exports = {
   votePost: function(author,permlink,weight){
     return wait.for(
       steem.broadcast.vote,
-      process.env.POSTING_KEY_PRV,
-      process.env.ACCOUNT_NAME,
+      conf.env.POSTING_KEY_PRV(),
+      conf.env.ACCOUNT_NAME(),
       author,
       permlink,
       weight);
+  },
+  commentPost: function(author,permlink){
+    //Leave a comment with #helpmein tag so I will transfer registration fee.
+    var commentMsg = "Welcome to steemit @"+author
+      +". Join #minnowsupportproject for more help. @OriginalWorks. ";
+    return wait.for(
+      steem.broadcast.comment,
+      conf.env.POSTING_KEY_PRV(),
+      author,
+      permlink,
+      conf.env.ACCOUNT_NAME(),
+      steem.formatter.commentPermlink(
+        author,
+        permlink
+      ).toLowerCase(),
+      "Welcome",
+      commentMsg,
+      {}
+    );
   },
   steem_getContent: function(author,post,callback){
     steem.api.getContent(author, post,function(err,result){
@@ -52,24 +71,28 @@ module.exports = {
       callback(err, result);
     });
   },
+  steem_getPostsByTag: function(tag,callback){
+    steem.api.getDiscussionsByCreated({"tag": tag, "limit": 4}, function(err, result) {
+      callback(err,result);
+    });
+  },
   verifyAccountHasVoted: function(account,result){
-    var pos = false;
+    var pos = 0;
     var votes = new Array();
     if(result.active_votes.length > 0){
       for(var i=0; i< result.active_votes.length;i++){
         votes.push(result.active_votes[i].voter);
       }
-      // TODO: verify that account is an array and iterate it for votes
-      //debug(JSON.stringify(votes));
-      //debug(account[0]+'found '+(votes.indexOf(account[0])!= -1));
-      // debug(account[1]+'found '+(votes.indexOf(account[1])!= -1));
-      pos = (votes.indexOf(account[0]) != -1);
-      //pos = ((votes.indexOf(account[0]) != -1)&&(votes.indexOf(account[1]) != -1));
-      //debug(pos);
+      for(var j=0;j<account.length;j++){
+        if(votes.indexOf(account[j]()) != -1){
+          pos++;
+          break;
+        }
+      }
     }
-    return pos;
+    return pos !== 0;
   },
-  calculateVoteWeight: function(account){
+  calculateVoteWeight: function(conversionInfo,globalData,account){
     var vp = account.voting_power;
     var vestingSharesParts = account.vesting_shares.split(" ");
     var vestingSharesNum = Number(vestingSharesParts[0]);
@@ -77,7 +100,7 @@ module.exports = {
     var receivedSharesNum = Number(receivedSharesParts[0]);
     var totalVests = vestingSharesNum + receivedSharesNum;
 
-    var steempower = this.getSteemPowerFromVest(totalVests);
+    var steempower = this.getSteemPowerFromVest(globalData,totalVests);
     var sp_scaled_vests = steempower / conversionInfo.steem_per_vest;
 
     var voteweight = 100;
@@ -88,13 +111,13 @@ module.exports = {
     var votingpower = (oneval / 
       (100 * (100 * voteweight) / conf.env.VOTE_POWER_1_PC())
       ) * 100;
-
     if (votingpower > 100) {
       votingpower = 100;
     }
     return votingpower*conf.env.VOTE_POWER_1_PC();
   },
-  init_conversion: function(callback) {
+  init_conversion: function(globalData,callback) {
+    var conversionInfo = new Object();
     // get some info first
     var headBlock = wait.for(this.steem_getBlockHeader_wrapper, globalData.head_block_number);
     latestBlockMoment = new Date(headBlock.timestamp);
@@ -119,8 +142,9 @@ module.exports = {
         conversionInfo.steem_to_dollar = data["data"][0]["price_usd"];
       }
     });
+    return conversionInfo;
   },
-  getSteemPowerFromVest: function(vest) {
+  getSteemPowerFromVest: function(globalData,vest) {
     try {
       return steem.formatter.vestToSteem(
         vest,

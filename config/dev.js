@@ -49,6 +49,14 @@ module.exports = {
       }
       return value;
     },
+    POSTING_KEY_PRV: function(){
+      var value = "";
+      if((process.env.POSTING_KEY_PRV !== undefined)
+        &&(process.env.POSTING_KEY_PRV !== null)){
+        value = process.env.POSTING_KEY_PRV;
+      }
+      return value;
+    },
     VOTING_ACCS: function(){
       var value = "";
       if((process.env.VOTING_ACCS !== undefined)
@@ -65,5 +73,6 @@ module.exports = {
       }
       return value;
     },
+
   }
 };
