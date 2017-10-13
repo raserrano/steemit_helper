@@ -25,7 +25,7 @@ module.exports = {
   commentPost: function(author,permlink){
     //Leave a comment with #helpmein tag so I will transfer registration fee.
     var commentMsg = "Welcome to steemit @"+author
-      +". Join #minnowsupportproject for more help. @OriginalWorks. ";
+      +". Join #minnowsupportproject for more help. @OriginalWorks";
     return wait.for(
       steem.broadcast.comment,
       conf.env.POSTING_KEY_PRV(),
