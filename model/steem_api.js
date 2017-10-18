@@ -72,9 +72,12 @@ module.exports = {
     });
   },
   steem_getPostsByTag: function(tag,callback){
-    steem.api.getDiscussionsByCreated({"tag": tag, "limit": 4}, function(err, result) {
-      callback(err,result);
-    });
+    steem.api.getDiscussionsByCreated(
+      {"tag": tag, "limit": 20}, 
+      function(err, result) {
+        callback(err,result);
+      }
+    );
   },
   verifyAccountHasVoted: function(account,result){
     var pos = 0;
@@ -125,10 +128,18 @@ module.exports = {
   init_conversion: function(globalData,callback) {
     var conversionInfo = new Object();
     // get some info first
-    var headBlock = wait.for(this.steem_getBlockHeader_wrapper, globalData.head_block_number);
+    var headBlock = wait.for(
+      this.steem_getBlockHeader_wrapper,
+      globalData.head_block_number
+    );
     latestBlockMoment = new Date(headBlock.timestamp);
-    conversionInfo.rewardfund_info = wait.for(this.steem_getRewardFund_wrapper, "post");
-    conversionInfo.price_info = wait.for(this.steem_getCurrentMedianHistoryPrice_wrapper);
+    conversionInfo.rewardfund_info = wait.for(
+      this.steem_getRewardFund_wrapper, 
+      "post"
+      );
+    conversionInfo.price_info = wait.for(
+      this.steem_getCurrentMedianHistoryPrice_wrapper
+    );
 
     conversionInfo.reward_balance = conversionInfo.rewardfund_info.reward_balance;
     conversionInfo.recent_claims = conversionInfo.rewardfund_info.recent_claims;
@@ -140,14 +151,17 @@ module.exports = {
 
     conversionInfo.steem_per_vest = globalData.total_vesting_fund_steem.replace(" STEEM", "")
       / globalData.total_vesting_shares.replace(" VESTS", "");
-    request('https://api.coinmarketcap.com/v1/ticker/steem/', function (err, response, body) {
-      if (err) {
-        conversionInfo.steem_to_dollar = 1;
-      } else {
-        var data = JSON.parse("{\"data\":"+body+"}");
-        conversionInfo.steem_to_dollar = data["data"][0]["price_usd"];
+    request(
+      'https://api.coinmarketcap.com/v1/ticker/steem/', 
+      function (err, response, body) {
+        if (err) {
+          conversionInfo.steem_to_dollar = 1;
+        } else {
+          var data = JSON.parse("{\"data\":"+body+"}");
+          conversionInfo.steem_to_dollar = data["data"][0]["price_usd"];
+        }
       }
-    });
+    );
     return conversionInfo;
   },
   getSteemPowerFromVest: function(globalData,vest) {

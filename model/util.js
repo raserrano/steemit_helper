@@ -20,7 +20,11 @@ module.exports = {
     for(var i=0; i<data.length;i++){
       if(data[i][1].op[0]=='transfer'){
         if(data[i][1].op[1].to == account){
-          var post = this.getContent([account,conf.env.ACCOUNT_NAME],data[i],"vote");
+          var post = this.getContent(
+            [account,conf.env.ACCOUNT_NAME],
+            data[i],
+            "vote"
+          );
           if(post !== null){
             console.log(JSON.stringify(post));
             posts.push(post);
@@ -33,7 +37,11 @@ module.exports = {
         return (a.amount > b.amount) ? 1 : ((b.amount > a.amount) ? -1 : 0);
       });
       this.debug(posts[posts.length-1]);
-      steem_api.votePost(posts[posts.length-1].author,posts[posts.length-1].post,weight);
+      steem_api.votePost(
+        posts[posts.length-1].author,
+        posts[posts.length-1].post,
+        weight
+      );
     }
   },
   commentOnNewUserPost: function(posts,weight){
