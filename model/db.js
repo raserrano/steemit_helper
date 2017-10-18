@@ -34,5 +34,6 @@ process.on('SIGINT', function() {
 });
 
 // Models
+require('../model/transfer');
 
 module.exports = db;

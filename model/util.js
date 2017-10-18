@@ -1,15 +1,33 @@
 const 
   wait = require('wait.for'),
   conf = require('../config/dev'),
+  db = require('./db')
   steem_api = require('./steem_api');
 module.exports = {
-  getTransfersToVoteReport: function(account,data){
+  getTransfersToVoteReport: function(account,data,type,min,max){
+  // var weight = steem_api.calculateVoteWeight(
+  //   conversionInfo,
+  //   globalData,
+  //   accounts[0]
+  // );
+  // console.log('Weight: '+weight);
     for(var i=0; i<data.length;i++){
       if(data[i][1].op[0]=='transfer'){
+        console.log(account[0]);
         if(data[i][1].op[1].to == account[0]){
-          var res = this.getContent(account,data[i],"report");
-          if(res !== null){
-            console.log(JSON.stringify(res));          
+          var res = this.getContent(account,data[i],"report",min,max);
+          if(res !== null && res !== undefined){
+            if(type === "report"){
+              console.log(JSON.stringify(res));  
+            }
+            if(type === "donate"){
+              db.model('Transfer').create(res,function(err) {
+                if (err) {
+                  console.log(res);
+                  throw err;
+                }
+              });
+            }
           }
         }
       }
@@ -37,11 +55,11 @@ module.exports = {
         return (a.amount > b.amount) ? 1 : ((b.amount > a.amount) ? -1 : 0);
       });
       this.debug(posts[posts.length-1]);
-      steem_api.votePost(
-        posts[posts.length-1].author,
-        posts[posts.length-1].post,
-        weight
-      );
+      // steem_api.votePost(
+      //   posts[posts.length-1].author,
+      //   posts[posts.length-1].post,
+      //   weight
+      // );
     }
   },
   commentOnNewUserPost: function(posts,weight){
@@ -51,10 +69,11 @@ module.exports = {
       var created = account[0].created;
       if(this.dateDiff(created) < (86400*7)){
         if(!steem_api.verifyAccountHasVoted([conf.env.ACCOUNT_NAME],posts[i])){
-          steem_api.votePost(posts[i].author,posts[i].permlink,weight);
-          wait.for(this.timeout_wrapper,5000);
-          steem_api.commentPost(posts[i].author,posts[i].permlink);
-          wait.for(this.timeout_wrapper,20000);
+          // steem_api.votePost(posts[i].author,posts[i].permlink,weight);
+          // wait.for(this.timeout_wrapper,5000);
+          // steem_api.commentPost(posts[i].author,posts[i].permlink);
+          // wait.for(this.timeout_wrapper,20000);
+          this.debug('Voted on: '+JSON.stringify(posts[i]));
         }else{
           this.debug('Account was already voted')
         }
@@ -63,13 +82,14 @@ module.exports = {
       }
     }
   },
-  getContent: function(account,post,type){
+  getContent: function(account,post,type,min,max){
     var obj = null;
     var number = post[0];
     var payer = post[1].op[1].from;
     var memo = post[1].op[1].memo;
     var amount_parts = post[1].op[1].amount.split(' ');
     var amount = parseFloat(amount_parts[0]);
+    var donation = 0;
     var currency = amount_parts[1];
     if(memo.indexOf('/') != -1){
       if(memo.indexOf('#') == -1){
@@ -88,11 +108,12 @@ module.exports = {
           }
           if(type === "report"){
             if(!steem_api.verifyAccountHasVoted(account,result)){
-              if(amount >= 0.1){
-                if(amount > 0.5){
-                  amount = 0.5;
+              if(amount >= min){
+                if(amount > max){
+                  donation = amount - max;
+                  amount = max;
                 }
-                obj = {number,payer,memo,amount,currency,author,post,created};
+                obj = {number,payer,memo,amount,donation,currency,author,post,created};
               }else{
                 this.debug("Not enough transferred");
               }
@@ -100,7 +121,6 @@ module.exports = {
               this.debug("Already voted on post")
             }
           }
-
         }else{
           this.debug(JSON.stringify(post[1].op[1]));
         }   
@@ -111,6 +131,18 @@ module.exports = {
       this.debug('URL not found, donation');
     }
     return obj;
+  },
+  getLastVoted: function(callback){
+    db.model('Transfer').find({}).limit(1).sort({number: -1}).exec(
+      function(err,data) {
+        callback(err,data);
+      });
+  },
+  getQueue: function(callback){
+    db.model('Transfer').find({}).sort({number: -1}).exec(
+      function(err,data) {
+        callback(err,data);
+      });
   },
   dateDiff: function(when){
     var then = new Date(when);
