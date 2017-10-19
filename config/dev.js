@@ -13,13 +13,18 @@ module.exports = {
     },
     conn: function(database) {
       var uri = '';
-      if (!database.auth) {
-        uri = 'mongodb://' + database.host + ':' +
-          database.port + '/' + database.database;
-      } else {
-        uri = 'mongodb://' + database.username + ':' +
-          database.password + '@' + database.host + ':' +
-          database.port + '/' + database.database;
+      if((process.env.MONGODB_URI !== undefined)
+        && (process.env.MONGODB_URI !== null)){
+        uri = process.env.MONGODB_URI;
+      }else{
+        if (!database.auth) {
+          uri = 'mongodb://' + database.host + ':' +
+            database.port + '/' + database.database;
+        } else {
+          uri = 'mongodb://' + database.username + ':' +
+            database.password + '@' + database.host + ':' +
+            database.port + '/' + database.database;
+        }
       }
       return uri.toString();
     },
@@ -73,6 +78,21 @@ module.exports = {
       }
       return value;
     },
-
+    VOTE_ACTIVE: function(){
+      var value = false;
+      if((process.env.VOTE_ACTIVE !== undefined)
+        &&(process.env.VOTE_ACTIVE !== null)){
+        value = process.env.VOTE_ACTIVE;
+      }
+      return value;
+    },
+    COMMENT_ACTIVE: function(){
+      var value = false;
+      if((process.env.COMMENT_ACTIVE !== undefined)
+        &&(process.env.COMMENT_ACTIVE !== null)){
+        value = process.env.COMMENT_ACTIVE;
+      }
+      return value;
+    },
   }
 };

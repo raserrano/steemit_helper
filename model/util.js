@@ -7,9 +7,15 @@ module.exports = {
     for(var i=0; i<data.length;i++){
       if(data[i][1].op[0]=='transfer'){
         if(data[i][1].op[1].to == account[0]){
-          var res = this.getContent(account,data[i],"report");
+          var res = this.getContent(account,data[i],true);
           if(res !== null){
-            console.log(JSON.stringify(res));          
+            if(res.voted === false){
+              console.log(JSON.stringify(res));
+            }
+          }else{
+            this.debug(
+              'Could not find content for transfer: '+JSON.stringify(data[i])
+            );
           }
         }
       }
@@ -20,11 +26,7 @@ module.exports = {
     for(var i=0; i<data.length;i++){
       if(data[i][1].op[0]=='transfer'){
         if(data[i][1].op[1].to == account){
-          var post = this.getContent(
-            [account,conf.env.ACCOUNT_NAME],
-            data[i],
-            "vote"
-          );
+          var post = this.getContent(data[i]);
           if(post !== null){
             console.log(JSON.stringify(post));
             posts.push(post);
@@ -37,11 +39,22 @@ module.exports = {
         return (a.amount > b.amount) ? 1 : ((b.amount > a.amount) ? -1 : 0);
       });
       this.debug(posts[posts.length-1]);
-      steem_api.votePost(
-        posts[posts.length-1].author,
-        posts[posts.length-1].post,
-        weight
-      );
+      if(conf.env.VOTE_ACTIVE()){
+        if(!steem_api.verifyAccountHasVoted(account,posts[posts.length-1])){
+          steem_api.votePost(
+            posts[posts.length-1].author,
+            posts[posts.length-1].post,
+            weight
+          );
+          wait.for(this.timeout_wrapper,5000);
+        }else{
+          this.debug('Already voted on post');
+        }
+      }else{
+        this.debug(
+          'Voting is not active, voting: '+JSON.stringify(posts.length-1)
+        );
+      }
     }
   },
   commentOnNewUserPost: function(posts,weight){
@@ -51,10 +64,22 @@ module.exports = {
       var created = account[0].created;
       if(this.dateDiff(created) < (86400*7)){
         if(!steem_api.verifyAccountHasVoted([conf.env.ACCOUNT_NAME],posts[i])){
-          steem_api.votePost(posts[i].author,posts[i].permlink,weight);
-          wait.for(this.timeout_wrapper,5000);
-          steem_api.commentPost(posts[i].author,posts[i].permlink);
-          wait.for(this.timeout_wrapper,20000);
+          if(conf.env.VOTE_ACTIVE()){
+            steem_api.votePost(posts[i].author,posts[i].permlink,weight);
+            wait.for(this.timeout_wrapper,5000);
+          }else{
+            this.debug(
+              'Voting is not active, voting: '+JSON.stringify(posts[i])
+            );
+          }
+          if(conf.env.COMMENT_ACTIVE()){
+            steem_api.commentPost(posts[i].author,posts[i].permlink);
+            wait.for(this.timeout_wrapper,20000);
+          }else{
+            this.debug(
+              'Commenting is not active, commenting: '+JSON.stringify(posts[i])
+            );
+          }
         }else{
           this.debug('Account was already voted')
         }
@@ -63,7 +88,7 @@ module.exports = {
       }
     }
   },
-  getContent: function(account,post,type){
+  getContent: function(account,post,to_vote){
     var obj = null;
     var number = post[0];
     var payer = post[1].op[1].from;
@@ -80,27 +105,15 @@ module.exports = {
         if(post != undefined && author != undefined 
           && post != null && author != null){
           var result = wait.for(steem_api.steem_getContent,author,post);
-          var created = result.created;
-          if(type === "vote"){
-            if(steem_api.verifyAccountHasVoted(account,result)){
-              obj = {number,payer,memo,amount,currency,author,post,created};
-            }
+          if((result !== undefined) && (result !== null)){
+            var created = result.created;
+            var voted = (
+              steem_api.verifyAccountHasVoted(account,result) === to_vote
+            );
+            obj = {number,payer,memo,amount,currency,author,post,voted,created};
+          }else{
+            this.debug('Could not find content for: '+memo);
           }
-          if(type === "report"){
-            if(!steem_api.verifyAccountHasVoted(account,result)){
-              if(amount >= 0.1){
-                if(amount > 0.5){
-                  amount = 0.5;
-                }
-                obj = {number,payer,memo,amount,currency,author,post,created};
-              }else{
-                this.debug("Not enough transferred");
-              }
-            }else{
-              this.debug("Already voted on post")
-            }
-          }
-
         }else{
           this.debug(JSON.stringify(post[1].op[1]));
         }   
