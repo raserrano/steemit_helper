@@ -1,6 +1,7 @@
 const
   wait = require('wait.for'),
   utils = require('../model/util'),
+  conf = require('../config/dev'),
   steem_api = require('../model/steem_api');
 // Generates a report for the not voted posts of account
 wait.launchFiber(function(){
@@ -9,7 +10,11 @@ wait.launchFiber(function(){
   var globalData = wait.for(steem_api.steem_getSteemGlobaleProperties_wrapper);
   var conversionInfo = steem_api.init_conversion(globalData);
   var results = wait.for(steem_api.getTransfers,'treeplanter',max,limit);
-  utils.getTransfersToVoteReport(['treeplanter'],results,"report",max,limit);
-  utils.debug('Finish report');
+  utils.getTransfersToVoteReport(
+    'treeplanter',
+    results,
+    conf.env.MIN_DONATION(),
+    conf.env.MAX_DONATION()
+  );
   process.exit();
 });

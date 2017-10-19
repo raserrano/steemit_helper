@@ -5,7 +5,7 @@ const steem = require('steem'),
 
 var conversionInfo = new Object()
 
-steem.config.set('websocket',conf.websockets[0]);
+steem.config.set('websocket',conf.websockets[1]);
 
 module.exports = {
   getTransfers:function(name,max,limit,callback){
