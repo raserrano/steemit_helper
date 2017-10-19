@@ -94,5 +94,21 @@ module.exports = {
       }
       return value;
     },
+    MIN_DONATION: function(){
+      var value = 0.1;
+      if((process.env.MIN_DONATION !== undefined)
+        &&(process.env.MIN_DONATION !== null)){
+        value = process.env.MIN_DONATION;
+      }
+      return value;
+    },
+    MAX_DONATION: function(){
+      var value = 0.25;
+      if((process.env.MAX_DONATION !== undefined)
+        &&(process.env.MAX_DONATION !== null)){
+        value = process.env.MAX_DONATION;
+      }
+      return value;
+    },
   }
 };

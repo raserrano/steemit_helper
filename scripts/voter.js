@@ -7,7 +7,7 @@ const
 // Voting for high bids
 wait.launchFiber(function(){
   var max = 10000000;
-  var limit = 50;
+  var limit = 100;
   var globalData = wait.for(steem_api.steem_getSteemGlobaleProperties_wrapper);
   var conversionInfo = steem_api.init_conversion(globalData);
   var accounts = wait.for(

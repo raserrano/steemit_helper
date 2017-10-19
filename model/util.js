@@ -3,14 +3,20 @@ const
   conf = require('../config/dev'),
   steem_api = require('./steem_api');
 module.exports = {
-  getTransfersToVoteReport: function(account,data){
+  getTransfersToVoteReport: function(account,data,min,max){
     for(var i=0; i<data.length;i++){
       if(data[i][1].op[0]=='transfer'){
-        if(data[i][1].op[1].to == account[0]){
-          var res = this.getContent(account,data[i],true);
+        if(data[i][1].op[1].to == account){
+          var res = this.getContent([account],data[i],true);
           if(res !== null){
-            if(res.voted === false){
-              console.log(JSON.stringify(res));
+            if(!res.voted){
+              if(res.amount > min){
+                console.log(JSON.stringify(res));
+              }else{
+                this.debug('Transfered amount is not greater than MIN: '+min);
+              }
+            }else{
+              this.debug('Already voted');
             }
           }else{
             this.debug(
@@ -26,10 +32,11 @@ module.exports = {
     for(var i=0; i<data.length;i++){
       if(data[i][1].op[0]=='transfer'){
         if(data[i][1].op[1].to == account){
-          var post = this.getContent(data[i]);
+          var post = this.getContent([account,conf.env.ACCOUNT_NAME()],data[i],true);
           if(post !== null){
-            console.log(JSON.stringify(post));
-            posts.push(post);
+            if(!post.voted){
+              posts.push(post);
+            }
           }
         }
       }
@@ -40,19 +47,15 @@ module.exports = {
       });
       this.debug(posts[posts.length-1]);
       if(conf.env.VOTE_ACTIVE()){
-        if(!steem_api.verifyAccountHasVoted(account,posts[posts.length-1])){
-          steem_api.votePost(
-            posts[posts.length-1].author,
-            posts[posts.length-1].post,
-            weight
-          );
-          wait.for(this.timeout_wrapper,5000);
-        }else{
-          this.debug('Already voted on post');
-        }
+        steem_api.votePost(
+          posts[posts.length-1].author,
+          posts[posts.length-1].post,
+          weight
+        );
+        wait.for(this.timeout_wrapper,5000);
       }else{
         this.debug(
-          'Voting is not active, voting: '+JSON.stringify(posts.length-1)
+          'Voting is not active, voting: '+JSON.stringify(posts[posts.length-1])
         );
       }
     }
@@ -88,7 +91,7 @@ module.exports = {
       }
     }
   },
-  getContent: function(account,post,to_vote){
+  getContent: function(account,post){
     var obj = null;
     var number = post[0];
     var payer = post[1].op[1].from;
@@ -107,9 +110,7 @@ module.exports = {
           var result = wait.for(steem_api.steem_getContent,author,post);
           if((result !== undefined) && (result !== null)){
             var created = result.created;
-            var voted = (
-              steem_api.verifyAccountHasVoted(account,result) === to_vote
-            );
+            var voted = steem_api.verifyAccountHasVoted(account,result);
             obj = {number,payer,memo,amount,currency,author,post,voted,created};
           }else{
             this.debug('Could not find content for: '+memo);
