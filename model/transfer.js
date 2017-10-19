@@ -9,7 +9,7 @@ var transferSchema = new Schema({
   payer: { type: String, required: true},
   memo: { type: String, required: true},
   amount: { type: Number, required: true},
-  donation: { type: Number, required: true},
+  donation: { type: Number, required: false},
   currency: { type: String, required: true},
   author: { type: String, required: true},
   post: { type: String, required: true},

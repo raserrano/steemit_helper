@@ -27,9 +27,13 @@ wait.launchFiber(function(){
     10000
   );
   // Process new transfers
-  console.log('Got transfers: '+results_to.length);
-  utils.getTransfersToVoteReport([conf.env.ACCOUNT_NAME()],results_to,"donate",0.1,0.25);
-
+  var results = wait.for(steem_api.getTransfers,conf.env.ACCOUNT_NAME(),100000,100);
+  utils.getTransfersToVote(
+    conf.env.ACCOUNT_NAME(),
+    results,
+    conf.env.MIN_DONATION(),
+    conf.env.MAX_DONATION()
+  );
 
   // Get not voted posts from DB
   var queue = wait.for(utils.getQueue);

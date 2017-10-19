@@ -28,6 +28,27 @@ module.exports = {
       }
     }
   },
+  getTransfersToVote: function(account,data,min,max){
+    for(var i=0; i<data.length;i++){
+      if(data[i][1].op[0]=='transfer'){
+        if(data[i][1].op[1].to == account){
+          var res = this.getContent([account],data[i],true);
+          if(res !== null){
+            db.model('Transfer').create(res,function(err) {
+              if(err){
+                console.log(res);
+                throw err;
+              }
+            });
+          }else{
+            this.debug(
+              'Could not find content for transfer: '+JSON.stringify(data[i])
+            );
+          }
+        }
+      }
+    }
+  },
   startVotingProcess: function(account,data,weight){
     var posts = new Array();
     for(var i=0; i<data.length;i++){
@@ -129,7 +150,7 @@ module.exports = {
     return obj;
   },
   getLastVoted: function(callback){
-    db.model('Transfer').find({}).limit(1).sort({number: -1}).exec(
+    db.model('Transfer').find({voted:true}).limit(1).sort({number: -1}).exec(
       function(err,data) {
         callback(err,data);
       });
