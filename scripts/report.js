@@ -9,7 +9,7 @@ wait.launchFiber(function(){
   var globalData = wait.for(steem_api.steem_getSteemGlobaleProperties_wrapper);
   var conversionInfo = steem_api.init_conversion(globalData);
   var results = wait.for(steem_api.getTransfers,'treeplanter',max,limit);
-  utils.getTransfersToVoteReport(['treeplanter'],results);
-  console.log('Finish report');
+  utils.getTransfersToVoteReport(['treeplanter'],results,"report",max,limit);
+  utils.debug('Finish report');
   process.exit();
 });

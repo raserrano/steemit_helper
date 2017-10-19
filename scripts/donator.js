@@ -23,8 +23,8 @@ wait.launchFiber(function(){
   var results_to = wait.for(
     steem_api.getTransfers,
     conf.env.ACCOUNT_NAME(),
-    last_voted+100,
-    100
+    last_voted,
+    10000
   );
   // Process new transfers
   console.log('Got transfers: '+results_to.length);

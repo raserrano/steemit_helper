@@ -13,7 +13,6 @@ module.exports = {
   // console.log('Weight: '+weight);
     for(var i=0; i<data.length;i++){
       if(data[i][1].op[0]=='transfer'){
-        console.log(account[0]);
         if(data[i][1].op[1].to == account[0]){
           var res = this.getContent(account,data[i],"report",min,max);
           if(res !== null && res !== undefined){
