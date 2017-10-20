@@ -5,7 +5,7 @@ const steem = require('steem'),
 
 var conversionInfo = new Object()
 
-steem.config.set('websocket',conf.websockets[1]);
+steem.config.set('websocket',conf.websockets[0]);
 
 module.exports = {
   getTransfers:function(name,max,limit,callback){
@@ -73,7 +73,7 @@ module.exports = {
   },
   steem_getPostsByTag: function(tag,callback){
     steem.api.getDiscussionsByCreated(
-      {"tag": tag, "limit": 20}, 
+      {"tag": tag, "limit": 10}, 
       function(err, result) {
         callback(err,result);
       }
@@ -101,25 +101,41 @@ module.exports = {
     }
     return pos !== 0;
   },
-  calculateVoteWeight: function(conversionInfo,globalData,account){
+  calculateVoteWeight: function(account,target_value){
+    // Still need to figure out what is this for
+    var globalData = wait.for(steem_api.steem_getSteemGlobaleProperties_wrapper);
+    //console.log('Global data: '+JSON.stringify(globalData));
+    var conversionInfo = steem_api.init_conversion(globalData);
+    //console.log('Conversion infor: '+JSON.stringify(conversionInfo));
+    
+    // Manual calcs
     var vp = account.voting_power;
+    //console.log('voting_power: '+vp);
     var vestingSharesParts = account.vesting_shares.split(" ");
-    var vestingSharesNum = Number(vestingSharesParts[0]);
+    //console.log('vesting_shares: '+vestingSharesParts[0]);
     var receivedSharesParts = account.received_vesting_shares.split(" ");
-    var receivedSharesNum = Number(receivedSharesParts[0]);
-    var totalVests = vestingSharesNum + receivedSharesNum;
+
+    //console.log('received_vesting_shares: '+receivedSharesParts[0]);
+    var totalVests = 
+      parseFloat(vestingSharesParts[0]) + parseFloat(receivedSharesParts[0]);
+    //console.log('Total vests: '+totalVests);
 
     var steempower = this.getSteemPowerFromVest(globalData,totalVests);
+    //console.log('Steempower: '+steempower);
+
     var sp_scaled_vests = steempower / conversionInfo.steem_per_vest;
+    //console.log('sp_scaled_vests: '+sp_scaled_vests);
 
     var voteweight = 100;
+    var up = target_value * 52;
+    //console.log('Up: '+up);
+    var down = sp_scaled_vests * 100 * conversionInfo.reward_pool * conversionInfo.sbd_per_steem;
+    //console.log('Down: '+down);
+    var oneval = up / down;
+    //console.log("oneval: " + oneval);
 
-    var oneval = (0.1 * 52) / (sp_scaled_vests * 100
-      * conversionInfo.reward_pool * conversionInfo.sbd_per_steem);
-
-    var votingpower = (oneval / 
-      (100 * (100 * voteweight) / conf.env.VOTE_POWER_1_PC())
-      ) * 100;
+    var votingpower = (oneval / (100 * (100 * voteweight) / conf.env.VOTE_POWER_1_PC())) * 100;
+    //console.log('Voting power: '+votingpower);
     if (votingpower > 100) {
       votingpower = 100;
     }

@@ -1,13 +1,14 @@
 const 
   wait = require('wait.for'),
   conf = require('../config/dev'),
+  db = require('./db')
   steem_api = require('./steem_api');
 module.exports = {
   getTransfersToVoteReport: function(account,data,min,max){
     for(var i=0; i<data.length;i++){
       if(data[i][1].op[0]=='transfer'){
         if(data[i][1].op[1].to == account){
-          var res = this.getContent([account],data[i],true);
+          var res = this.getContent([account],data[i]);
           if(res !== null){
             if(!res.voted){
               if(res.amount > min){
@@ -27,12 +28,34 @@ module.exports = {
       }
     }
   },
-  startVotingProcess: function(account,data,weight){
+  getTransfersToVote: function(account,data,min,max){
+    for(var i=0; i<data.length;i++){
+      if(data[i][1].op[0]=='transfer'){
+        if(data[i][1].op[1].to == account){
+          var res = this.getContent([account],data[i]);
+          if(res !== null){
+            db.model('Transfer').create(res,function(err) {
+              if(err){
+                console.log(res);
+                throw err;
+              }
+            });
+          }else{
+            this.debug(
+              'Could not find content for transfer: '+JSON.stringify(data[i])
+            );
+          }
+        }
+      }
+    }
+  },
+  startVotingProcess: function(account,data,weight,voter){
+    var vp = voter.voting_power;
     var posts = new Array();
     for(var i=0; i<data.length;i++){
       if(data[i][1].op[0]=='transfer'){
         if(data[i][1].op[1].to == account){
-          var post = this.getContent([account,conf.env.ACCOUNT_NAME()],data[i],true);
+          var post = this.getContent([account,conf.env.ACCOUNT_NAME()],data[i]);
           if(post !== null){
             if(!post.voted){
               posts.push(post);
@@ -47,15 +70,83 @@ module.exports = {
       });
       this.debug(posts[posts.length-1]);
       if(conf.env.VOTE_ACTIVE()){
-        steem_api.votePost(
-          posts[posts.length-1].author,
-          posts[posts.length-1].post,
-          weight
-        );
-        wait.for(this.timeout_wrapper,5000);
+        if (vp >= (conf.env.MIN_VOTING_POWER() * conf.env.VOTE_POWER_1_PC())) {
+          steem_api.votePost(
+            posts[posts.length-1].author,
+            posts[posts.length-1].post,
+            weight
+          );
+          wait.for(this.timeout_wrapper,5000);
+        }
       }else{
         this.debug(
           'Voting is not active, voting: '+JSON.stringify(posts[posts.length-1])
+        );
+      }
+    }
+  },
+  startVotingDonationsProcess: function(account,data,voter){
+    for(var i=0;i<data.length;i++){
+      console.log(data[i]);
+      break;
+      if(data[i].amount>=conf.env.MIN_DONATION()){
+        var amount_to_be_voted = data[i].amount;
+        if(data[i].amount>conf.env.MAX_DONATION()){
+          amount_to_be_voted = conf.env.MAX_DONATION();
+          data[i].donation = data[i].amount - conf.env.MAX_DONATION();
+        }
+        var voter = wait.for(
+          steem_api.steem_getAccounts_wrapper,[conf.env.ACCOUNT_NAME()]
+        );
+        var vp = voter.voting_power;
+        var weight = steem_api.calculateVoteWeight(
+          voter[0],
+          (amount_to_be_voted*1.5)
+        );
+        if(conf.env.VOTE_ACTIVE()){
+          if (vp >= (conf.env.MIN_VOTING_POWER() * conf.env.VOTE_POWER_1_PC())){
+            if(conf.env.VOTE_ACTIVE()){
+              steem_api.votePost(data[i].author,data[i].memo,weight);
+              wait.for(this.timeout_wrapper,5000);
+            }else{
+              this.debug(
+                'Voting is not active, voting: '+JSON.stringify(data[i])
+              );
+            }
+            if(conf.env.COMMENT_ACTIVE()){
+              steem_api.commentPost(data[i].author,data[i].memo,weight);
+              wait.for(this.timeout_wrapper,20000);
+            }else{
+              this.debug(
+                'Commenting is not active, commenting: '+JSON.stringify(data[i])
+              );
+            }
+            db.model('Transfer').update(
+              {_id:data[i]._id},
+              {donation:data[i].donation,voted:true},
+              function(err) {
+                if(err){
+                  console.log(res);
+                  throw err;
+                }
+              }
+            );
+          }
+        }else{
+          this.debug(
+            'Voting is not active, voting: '+JSON.stringify(data[i])
+          );
+        }
+      }else{
+        db.model('Transfer').update(
+          {_id:data[i]._id},
+          {donation:data[i].amount},
+          function(err) {
+            if(err){
+              console.log(res);
+              throw err;
+            }
+          }
         );
       }
     }
@@ -98,10 +189,12 @@ module.exports = {
     var memo = post[1].op[1].memo;
     var amount_parts = post[1].op[1].amount.split(' ');
     var amount = parseFloat(amount_parts[0]);
+    var donation = 0;
     var currency = amount_parts[1];
     if(memo.indexOf('/') != -1){
       if(memo.indexOf('#') == -1){
         var post_url = post[1].op[1].memo.split('/');
+        post_url = post_url.filter(function(e){return e});
         var author = post_url[post_url.length-2]
           .substr(1, post_url[post_url.length-2].length);
         var post = post_url[post_url.length-1];
@@ -125,6 +218,24 @@ module.exports = {
       this.debug('URL not found, donation');
     }
     return obj;
+  },
+  getLastVoted: function(callback){
+    db.model('Transfer').find({voted:true}).limit(1).sort({number: -1}).exec(
+      function(err,data) {
+        callback(err,data);
+      });
+  },
+  getLastTransfer: function(callback){
+    db.model('Transfer').find().limit(1).sort({number: -1}).exec(
+      function(err,data) {
+        callback(err,data);
+      });
+  },
+  getQueue: function(callback){
+    db.model('Transfer').find({voted:false,donation:{$gt:0}}).sort({number: 1}).exec(
+      function(err,data) {
+        callback(err,data);
+      });
   },
   dateDiff: function(when){
     var then = new Date(when);
