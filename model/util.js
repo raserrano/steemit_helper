@@ -49,7 +49,8 @@ module.exports = {
       }
     }
   },
-  startVotingProcess: function(account,data,weight){
+  startVotingProcess: function(account,data,weight,voter){
+    var vp = voter.voting_power;
     var posts = new Array();
     for(var i=0; i<data.length;i++){
       if(data[i][1].op[0]=='transfer'){
@@ -69,12 +70,50 @@ module.exports = {
       });
       this.debug(posts[posts.length-1]);
       if(conf.env.VOTE_ACTIVE()){
-        steem_api.votePost(
-          posts[posts.length-1].author,
-          posts[posts.length-1].post,
-          weight
+        if (vp >= (conf.env.MIN_VOTING_POWER() * conf.env.VOTE_POWER_1_PC())) {
+          steem_api.votePost(
+            posts[posts.length-1].author,
+            posts[posts.length-1].post,
+            weight
+          );
+          wait.for(this.timeout_wrapper,5000);
+        }
+      }else{
+        this.debug(
+          'Voting is not active, voting: '+JSON.stringify(posts[posts.length-1])
         );
-        wait.for(this.timeout_wrapper,5000);
+      }
+    }
+  },
+  startVotingProcess: function(account,data,weight,voter){
+    var vp = voter.voting_power;
+    var posts = new Array();
+    for(var i=0; i<data.length;i++){
+      if(data[i][1].op[0]=='transfer'){
+        if(data[i][1].op[1].to == account){
+          var post = this.getContent([account,conf.env.ACCOUNT_NAME()],data[i],true);
+          if(post !== null){
+            if(!post.voted){
+              posts.push(post);
+            }
+          }
+        }
+      }
+    }
+    if(posts.length > 0){
+      posts.sort(function(a,b) {
+        return (a.amount > b.amount) ? 1 : ((b.amount > a.amount) ? -1 : 0);
+      });
+      this.debug(posts[posts.length-1]);
+      if(conf.env.VOTE_ACTIVE()){
+        if (vp >= (conf.env.MIN_VOTING_POWER() * conf.env.VOTE_POWER_1_PC())) {
+          steem_api.votePost(
+            posts[posts.length-1].author,
+            posts[posts.length-1].post,
+            weight
+          );
+          wait.for(this.timeout_wrapper,5000);
+        }
       }else{
         this.debug(
           'Voting is not active, voting: '+JSON.stringify(posts[posts.length-1])
@@ -125,6 +164,7 @@ module.exports = {
     if(memo.indexOf('/') != -1){
       if(memo.indexOf('#') == -1){
         var post_url = post[1].op[1].memo.split('/');
+        post_url = post_url.filter(function(e){return e});
         var author = post_url[post_url.length-2]
           .substr(1, post_url[post_url.length-2].length);
         var post = post_url[post_url.length-1];
@@ -155,8 +195,14 @@ module.exports = {
         callback(err,data);
       });
   },
+  getLastTransfer: function(callback){
+    db.model('Transfer').find().limit(1).sort({number: -1}).exec(
+      function(err,data) {
+        callback(err,data);
+      });
+  },
   getQueue: function(callback){
-    db.model('Transfer').find({}).sort({number: -1}).exec(
+    db.model('Transfer').find({voted:false}).sort({number: -1}).exec(
       function(err,data) {
         callback(err,data);
       });

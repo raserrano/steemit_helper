@@ -78,6 +78,14 @@ module.exports = {
       }
       return value;
     },
+    MIN_VOTING_POWER: function(){
+      var value = 70;
+      if((process.env.MIN_VOTING_POWER !== undefined)
+        &&(process.env.MIN_VOTING_POWER !== null)){
+        value = process.env.MIN_VOTING_POWER;
+      }
+      return value;
+    },
     VOTE_ACTIVE: function(){
       var value = false;
       if((process.env.VOTE_ACTIVE !== undefined)

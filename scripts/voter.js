@@ -8,17 +8,7 @@ const
 wait.launchFiber(function(){
   var max = 10000000;
   var limit = 100;
-  var globalData = wait.for(steem_api.steem_getSteemGlobaleProperties_wrapper);
-  var conversionInfo = steem_api.init_conversion(globalData);
-  var accounts = wait.for(
-    steem_api.steem_getAccounts_wrapper,[conf.env.ACCOUNT_NAME()]
-  );
   
-  var weight = steem_api.calculateVoteWeight(
-    conversionInfo,
-    globalData,
-    accounts[0]
-  );
   var accounts_to = conf.env.VOTING_ACCS().split(',');
   for(var i=0;i<accounts_to.length;i++){
     utils.debug('Votes for '+accounts_to[i]);
@@ -28,7 +18,11 @@ wait.launchFiber(function(){
       max,
       limit
     );
-    utils.startVotingProcess(accounts_to[i],results_to,weight);
+    var voter = wait.for(
+      steem_api.steem_getAccounts_wrapper,[conf.env.ACCOUNT_NAME()]
+    );
+    var weight = steem_api.calculateVoteWeight(voter[0],0.005);
+    utils.startVotingProcess(accounts_to[i],results_to,weight,voter[0]);
   }
   console.log('Finish voting');
   process.exit();

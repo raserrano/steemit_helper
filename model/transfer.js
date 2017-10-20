@@ -25,7 +25,6 @@ transferSchema.pre('save', function(next) {
     this.created_at = currentDate;
   }
   next();
-  console.log('Transfer added!');
 });
 
 module.exports = mongoose.model('Transfer', transferSchema);
