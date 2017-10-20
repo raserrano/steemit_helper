@@ -23,9 +23,13 @@ module.exports = {
       weight);
   },
   commentPost: function(author,permlink){
-    //Leave a comment with #helpmein tag so I will transfer registration fee.
     var commentMsg = "Welcome to steemit @"+author
-      +". Join #minnowsupportproject for more help. @OriginalWorks";
+      +". Join #minnowsupportproject for more help. "+
+      "Leave a comment with #helpmein tag so I will transfer registration fee."+
+      "@OriginalWorks "+
+      "If you want a little boost in your posts and also help the "+
+      " evironment try @treeplanter ."+
+      "Use @tipu to give users a 0.1 SBD tip. ";
     return wait.for(
       steem.broadcast.comment,
       conf.env.POSTING_KEY_PRV(),
