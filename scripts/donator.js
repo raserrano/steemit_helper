@@ -52,13 +52,7 @@ wait.launchFiber(function(){
   }
   // Get not voted posts from DB
   var queue = wait.for(utils.getQueue);
-
-  
-
-  // recalculate weight;
-
-  // Working vote weight calculation and also the vote and post magic
-
+  utils.startVotingDonationsProcess(conf.env.ACCOUNT_NAME(),queue,accounts[0]);
   console.log('Finish voting donations');
   process.exit();
 });

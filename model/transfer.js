@@ -13,6 +13,7 @@ var transferSchema = new Schema({
   currency: { type: String, required: true},
   author: { type: String, required: true},
   post: { type: String, required: true},
+  voted: { type: Boolean, required: true},
   created: { type: String, required: true},
   created_at: Date,
   updated_at: Date,

@@ -9,7 +9,7 @@ wait.launchFiber(function(){
   var accounts = wait.for(
     steem_api.steem_getAccounts_wrapper,[conf.env.ACCOUNT_NAME()]
   );
-  var weight = steem_api.calculateVoteWeight(accounts[0]);
+  var weight = steem_api.calculateVoteWeight(accounts[0],0.002);
   var posts = wait.for(steem_api.steem_getPostsByTag,"introduceyourself");
   utils.commentOnNewUserPost(posts,weight);
   console.log('Finish commenting new users');
