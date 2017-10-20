@@ -13,6 +13,7 @@ var transferSchema = new Schema({
   currency: { type: String, required: true},
   author: { type: String, required: true},
   post: { type: String, required: true},
+  voted: { type: Boolean, required: true},
   created: { type: String, required: true},
   created_at: Date,
   updated_at: Date,
@@ -23,9 +24,11 @@ transferSchema.pre('save', function(next) {
   this.updated_at = currentDate;
   if (!this.created_at) {
     this.created_at = currentDate;
+  }  
+  if (!this.donation) {
+    this.donation = 0;
   }
   next();
-  console.log('Transfer added!');
 });
 
 module.exports = mongoose.model('Transfer', transferSchema);
