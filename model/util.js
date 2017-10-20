@@ -89,36 +89,64 @@ module.exports = {
     for(var i=0;i<data.length;i++){
       console.log(data[i]);
       break;
-      // var post = this.getContent([conf.env.ACCOUNT_NAME()],data[i]);
-      // var result = wait.for(steem_api.steem_getContent,author,post);
-      // var voted = steem_api.verifyAccountHasVoted(account,result);
-      var voter = wait.for(
-        steem_api.steem_getAccounts_wrapper,[conf.env.ACCOUNT_NAME()]
-      );
-      var vp = voter.voting_power;
-      var weight = steem_api.calculateVoteWeight(voter[0],(data[i].amount*1.5));
-      if(conf.env.VOTE_ACTIVE()){
-        if (vp >= (conf.env.MIN_VOTING_POWER() * conf.env.VOTE_POWER_1_PC())) {
-          if(conf.env.VOTE_ACTIVE()){
-            steem_api.votePost(posts[i].author,posts[i].permlink,weight);
-            wait.for(this.timeout_wrapper,5000);
-          }else{
-            this.debug(
-              'Voting is not active, voting: '+JSON.stringify(posts[i])
+      if(data[i].amount>=conf.env.MIN_DONATION()){
+        var amount_to_be_voted = data[i].amount;
+        if(data[i].amount>conf.env.MAX_DONATION()){
+          amount_to_be_voted = conf.env.MAX_DONATION();
+          data[i].donation = data[i].amount - conf.env.MAX_DONATION();
+        }
+        var voter = wait.for(
+          steem_api.steem_getAccounts_wrapper,[conf.env.ACCOUNT_NAME()]
+        );
+        var vp = voter.voting_power;
+        var weight = steem_api.calculateVoteWeight(
+          voter[0],
+          (amount_to_be_voted*1.5)
+        );
+        if(conf.env.VOTE_ACTIVE()){
+          if (vp >= (conf.env.MIN_VOTING_POWER() * conf.env.VOTE_POWER_1_PC())){
+            if(conf.env.VOTE_ACTIVE()){
+              steem_api.votePost(data[i].author,data[i].memo,weight);
+              wait.for(this.timeout_wrapper,5000);
+            }else{
+              this.debug(
+                'Voting is not active, voting: '+JSON.stringify(data[i])
+              );
+            }
+            if(conf.env.COMMENT_ACTIVE()){
+              steem_api.commentPost(data[i].author,data[i].memo,weight);
+              wait.for(this.timeout_wrapper,20000);
+            }else{
+              this.debug(
+                'Commenting is not active, commenting: '+JSON.stringify(data[i])
+              );
+            }
+            db.model('Transfer').update(
+              {_id:data[i]._id},
+              {donation:data[i].donation,voted:true},
+              function(err) {
+                if(err){
+                  console.log(res);
+                  throw err;
+                }
+              }
             );
           }
-          if(conf.env.COMMENT_ACTIVE()){
-            steem_api.commentPost(posts[i].author,posts[i].permlink);
-            wait.for(this.timeout_wrapper,20000);
-          }else{
-            this.debug(
-              'Commenting is not active, commenting: '+JSON.stringify(posts[i])
-            );
-          }
+        }else{
+          this.debug(
+            'Voting is not active, voting: '+JSON.stringify(data[i])
+          );
         }
       }else{
-        this.debug(
-          'Voting is not active, voting: '+JSON.stringify(posts[posts.length-1])
+        db.model('Transfer').update(
+          {_id:data[i]._id},
+          {donation:data[i].amount},
+          function(err) {
+            if(err){
+              console.log(res);
+              throw err;
+            }
+          }
         );
       }
     }
@@ -204,7 +232,7 @@ module.exports = {
       });
   },
   getQueue: function(callback){
-    db.model('Transfer').find({voted:false}).sort({number: -1}).exec(
+    db.model('Transfer').find({voted:false,donation:{$gt:0}}).sort({number: 1}).exec(
       function(err,data) {
         callback(err,data);
       });
