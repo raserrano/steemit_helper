@@ -14,7 +14,7 @@ var transferSchema = new Schema({
   author: { type: String, required: true},
   post: { type: String, required: true},
   voted: { type: Boolean, required: true},
-  created: { type: String, required: true},
+  created: { type: Date, required: true},
   created_at: Date,
   updated_at: Date,
 });
@@ -28,6 +28,7 @@ transferSchema.pre('save', function(next) {
   if (!this.donation) {
     this.donation = 0;
   }
+  this.created = new Date(this.created);
   next();
 });
 
