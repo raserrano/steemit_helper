@@ -237,6 +237,28 @@ module.exports = {
         callback(err,data);
       });
   },
+  getReport: function(period,is_voted,callback){
+    var today = new Date();
+    var cutoff = new Date();
+    cutoff.setDate(cutoff.getDate()-period);
+    console.log(cutoff);
+    console.log(today);
+    db.model('Transfer').aggregate(
+      {$project:{
+        payer:"$payer",
+        amount:"$amount",
+        voted:"$voted",
+        created:"$created"
+      }},
+      {$match:{
+        voted:is_voted
+      }},
+      {$group:{_id:"$payer",total:{$sum:"$amount"}}}
+    ).sort({total: -1}).exec(
+      function(err,data) {
+        callback(err,data);
+      });
+  },
   dateDiff: function(when){
     var then = new Date(when);
     var now = new Date();
