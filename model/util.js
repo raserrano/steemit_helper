@@ -249,23 +249,27 @@ module.exports = {
   getReport: function(period,is_voted,callback){
     var today = new Date();
     var cutoff = new Date();
+    // Improve date ranges search
+    // Fix the static rate calculation for steem
     cutoff.setDate(cutoff.getDate()-period);
     console.log(cutoff);
     console.log(today);
     db.model('Transfer').aggregate(
       {$project:{
         payer:"$payer",
-        amount:"$amount",
+        amount:{
+          $cond:{
+            if:{$eq:["$currency",'STEEM']},
+            then: {$multiply:["$amount",0.93]},
+            else: "$amount"
+          }
+        },
         currency:"$currency",
         voted:"$voted",
         created:"$created"
       }},
-      {$match:{
-        voted:is_voted,
-      }},
       {$group:{
-        _id:{payer:"$payer",currency:"$currency"},
-        total:{$sum:"$amount"}}
+        _id:{payer:"$payer"},total:{$sum:{$divide:["$amount",2]}}}
       }
     ).sort({total: -1}).exec(
       function(err,data) {
@@ -286,7 +290,7 @@ module.exports = {
 
     body+="\n\nMake sure to visit their profile and welcome them as well.\n";
     body+="Long live Steemit, the social revolution platform.";
-    if(conf.env.DEBUG() === true){
+    if(conf.env.REPORT_ACTIVE()){
       var voter = wait.for(
         steem_api.publishPost,
         conf.env.ACCOUNT_NAME(),

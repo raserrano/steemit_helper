@@ -102,6 +102,14 @@ module.exports = {
       }
       return value;
     },
+    REPORT_ACTIVE: function(){
+      var value = false;
+      if((process.env.REPORT_ACTIVE !== undefined)
+        &&(process.env.REPORT_ACTIVE !== null)){
+        value = process.env.REPORT_ACTIVE;
+      }
+      return value;
+    },
     MIN_DONATION: function(){
       var value = 0.1;
       if((process.env.MIN_DONATION !== undefined)
