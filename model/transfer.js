@@ -12,9 +12,9 @@ var transferSchema = new Schema({
   donation: { type: Number, required: false},
   currency: { type: String, required: true},
   author: { type: String, required: true},
-  post: { type: String, required: true},
+  post: { type: String, required: false},
   voted: { type: Boolean, required: true},
-  created: { type: Date, required: true},
+  created: { type: Date, required: false},
   created_at: Date,
   updated_at: Date,
 });

@@ -41,9 +41,14 @@ module.exports = {
               }
             });
           }else{
-            this.debug(
-              'Could not find content for transfer: '+JSON.stringify(data[i])
-            );
+            console.log(res);
+            break;
+            db.model('Transfer').create(res,function(err) {
+              if(err){
+                console.log(res);
+                throw err;
+              }
+            });
           }
         }
       }
@@ -191,32 +196,36 @@ module.exports = {
     var amount = parseFloat(amount_parts[0]);
     var donation = 0;
     var currency = amount_parts[1];
+    var voted = false;
+    var author = "";
+    var url = "";
+    var created = "";
     if(memo.indexOf('/') != -1){
       if(memo.indexOf('#') == -1){
         var post_url = post[1].op[1].memo.split('/');
         post_url = post_url.filter(function(e){return e});
-        var author = post_url[post_url.length-2]
+        author = post_url[post_url.length-2]
           .substr(1, post_url[post_url.length-2].length);
-        var post = post_url[post_url.length-1];
+        url = post_url[post_url.length-1];
         if(post != undefined && author != undefined 
           && post != null && author != null){
-          var result = wait.for(steem_api.steem_getContent,author,post);
+          var result = wait.for(steem_api.steem_getContent,author,url);
           if((result !== undefined) && (result !== null)){
-            var created = result.created;
-            var voted = steem_api.verifyAccountHasVoted(account,result);
-            obj = {number,payer,memo,amount,currency,author,post,voted,created};
+            created = result.created;
+            voted = steem_api.verifyAccountHasVoted(account,result);
           }else{
-            this.debug('Could not find content for: '+memo);
+            author = 'content-not-found';
           }
         }else{
-          this.debug(JSON.stringify(post[1].op[1]));
+          author = 'url-not-found';
         }   
       }else{
-        this.debug('Vote on comment');
+        author = 'comment';
       }
     }else{
-      this.debug('URL not found, donation');
+      author = 'donation';
     }
+    obj = {number,payer,memo,amount,currency,author,url,voted,created};
     return obj;
   },
   getLastVoted: function(callback){
