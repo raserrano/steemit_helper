@@ -45,6 +45,37 @@ module.exports = {
       {}
     );
   },
+  publishPost: function(author, permlink, tags,title, body){
+    return wait.for(
+      steem.broadcast.comment,
+      conf.env.POSTING_KEY_PRV(),
+      '',
+      permlink,
+      author,
+      permlink,
+      title,
+      body,
+      tags
+    );
+  },
+  publishPostOptions: function(author, permlink,percent){
+    var maxAcceptedPayout = '1000000.000 SBD';
+    var allowVotes = true;
+    var allowCurationRewards = true;
+    var extensions = [];
+    return wait.for(
+      steem.broadcast.commentOptions,
+      conf.env.POSTING_KEY_PRV(),
+      author,
+      permlink,
+      maxAcceptedPayout,
+      percent,
+      allowVotes,
+      allowCurationRewards,
+      extensions
+
+    );
+  },
   steem_getContent: function(author,post,callback){
     steem.api.getContent(author, post,function(err,result){
       callback(err,result);

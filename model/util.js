@@ -247,22 +247,64 @@ module.exports = {
       {$project:{
         payer:"$payer",
         amount:"$amount",
+        currency:"$currency",
         voted:"$voted",
         created:"$created"
       }},
       {$match:{
-        voted:is_voted
+        voted:is_voted,
       }},
-      {$group:{_id:"$payer",total:{$sum:"$amount"}}}
+      {$group:{
+        _id:{payer:"$payer",currency:"$currency"},
+        total:{$sum:"$amount"}}
+      }
     ).sort({total: -1}).exec(
       function(err,data) {
         callback(err,data);
       });
   },
+  generateCommentedReport: function(posts){
+    var when = this.getDate(new Date());
+    var permlink = "tuanis-report";
+    var title = "Welcome repor for "+when;
+    var body = "Starting my duty report. \n";
+    var tags = {tags:['helpmejoin','minnowsupportproject']}
+    body +="\n\nToday, I've welcome the following users: \n";
+    for(var i = 0; i< posts.length; i++){
+      body+="- @"+posts[i].author;
+      body+=" [post]](https://steemit.com"+posts[i].url+")\n";
+    }
+
+    body+="\n\nMake sure to visit their profile and welcome them as well.\n";
+    body+="Long live Steemit, the social revolution platform.";
+    if(conf.env.DEBUG() === true){
+      var voter = wait.for(
+        steem_api.publishPost,
+        conf.env.ACCOUNT_NAME(),
+        permlink,
+        tags,
+        title,
+        body
+      );
+      var options = wait.for(
+        steem_api.publishPostOptions,
+        conf.env.ACCOUNT_NAME(),
+        permlink,
+        0
+      );
+    }else{
+      this.debug('Debug is active not posting but body is:');
+      this.debug(body);
+    }
+    
+  },
   dateDiff: function(when){
     var then = new Date(when);
     var now = new Date();
     return (now - then)/1000;
+  },
+  getDate: function(when){
+    return (when.getMonth() + 1)+"-"+when.getDate()+"-"+when.getFullYear();
   },
   debug: function(message){
     if(conf.env.DEBUG() === true){
