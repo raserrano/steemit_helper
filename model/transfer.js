@@ -5,7 +5,7 @@ var Schema = mongoose.Schema;
 // obj = {number,payer,memo,amount,donation,currency,author,post,created};
 
 var transferSchema = new Schema({
-  number: { type: Number, required: true},
+  number: { type: Number, index: { unique: true }, required: true},
   payer: { type: String, required: true},
   memo: { type: String, required: false},
   amount: { type: Number, required: true},
