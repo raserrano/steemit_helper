@@ -270,18 +270,18 @@ module.exports = {
     console.log(cutoff);
     console.log(today);
 
-    var stages= new Array();
+    var stages = new Array();
 
-    if((options.rate !== undefined)&&(options.rate !== null)){
+    if ((options.rate !== undefined) && (options.rate !== null)) {
       var amount_calc = {
         $cond: {
           if: {$eq: ['$currency','STEEM']},
           then: {$multiply: ['$amount',options.rate]},
-          else: '$amount'
+          else: '$amount',
         },
       };
-    }else{
-      amount_calc ={amount:"$amount"};
+    }else {
+      amount_calc = {amount: '$amount'};
     }
 
     var project = {$project: {
@@ -294,22 +294,23 @@ module.exports = {
         currency: '$currency',
         voted: '$voted',
         created: '$created',
-        },
-      };
+      },
+    };
     stages.push(project);
 
-    if((options.voted !== undefined)&&(options.voted !== null)){
-      stages.push({$match:{voted:options.voted}});
-      stages.push({$sort:{number: -1}});
-    }else{
+    if ((options.voted !== undefined) && (options.voted !== null)) {
+      stages.push({$match: {voted: options.voted}});
+      stages.push({$sort: {number: -1}});
+    }
+    if ((options.trees !== undefined) && (options.trees !== null)) {
       var group = {$group: {
         _id: {payer: '$payer'},
-        total: {$sum: {$divide: ['$amount',2]}}}};
+        total: {$sum: {$divide: ['$amount',2]}},},};
       stages.push(group);
-      stages.push({$sort:{total: -1}});
+      stages.push({$sort: {total: -1}});
+    }else {
+      stages.push({$sort: {number: -1}});
     }
-
-
 
     db.model('Transfer').aggregate(stages).exec(
       function(err,data) {
