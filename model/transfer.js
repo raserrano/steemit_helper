@@ -2,10 +2,10 @@ var mongoose = require('mongoose');
 
 var Schema = mongoose.Schema;
 
-// obj = {number,payer,memo,amount,donation,currency,author,post,created};
+// Obj = {number,payer,memo,amount,donation,currency,author,post,created};
 
 var transferSchema = new Schema({
-  number: { type: Number, index: {unique: true,dropDups:true}, required: true},
+  number: { type: Number, index: {unique: true,dropDups: true}, required: true},
   payer: { type: String, required: true},
   memo: { type: String, required: false},
   amount: { type: Number, required: true},
@@ -24,7 +24,7 @@ transferSchema.pre('save', function(next) {
   this.updated_at = currentDate;
   if (!this.created_at) {
     this.created_at = currentDate;
-  }  
+  }
   if (!this.donation) {
     this.donation = 0;
   }

@@ -5,21 +5,21 @@ const
   steem_api = require('../model/steem_api');
 
 // Voting for donations
-wait.launchFiber(function(){
+wait.launchFiber(function() {
   var RECORDS_FETCH_LIMIT = 1000;
 
   var accounts = wait.for(
     steem_api.steem_getAccounts_wrapper,[conf.env.ACCOUNT_NAME()]
   );
-  
+
   // Find last voted post number
   var last_voted = wait.for(utils.getLastTransfer);
-  if(last_voted.length === 0){
+  if (last_voted.length === 0) {
     last_voted = 0;
-  }else{
-    last_voted = last_voted[0].number + 1; 
+  }else {
+    last_voted = last_voted[0].number + 1;
   }
-  console.log('Last: '+last_voted);
+  console.log('Last: ' + last_voted);
 
   // Get latest transfer
   var max = wait.for(
@@ -28,18 +28,18 @@ wait.launchFiber(function(){
     10000000,
     1
   );
-  if((max !== undefined)&&(max !== null)){
-    max = max[max.length-1][0];
+  if ((max !== undefined) && (max !== null)) {
+    max = max[max.length - 1][0];
   }
-  utils.debug('Max is: '+max);
-  while(last_voted <= max){
+  utils.debug('Max is: ' + max);
+  while (last_voted <= max) {
     from = last_voted + RECORDS_FETCH_LIMIT;
-    utils.debug('Fetching from:'+from+' of '+max);
+    utils.debug('Fetching from:' + from + ' of ' + max);
     // Process new transfers
     var results = wait.for(
       steem_api.getTransfers,
       conf.env.ACCOUNT_NAME(),
-      from, 
+      from,
       RECORDS_FETCH_LIMIT
     );
     utils.getTransfersToVote(
