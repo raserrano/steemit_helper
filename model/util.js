@@ -261,32 +261,57 @@ module.exports = {
         callback(err,data);
       });
   },
-  getReport: function(period,is_voted,callback) {
+  getReport: function(options,callback) {
     var today = new Date();
     var cutoff = new Date();
     // Improve date ranges search
     // Fix the static rate calculation for steem
-    cutoff.setDate(cutoff.getDate() - period);
+    cutoff.setDate(cutoff.getDate() - options.period);
     console.log(cutoff);
     console.log(today);
-    db.model('Transfer').aggregate(
-      {$project: {
-        payer: '$payer',
-        amount: {
-          $cond: {
-            if: {$eq: ['$currency','STEEM']},
-            then: {$multiply: ['$amount',0.93]},
-            else: '$amount',
-          },
+
+    var stages= new Array();
+
+    if((options.rate !== undefined)&&(options.rate !== null)){
+      var amount_calc = {
+        $cond: {
+          if: {$eq: ['$currency','STEEM']},
+          then: {$multiply: ['$amount',options.rate]},
+          else: '$amount'
         },
+      };
+    }else{
+      amount_calc ={amount:"$amount"};
+    }
+
+    var project = {$project: {
+        number: '$number',
+        payer: '$payer',
+        memo: '$memo',
+        author: '$author',
+        donation: '$donation',
+        amount: amount_calc,
         currency: '$currency',
         voted: '$voted',
         created: '$created',
-      },},
-      {$group: {
-        _id: {payer: '$payer'},total: {$sum: {$divide: ['$amount',2]}},},
+        },
+      };
+    stages.push(project);
+
+    if((options.voted !== undefined)&&(options.voted !== null)){
+      stages.push({$match:{voted:options.voted}});
+      stages.push({$sort:{number: -1}});
+    }else{
+      var group = {$group: {
+        _id: {payer: '$payer'},
+        total: {$sum: {$divide: ['$amount',2]}}}};
+      stages.push(group);
+      stages.push({$sort:{total: -1}});
     }
-    ).sort({total: -1}).exec(
+
+
+
+    db.model('Transfer').aggregate(stages).exec(
       function(err,data) {
         callback(err,data);
       });

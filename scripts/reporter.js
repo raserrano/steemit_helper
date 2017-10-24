@@ -4,7 +4,29 @@ const
   conf = require('../config/dev');
 // Generates a report for the not voted posts of account
 wait.launchFiber(function() {
-  var data = wait.for(utils.getReport,700000000,true);
+  
+  // Report types
+  // Full
+
+  // Not voted
+  var options_notvoted = {
+    voted: false,
+  };
+  // Trees
+  var options_trees = {
+    rate: 0.93,
+  };
+  // Peridiosity
+
+
+  var options = {
+    voted: true,
+    period: 7,
+    rate: 0.93,
+    trees:false,
+  };
+
+  var data = wait.for(utils.getReport,options_trees);
   console.log(data.length);
   for (var i = 0; i < data.length;i++) {
     console.log(data[i]);
