@@ -19,15 +19,15 @@ wait.launchFiber(function() {
   };
   // Period
   var options_period = {
-    period: 1,
-    voted:true
+    period: 6,
+    voted:false
   };
 
   var data = wait.for(utils.getReport,options_period);
   console.log(data.length);
-  // for (var i = 0; i < data.length;i++) {
-  //   console.log(data[i]);
-  // }
+  for (var i = 0; i < data.length;i++) {
+    console.log(JSON.stringify(data[i]));
+  }
   console.log('Finish report');
   process.exit();
 });
