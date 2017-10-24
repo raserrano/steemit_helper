@@ -1,0 +1,9 @@
+{
+  "preset": "node-style-guide",
+  "requireCurlyBraces": true,
+  "validateLineBreaks": "LF",
+  "maxErrors": 100,
+  "requireCamelCaseOrUpperCaseIdentifiers": false,
+  "disallowMultipleVarDecl": false,
+  "requireEarlyReturn": false,
+}
