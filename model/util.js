@@ -41,8 +41,6 @@ module.exports = {
               }
             });
           }else{
-            console.log(res);
-            break;
             db.model('Transfer').create(res,function(err) {
               if(err){
                 console.log(res);
@@ -91,6 +89,8 @@ module.exports = {
     }
   },
   startVotingDonationsProcess: function(account,data,voter){
+    var comment = "";
+    var title = "";
     for(var i=0;i<data.length;i++){
       console.log(data[i]);
       break;
@@ -106,7 +106,7 @@ module.exports = {
         var vp = voter.voting_power;
         var weight = steem_api.calculateVoteWeight(
           voter[0],
-          (amount_to_be_voted*1.5)
+          (amount_to_be_voted*conf.env.VOTE_MULTIPLIER())
         );
         if(conf.env.VOTE_ACTIVE()){
           if (vp >= (conf.env.MIN_VOTING_POWER() * conf.env.VOTE_POWER_1_PC())){
@@ -157,6 +157,8 @@ module.exports = {
     }
   },
   commentOnNewUserPost: function(posts,weight){
+    var comment = "";
+    var title = "Welcome";
     for(var i=0; i<posts.length;i++){
       var author = posts[i].author;
       var account = wait.for(steem_api.steem_getAccounts_wrapper,[author]);
@@ -172,7 +174,19 @@ module.exports = {
             );
           }
           if(conf.env.COMMENT_ACTIVE()){
-            steem_api.commentPost(posts[i].author,posts[i].permlink);
+            var comment = "Welcome to steemit @"+posts[i].author
+            +". Join #minnowsupportproject for more help. "+
+            "Leave a comment with #helpmein tag so I will"+
+            " transfer registration fee. @OriginalWorks "+
+            "If you want a little boost in your posts and also help the "+
+            " evironment try @treeplanter ."+
+            "Use @tipu to give users a 0.1 SBD tip. ";
+            steem_api.commentPost(
+              posts[i].author,
+              posts[i].permlink,
+              title,
+              comment
+            );
             wait.for(this.timeout_wrapper,20000);
           }else{
             this.debug(

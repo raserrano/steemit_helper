@@ -17,7 +17,7 @@ wait.launchFiber(function(){
   if(last_voted.length === 0){
     last_voted = 0;
   }else{
-    last_voted = last_voted[0].number; 
+    last_voted = last_voted[0].number + 1; 
   }
   console.log('Last: '+last_voted);
 

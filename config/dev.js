@@ -126,5 +126,13 @@ module.exports = {
       }
       return value;
     },
+    VOTE_MULTIPLIER: function(){
+      var value = 1.5;
+      if((process.env.VOTE_MULTIPLIER !== undefined)
+        &&(process.env.VOTE_MULTIPLIER !== null)){
+        value = process.env.VOTE_MULTIPLIER;
+      }
+      return value;
+    },
   }
 };
