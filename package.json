@@ -5,11 +5,11 @@
   "main": "index.js",
   "scripts": {
     "test": "mocha test",
-    "start": "node server.js"
+    "start": "node ./bin/www"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/raserrano/goalsapp.git"
+    "url": "git+https://github.com/raserrano/steemit_helper.git"
   },
   "keywords": [
     "steemit",
@@ -21,17 +21,22 @@
   "author": "raserrano",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/raserrano/goalsapp/issues"
+    "url": "https://github.com/raserrano/steemit_helper/issues"
   },
-  "homepage": "https://github.com/raserrano/goalsapp#readme",
+  "homepage": "https://github.com/raserrano/steemit_helper/blob/develop/README",
   "dependencies": {
     "express": "^4.16.2",
     "mongoose": "^4.12.4",
     "pug": "^2.0.0-rc.4",
     "request": "^2.83.0",
     "steem": "^0.6.4",
-    "wait.for": "^0.6.6"
-  },
+    "wait.for": "^0.6.6",
+    "body-parser": "~1.18.2",
+    "cookie-parser": "~1.4.3",
+    "debug": "~2.6.9",
+    "morgan": "~1.9.0",
+    "serve-favicon": "~2.4.5"
+  }
   "devDependencies": {
     "chai": "^4.1.2",
     "jscs": "^3.0.7",
