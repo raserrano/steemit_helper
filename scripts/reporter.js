@@ -17,17 +17,15 @@ wait.launchFiber(function() {
     rate: 0.93,
     trees:true
   };
-  // Peridiosity
-
-
-  var options = {
+  // Period
+  var options_period = {
     voted: true,
     period: 7,
     rate: 0.93,
     trees: false,
   };
 
-  var data = wait.for(utils.getReport,options_full);
+  var data = wait.for(utils.getReport,options_notvoted);
   console.log(data.length);
   for (var i = 0; i < data.length;i++) {
     console.log(data[i]);

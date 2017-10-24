@@ -1,27 +1,24 @@
-Steemit helper
+*Steemit helper*
 
-** Features
+** Features **
 
-Report for votes
-Voting feature
-Welcome message feature
-Transfer funds feature
+- [x] Report for votes
+- [x] Voting feature
+- [x] Welcome message feature
+- [] Transfer funds feature
+- [x] Commenting feature
+- [x] Donator transfers tracker
+- [x] Poster creator
 
-//Donator
+*Donator*
 verfy posts with date 1970-01-01T00:00:00
 Verify queue items duplicated
 probably implement a unique with number
 
-- voter feature
-- commenting feature
-- donator transfers tracker
-- poster creator
-
-Work in progress:
+*Work in progress:*
 - reporter with a set of filters
 - donation feature work in progress
 
-
-Not developed yet
+*Not developed yet*
 - webpage
 - refunder
