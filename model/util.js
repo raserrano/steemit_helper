@@ -262,13 +262,6 @@ module.exports = {
       });
   },
   getReport: function(options,callback) {
-    var today = new Date();
-    var cutoff = new Date();
-    // Improve date ranges search
-    // Fix the static rate calculation for steem
-    cutoff.setDate(cutoff.getDate() - options.period);
-    console.log(cutoff);
-    console.log(today);
 
     var stages = new Array();
 
@@ -298,9 +291,14 @@ module.exports = {
     };
     stages.push(project);
 
+    if((options.period!==undefined)&&(options.period!==null)){
+      var cutoff = new Date();
+      cutoff.setDate(cutoff.getDate() - options.period);
+      stages.push({$match:{created:{$gt:cutoff}}});
+    }
+
     if ((options.voted !== undefined) && (options.voted !== null)) {
       stages.push({$match: {voted: options.voted}});
-      stages.push({$sort: {number: -1}});
     }
     if ((options.trees !== undefined) && (options.trees !== null)) {
       var group = {$group: {
@@ -312,6 +310,7 @@ module.exports = {
       stages.push({$sort: {number: -1}});
     }
 
+    console.log(stages);
     db.model('Transfer').aggregate(stages).exec(
       function(err,data) {
         callback(err,data);
