@@ -325,7 +325,7 @@ module.exports = {
     body += '\n\nToday, I\'ve welcome the following users: \n';
     for (var i = 0; i < posts.length; i++) {
       body += '- @' + posts[i].author;
-      body += ' [post]](https://steemit.com' + posts[i].url + ')\n';
+      body += ' [post](https://steemit.com' + posts[i].url + ')\n';
     }
 
     body += '\n\nMake sure to visit their profile and welcome them as well.\n';
