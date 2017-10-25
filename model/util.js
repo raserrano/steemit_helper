@@ -52,7 +52,8 @@ module.exports = {
         if (data[i][1].op[1].to == account) {
           var post = this.getContent([account,conf.env.ACCOUNT_NAME()],data[i]);
           if (post !== null) {
-            if (!post.voted) {
+            if (!post.voted 
+              && ((post.status == 'pending') || (post.status == 'processed'))) {
               posts.push(post);
             }
           }
@@ -63,15 +64,18 @@ module.exports = {
       posts.sort(function(a,b) {
         return (a.amount > b.amount) ? 1 : ((b.amount > a.amount) ? -1 : 0);
       });
-      this.debug(posts[posts.length - 1]);
       if (conf.env.VOTE_ACTIVE()) {
         if (vp >= (conf.env.MIN_VOTING_POWER() * conf.env.VOTE_POWER_1_PC())) {
-          steem_api.votePost(
-            posts[posts.length - 1].author,
-            posts[posts.length - 1].post,
-            weight
-          );
-          wait.for(this.timeout_wrapper,5000);
+          var to_vote = posts[posts.length - 1];
+          if((to_vote.author !== undefined) &&(to_vote.author !== null)
+            && (to_vote.url !== undefined) &&(to_vote.url !== null)){
+            steem_api.votePost(
+              to_vote.author,
+              to_vote.url,
+              weight
+            );
+            wait.for(this.timeout_wrapper,5000);
+          }
         }
       }else {
         this.debug(

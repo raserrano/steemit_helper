@@ -6,7 +6,7 @@ const
 
 // Voting for high bids
 wait.launchFiber(function(){
-  var max = 10000000;
+  var max = 100000000;
   var limit = 100;
   
   var accounts_to = conf.env.VOTING_ACCS().split(',');
