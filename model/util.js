@@ -85,7 +85,6 @@ module.exports = {
     var title = '';
     for (var i = 0;i < data.length;i++) {
       var voted_ok = false;
-      console.log(data[i].number);
       if (data[i].amount >= conf.env.MIN_DONATION()) {
         var amount_to_be_voted = data[i].amount;
         if (data[i].amount > conf.env.MAX_DONATION()) {
@@ -147,7 +146,7 @@ module.exports = {
       }else {
         db.model('Transfer').update(
           {_id: data[i]._id},
-          {donation: data[i].amount,processed: true},
+          {donation: data[i].amount,processed: true,status:'min amount'},
           function(err) {
             if (err) {
               console.log(res);
@@ -211,10 +210,10 @@ module.exports = {
     var amount_parts = post[1].op[1].amount.split(' ');
     var amount = parseFloat(amount_parts[0]);
     var donation = 0;
-    var donation = 0;
     var currency = amount_parts[1];
     var voted = false;
     var processed = false;
+    var status = "pending";
     var author = '';
     var url = '';
     var created = '';
@@ -222,33 +221,38 @@ module.exports = {
       if (memo.indexOf('#') == -1) {
         var post_url = post[1].op[1].memo.split('/');
         post_url = post_url.filter(function(e) {return e});
-        author = post_url[post_url.length - 2]
+        if(post_url[post_url.length - 2][0] === '@'){
+          author = post_url[post_url.length - 2]
           .substr(1, post_url[post_url.length - 2].length);
-        url = post_url[post_url.length - 1];
-        if (post != undefined && author != undefined
-          && post != null && author != null) {
-          var result = wait.for(steem_api.steem_getContent,author,url);
-          if ((result !== undefined) && (result !== null)) {
-            created = result.created;
-            voted = steem_api.verifyAccountHasVoted(account,result);
-            processed=voted;
+          url = post_url[post_url.length - 1];
+          if (url != undefined && author != undefined
+            && url != null && author != null) {
+            var result = wait.for(steem_api.steem_getContent,author,url);
+            if ((result !== undefined) && (result !== null)) {
+              created = result.created;
+              voted = steem_api.verifyAccountHasVoted(account,result);
+              processed=voted;
+            }else {
+              status = 'content-not-found';
+              processed=true;
+            }
           }else {
-            author = 'content-not-found';
+            status = 'url-not-found';
             processed=true;
           }
-        }else {
-          author = 'url-not-found';
+        }else{
+          status='url not valid';
           processed=true;
         }
       }else {
-        author = 'comment';
+        status = 'comment';
         processed=true;
       }
     }else {
-      author = 'donation';
+      status = 'donation';
       processed=true;
     }
-    obj = {number,payer,memo,amount,donation,currency,author,url,voted,processed,created};
+    obj = {number,payer,memo,amount,donation,currency,author,url,voted,processed,status,created};
     return obj;
   },
   getLastVoted: function(callback) {
@@ -265,7 +269,7 @@ module.exports = {
   },
   getQueue: function(callback) {
     // Add calculation to be less than 6 days and a half (to be able to vote it)
-    db.model('Transfer').find({voted: false,processed: false,created: {$ne: null}}).sort({number: 1}).exec(
+    db.model('Transfer').find({voted: false,processed: false,status:"pending",created: {$ne: null}}).sort({number: 1}).exec(
       function(err,data) {
         callback(err,data);
       });
@@ -295,6 +299,8 @@ module.exports = {
         amount: amount_calc,
         currency: '$currency',
         voted: '$voted',
+        processed: '$processed',
+        status: '$status',
         created: '$created',
       },
     };

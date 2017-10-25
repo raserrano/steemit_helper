@@ -5,13 +5,5 @@ block content
   p Welcome to #{title}
   div.table-responsive
   table.table.table-striped
-    thead
-      tr
-        th Payer
-    tbody
-      each transfer, i in transfers
-        tr
-          td
-            - var text='@'+transfer._id.payer+' | '+transfer.total
-            div=text
+
 

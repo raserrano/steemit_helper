@@ -13,6 +13,7 @@ var transferSchema = new Schema({
   post: { type: String, required: false},
   voted: { type: Boolean, required: false},
   processed: { type: Boolean, required: false},
+  status: { type: String, required: false},
   created: { type: Date, required: false},
 });
 

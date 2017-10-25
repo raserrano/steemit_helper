@@ -43,7 +43,7 @@ router.get('/', function(req, res, next) {
     }
   );
 });
-router.get('/trees', function(req, res, next) {
+router.get('/votes', function(req, res, next) {
   var options_voted = {
     voted: false,
   };
@@ -51,7 +51,7 @@ router.get('/trees', function(req, res, next) {
     var data = wait.for(utils.getReport,options_voted);
     res.format({
       html: function() {
-        res.render('report', {
+        res.render('index', {
           title: 'Not voted report',
           transfers: data,
           type:'votes',
@@ -60,7 +60,7 @@ router.get('/trees', function(req, res, next) {
     });
   });
 });
-router.get('/voted', function(req, res, next) {
+router.get('/trees', function(req, res, next) {
   // Trees
   var options_trees = {
     rate: 0.93,
@@ -70,7 +70,7 @@ router.get('/voted', function(req, res, next) {
     var data = wait.for(utils.getReport,options_trees);
     res.format({
       html: function() {
-        res.render('report', {
+        res.render('index', {
           title: 'Trees planted report',
           transfers: data,
           type:'trees',
