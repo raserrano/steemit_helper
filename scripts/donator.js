@@ -52,6 +52,7 @@ wait.launchFiber(function() {
   }
   // Get not voted posts from DB
   var queue = wait.for(utils.getQueue);
+  console.log('Queue: '+queue.length);
   utils.startVotingDonationsProcess(conf.env.ACCOUNT_NAME(),queue,accounts[0]);
   console.log('Finish voting donations');
   process.exit();

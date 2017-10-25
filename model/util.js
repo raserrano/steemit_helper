@@ -34,21 +34,12 @@ module.exports = {
         if (data[i][1].op[1].to == account) {
           var res = this.getContent([account],data[i]);
           var query = {number: data[i][0]};
-          if (res !== null) {
-            db.model('Transfer').update(query,res,{upsert: true},function(err) {
-              if (err) {
-                console.log(res);
-                throw err;
-              }
-            });
-          }else {
-            db.model('Transfer').create(query,res,{upsert: true},function(err) {
-              if (err) {
-                console.log(res);
-                throw err;
-              }
-            });
-          }
+          db.model('Transfer').update(query,res,{upsert: true},function(err) {
+            if (err) {
+              console.log(res);
+              throw err;
+            }
+          });
         }
       }
     }
@@ -93,8 +84,8 @@ module.exports = {
     var comment = '';
     var title = '';
     for (var i = 0;i < data.length;i++) {
-      console.log(data[i]);
-      break;
+      var voted_ok = false;
+      console.log(data[i].number);
       if (data[i].amount >= conf.env.MIN_DONATION()) {
         var amount_to_be_voted = data[i].amount;
         if (data[i].amount > conf.env.MAX_DONATION()) {
@@ -111,17 +102,27 @@ module.exports = {
         );
         if (conf.env.VOTE_ACTIVE()) {
           if (vp >= (conf.env.MIN_VOTING_POWER() * conf.env.VOTE_POWER_1_PC())) {
+
+            // Author = 'content-not-found';
+            // author = 'url-not-found';
+            // author = 'comment';
+            // author = 'donation';
+            // and created == null
             if (conf.env.VOTE_ACTIVE()) {
-              steem_api.votePost(data[i].author,data[i].memo,weight);
-              wait.for(this.timeout_wrapper,5000);
+              voted_ok = true;
+              // Steem_api.votePost(data[i].author,data[i].memo,weight);
+              // wait.for(this.timeout_wrapper,5000);
             }else {
               this.debug(
                 'Voting is not active, voting: ' + JSON.stringify(data[i])
               );
             }
             if (conf.env.COMMENT_ACTIVE()) {
-              steem_api.commentPost(data[i].author,data[i].memo,weight);
-              wait.for(this.timeout_wrapper,20000);
+              var title = '';
+              var comment = '';
+              // Decide how to handle this with a form and mongodb document
+              // steem_api.commentPost(data[i].author,data[i].memo,title,comment);
+              // wait.for(this.timeout_wrapper,20000);
             }else {
               this.debug(
                 'Commenting is not active, commenting: ' + JSON.stringify(data[i])
@@ -129,7 +130,7 @@ module.exports = {
             }
             db.model('Transfer').update(
               {_id: data[i]._id},
-              {donation: data[i].donation,voted: true},
+              {donation: data[i].donation,voted: voted_ok,processed: true},
               function(err) {
                 if (err) {
                   console.log(res);
@@ -146,7 +147,7 @@ module.exports = {
       }else {
         db.model('Transfer').update(
           {_id: data[i]._id},
-          {donation: data[i].amount},
+          {donation: data[i].amount,processed: true},
           function(err) {
             if (err) {
               console.log(res);
@@ -210,8 +211,10 @@ module.exports = {
     var amount_parts = post[1].op[1].amount.split(' ');
     var amount = parseFloat(amount_parts[0]);
     var donation = 0;
+    var donation = 0;
     var currency = amount_parts[1];
     var voted = false;
+    var processed = false;
     var author = '';
     var url = '';
     var created = '';
@@ -228,19 +231,24 @@ module.exports = {
           if ((result !== undefined) && (result !== null)) {
             created = result.created;
             voted = steem_api.verifyAccountHasVoted(account,result);
+            processed=voted;
           }else {
             author = 'content-not-found';
+            processed=true;
           }
         }else {
           author = 'url-not-found';
+          processed=true;
         }
       }else {
         author = 'comment';
+        processed=true;
       }
     }else {
       author = 'donation';
+      processed=true;
     }
-    obj = {number,payer,memo,amount,currency,author,url,voted,created};
+    obj = {number,payer,memo,amount,donation,currency,author,url,voted,processed,created};
     return obj;
   },
   getLastVoted: function(callback) {
@@ -256,7 +264,8 @@ module.exports = {
       });
   },
   getQueue: function(callback) {
-    db.model('Transfer').find({voted: false,donation: {$gt: 0}}).sort({number: 1}).exec(
+    // Add calculation to be less than 6 days and a half (to be able to vote it)
+    db.model('Transfer').find({voted: false,processed: false,created: {$ne: null}}).sort({number: 1}).exec(
       function(err,data) {
         callback(err,data);
       });
@@ -291,10 +300,10 @@ module.exports = {
     };
     stages.push(project);
 
-    if((options.period!==undefined)&&(options.period!==null)){
+    if ((options.period !== undefined) && (options.period !== null)) {
       var cutoff = new Date();
       cutoff.setDate(cutoff.getDate() - options.period);
-      stages.push({$match:{created:{$gt:cutoff}}});
+      stages.push({$match: {created: {$gt: cutoff}}});
     }
 
     if ((options.voted !== undefined) && (options.voted !== null)) {
