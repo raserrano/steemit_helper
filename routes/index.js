@@ -79,5 +79,19 @@ router.get('/trees', function(req, res, next) {
     });
   });
 });
+router.get('/queue', function(req, res, next) {
+  wait.launchFiber(function() {
+    var data = wait.for(utils.getQueue);
+    res.format({
+      html: function() {
+        res.render('index', {
+          title: 'Queue',
+          transfers: data,
+          type:'queue',
+        });
+      },
+    });
+  });
+});
 
 module.exports = router;

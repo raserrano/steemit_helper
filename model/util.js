@@ -137,6 +137,9 @@ module.exports = {
                 }
               }
             );
+          }else{
+            console.log('Finishing donation process due to low voting power');
+            break;
           }
         }else {
           this.debug(
@@ -230,8 +233,14 @@ module.exports = {
             var result = wait.for(steem_api.steem_getContent,author,url);
             if ((result !== undefined) && (result !== null)) {
               created = result.created;
-              voted = steem_api.verifyAccountHasVoted(account,result);
-              processed=voted;
+              if(this.dateDiff(created) < (86400 * 6.5)){
+                voted = steem_api.verifyAccountHasVoted(account,result);
+                status='processed';
+                processed=voted;
+              }else{
+                status= 'due date';
+                processed=true;
+              }
             }else {
               status = 'content-not-found';
               processed=true;
@@ -269,7 +278,7 @@ module.exports = {
   },
   getQueue: function(callback) {
     // Add calculation to be less than 6 days and a half (to be able to vote it)
-    db.model('Transfer').find({voted: false,processed: false,status:"pending",created: {$ne: null}}).sort({number: 1}).exec(
+    db.model('Transfer').find({voted: false,processed: false,status:{$in:["pending","processed"]},created: {$ne: null}}).sort({number: 1}).exec(
       function(err,data) {
         callback(err,data);
       });
