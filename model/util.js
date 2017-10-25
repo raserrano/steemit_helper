@@ -34,21 +34,12 @@ module.exports = {
         if (data[i][1].op[1].to == account) {
           var res = this.getContent([account],data[i]);
           var query = {number: data[i][0]};
-          if (res !== null) {
-            db.model('Transfer').update(query,res,{upsert: true},function(err) {
-              if (err) {
-                console.log(res);
-                throw err;
-              }
-            });
-          }else {
-            db.model('Transfer').create(query,res,{upsert: true},function(err) {
-              if (err) {
-                console.log(res);
-                throw err;
-              }
-            });
-          }
+          db.model('Transfer').update(query,res,{upsert: true},function(err) {
+            if (err) {
+              console.log(res);
+              throw err;
+            }
+          });
         }
       }
     }
@@ -93,8 +84,7 @@ module.exports = {
     var comment = '';
     var title = '';
     for (var i = 0;i < data.length;i++) {
-      console.log(data[i]);
-      break;
+      var voted_ok = false;
       if (data[i].amount >= conf.env.MIN_DONATION()) {
         var amount_to_be_voted = data[i].amount;
         if (data[i].amount > conf.env.MAX_DONATION()) {
@@ -111,17 +101,27 @@ module.exports = {
         );
         if (conf.env.VOTE_ACTIVE()) {
           if (vp >= (conf.env.MIN_VOTING_POWER() * conf.env.VOTE_POWER_1_PC())) {
+
+            // Author = 'content-not-found';
+            // author = 'url-not-found';
+            // author = 'comment';
+            // author = 'donation';
+            // and created == null
             if (conf.env.VOTE_ACTIVE()) {
-              steem_api.votePost(data[i].author,data[i].memo,weight);
-              wait.for(this.timeout_wrapper,5000);
+              voted_ok = true;
+              // Steem_api.votePost(data[i].author,data[i].memo,weight);
+              // wait.for(this.timeout_wrapper,5000);
             }else {
               this.debug(
                 'Voting is not active, voting: ' + JSON.stringify(data[i])
               );
             }
             if (conf.env.COMMENT_ACTIVE()) {
-              steem_api.commentPost(data[i].author,data[i].memo,weight);
-              wait.for(this.timeout_wrapper,20000);
+              var title = '';
+              var comment = '';
+              // Decide how to handle this with a form and mongodb document
+              // steem_api.commentPost(data[i].author,data[i].memo,title,comment);
+              // wait.for(this.timeout_wrapper,20000);
             }else {
               this.debug(
                 'Commenting is not active, commenting: ' + JSON.stringify(data[i])
@@ -129,7 +129,7 @@ module.exports = {
             }
             db.model('Transfer').update(
               {_id: data[i]._id},
-              {donation: data[i].donation,voted: true},
+              {donation: data[i].donation,voted: voted_ok,processed: true},
               function(err) {
                 if (err) {
                   console.log(res);
@@ -137,6 +137,9 @@ module.exports = {
                 }
               }
             );
+          }else{
+            console.log('Finishing donation process due to low voting power');
+            break;
           }
         }else {
           this.debug(
@@ -146,7 +149,7 @@ module.exports = {
       }else {
         db.model('Transfer').update(
           {_id: data[i]._id},
-          {donation: data[i].amount},
+          {donation: data[i].amount,processed: true,status:'min amount'},
           function(err) {
             if (err) {
               console.log(res);
@@ -212,6 +215,8 @@ module.exports = {
     var donation = 0;
     var currency = amount_parts[1];
     var voted = false;
+    var processed = false;
+    var status = "pending";
     var author = '';
     var url = '';
     var created = '';
@@ -219,28 +224,44 @@ module.exports = {
       if (memo.indexOf('#') == -1) {
         var post_url = post[1].op[1].memo.split('/');
         post_url = post_url.filter(function(e) {return e});
-        author = post_url[post_url.length - 2]
+        if(post_url[post_url.length - 2][0] === '@'){
+          author = post_url[post_url.length - 2]
           .substr(1, post_url[post_url.length - 2].length);
-        url = post_url[post_url.length - 1];
-        if (post != undefined && author != undefined
-          && post != null && author != null) {
-          var result = wait.for(steem_api.steem_getContent,author,url);
-          if ((result !== undefined) && (result !== null)) {
-            created = result.created;
-            voted = steem_api.verifyAccountHasVoted(account,result);
+          url = post_url[post_url.length - 1];
+          if (url != undefined && author != undefined
+            && url != null && author != null) {
+            var result = wait.for(steem_api.steem_getContent,author,url);
+            if ((result !== undefined) && (result !== null)) {
+              created = result.created;
+              if(this.dateDiff(created) < (86400 * 6.5)){
+                voted = steem_api.verifyAccountHasVoted(account,result);
+                status='processed';
+                processed=voted;
+              }else{
+                status= 'due date';
+                processed=true;
+              }
+            }else {
+              status = 'content-not-found';
+              processed=true;
+            }
           }else {
-            author = 'content-not-found';
+            status = 'url-not-found';
+            processed=true;
           }
-        }else {
-          author = 'url-not-found';
+        }else{
+          status='url not valid';
+          processed=true;
         }
       }else {
-        author = 'comment';
+        status = 'comment';
+        processed=true;
       }
     }else {
-      author = 'donation';
+      status = 'donation';
+      processed=true;
     }
-    obj = {number,payer,memo,amount,currency,author,url,voted,created};
+    obj = {number,payer,memo,amount,donation,currency,author,url,voted,processed,status,created};
     return obj;
   },
   getLastVoted: function(callback) {
@@ -256,7 +277,8 @@ module.exports = {
       });
   },
   getQueue: function(callback) {
-    db.model('Transfer').find({voted: false,donation: {$gt: 0}}).sort({number: 1}).exec(
+    // Add calculation to be less than 6 days and a half (to be able to vote it)
+    db.model('Transfer').find({voted: false,processed: false,status:{$in:["pending","processed"]},created: {$ne: null}}).sort({number: 1}).exec(
       function(err,data) {
         callback(err,data);
       });
@@ -286,15 +308,17 @@ module.exports = {
         amount: amount_calc,
         currency: '$currency',
         voted: '$voted',
+        processed: '$processed',
+        status: '$status',
         created: '$created',
       },
     };
     stages.push(project);
 
-    if((options.period!==undefined)&&(options.period!==null)){
+    if ((options.period !== undefined) && (options.period !== null)) {
       var cutoff = new Date();
       cutoff.setDate(cutoff.getDate() - options.period);
-      stages.push({$match:{created:{$gt:cutoff}}});
+      stages.push({$match: {created: {$gt: cutoff}}});
     }
 
     if ((options.voted !== undefined) && (options.voted !== null)) {

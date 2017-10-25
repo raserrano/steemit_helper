@@ -1,0 +1,116 @@
+extends layout
+
+block content
+  h1= title
+  p Welcome to #{title}
+  div.table-responsive
+  table.table.table-striped
+    if type === 'trees'
+      thead
+        tr
+          th Payer
+      tbody
+        each transfer, i in transfers
+          tr
+            td
+              - var text='@'+transfer._id.payer+' | '+transfer.total
+              div=text
+    else if type === 'votes'
+      thead
+        tr
+          th Number
+          th Payee
+          th Amount
+          th Voted
+          th Processed
+          th Status
+          th Details
+      tbody
+        each transfer, i in transfers
+          tr
+            td
+              div=transfer.number
+            td
+              div=transfer.payer
+            td
+              div=transfer.amount.amount
+            td
+              - var vote_ok=transfer.voted
+              div.text-white(class=vote_ok ? 'bg-success' : 'bg-danger')=transfer.voted
+            td
+              - var processed_ok=transfer.processed
+              div.text-white(class=processed_ok ? 'bg-success' : 'bg-danger')=transfer.processed
+            td
+              div=transfer.status
+            td
+              a() Details
+              div=transfer.author
+              div=transfer.memo
+              div=transfer.donation
+              div=transfer.created
+    else if type === 'queue'
+      thead
+        tr
+          th Number
+          th Payee
+          th Amount
+          th Voted
+          th Processed
+          th Status
+          th Details
+      tbody
+        each transfer, i in transfers
+          tr
+            td
+              div=transfer.number
+            td
+              div=transfer.payer
+            td
+              div=transfer.amount
+            td
+              - var vote_ok=transfer.voted
+              div.text-white(class=vote_ok ? 'bg-success' : 'bg-danger')=transfer.voted
+            td
+              - var processed_ok=transfer.processed
+              div.text-white(class=processed_ok ? 'bg-success' : 'bg-danger')=transfer.processed
+            td
+              div=transfer.status
+            td
+              a() Details
+              div=transfer.author
+              div=transfer.memo
+              div=transfer.donation
+              div=transfer.created
+    else
+      thead
+        tr
+          th Number
+          th Payee
+          th Amount
+          th Voted
+          th Processed
+          th Status
+          th Details
+      tbody
+        each transfer, i in transfers
+          tr
+            td
+              div=transfer.number
+            td
+              div=transfer.payer
+            td
+              div=transfer.amount
+            td
+              - var vote_ok=transfer.voted
+              div.text-white(class=vote_ok ? 'bg-success' : 'bg-danger')=transfer.voted
+            td
+              - var processed_ok=transfer.processed
+              div.text-white(class=processed_ok ? 'bg-success' : 'bg-danger')=transfer.processed
+            td
+              div=transfer.status
+            td
+              a() Details
+              div=transfer.author
+              div=transfer.memo
+              div=transfer.donation
+              div=transfer.created
