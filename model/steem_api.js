@@ -43,7 +43,7 @@ module.exports = {
       steem.broadcast.comment,
       conf.env.POSTING_KEY_PRV(),
       '',
-      permlink,
+      'report',
       author,
       permlink,
       title,
@@ -101,7 +101,7 @@ module.exports = {
   },
   steem_getPostsByTag: function(tag,callback) {
     steem.api.getDiscussionsByCreated(
-      {tag: tag, limit: 10},
+      {tag: tag, limit: 20},
       function(err, result) {
         callback(err,result);
       }

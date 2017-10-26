@@ -189,9 +189,10 @@ module.exports = {
             'If you want a little boost in your posts and also help the ' +
             ' evironment try @treeplanter .' +
             'Use @tipu to give users a 0.1 SBD tip. ';
+            var temp_permlink = posts[i].permlink.replace('.','');
             steem_api.commentPost(
               posts[i].author,
-              posts[i].permlink,
+              temp_permlink,
               title,
               comment
             );
@@ -346,8 +347,8 @@ module.exports = {
   },
   generateCommentedReport: function(posts) {
     var when = this.getDate(new Date());
-    var permlink = 'tuanis-report';
-    var title = 'Welcome repor for ' + when;
+    var permlink = 'tuanis-report-'+when;
+    var title = 'Welcome report for ' + when;
     var body = 'Starting my duty report. \n';
     var tags = {tags: ['helpmejoin','minnowsupportproject']}
     body += '\n\nToday, I\'ve welcome the following users: \n';
