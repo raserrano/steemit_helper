@@ -340,7 +340,6 @@ module.exports = {
       stages.push({$sort: {number: -1}});
     }
 
-    console.log(stages);
     db.model('Transfer').aggregate(stages).exec(
       function(err,data) {
         callback(err,data);
