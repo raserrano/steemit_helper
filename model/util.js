@@ -113,19 +113,20 @@ module.exports = {
             // and created == null
             if (conf.env.VOTE_ACTIVE()) {
               voted_ok = true;
-              // Steem_api.votePost(data[i].author,data[i].memo,weight);
-              // wait.for(this.timeout_wrapper,5000);
+              Steem_api.votePost(data[i].author,data[i].memo,weight);
+              wait.for(this.timeout_wrapper,5000);
             }else {
               this.debug(
                 'Voting is not active, voting: ' + JSON.stringify(data[i])
               );
             }
             if (conf.env.COMMENT_ACTIVE()) {
-              var title = '';
-              var comment = '';
+              var title = 'Thanks for your donation';
+              var comment = 'Thank you @'+data[i].author+' with this donation';
+              comment+='I will be able to help more minnows';
               // Decide how to handle this with a form and mongodb document
-              // steem_api.commentPost(data[i].author,data[i].memo,title,comment);
-              // wait.for(this.timeout_wrapper,20000);
+              steem_api.commentPost(data[i].author,data[i].memo,title,comment);
+              wait.for(this.timeout_wrapper,20000);
             }else {
               this.debug(
                 'Commenting is not active, commenting: ' + JSON.stringify(data[i])
