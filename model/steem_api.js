@@ -167,7 +167,7 @@ module.exports = {
     if (votingpower > 100) {
       votingpower = 100;
     }
-    return votingpower * conf.env.VOTE_POWER_1_PC();
+    return parseInt(votingpower * conf.env.VOTE_POWER_1_PC());
   },
   init_conversion: function(globalData,callback) {
     var conversionInfo = new Object();
