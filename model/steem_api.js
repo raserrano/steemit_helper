@@ -23,6 +23,7 @@ module.exports = {
       weight);
   },
   commentPost: function(author,permlink,title,comment) {
+    var permlink = permlink.replace('.','');
     return wait.for(
       steem.broadcast.comment,
       conf.env.POSTING_KEY_PRV(),

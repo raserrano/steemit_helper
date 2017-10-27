@@ -190,10 +190,9 @@ module.exports = {
             'If you want a little boost in your posts and also help the ' +
             ' evironment try @treeplanter .' +
             'Use @tipu to give users a 0.1 SBD tip. ';
-            var temp_permlink = posts[i].permlink.replace('.','');
             steem_api.commentPost(
               posts[i].author,
-              temp_permlink,
+              posts[i].permlink,
               title,
               comment
             );
