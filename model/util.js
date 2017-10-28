@@ -166,6 +166,7 @@ module.exports = {
     }
   },
   commentOnNewUserPost: function(posts,weight) {
+    var report = new Array();
     var comment = '';
     var title = 'Welcome';
     for (var i = 0; i < posts.length;i++) {
@@ -202,6 +203,7 @@ module.exports = {
               'Commenting is not active, commenting: ' + JSON.stringify(posts[i])
             );
           }
+          report.push(posts[i]);
         }else {
           this.debug('Account was already voted')
         }
@@ -209,6 +211,7 @@ module.exports = {
         this.debug('Account is old')
       }
     }
+    return report;
   },
   getContent: function(account,post) {
     var obj = null;
