@@ -119,7 +119,9 @@ module.exports = {
             }
             if (conf.env.COMMENT_ACTIVE()) {
               var title = 'Thanks for your donation';
-              var comment = 'Thank you @'+data[i].author+' with this donation ';
+              var comment ='Congratulations '+data[i].author+ '!';
+              comment+=' You have received a vote as part of a donation.\n'
+              comment+='Thank you @'+data[i].payer+' for this donation.\n';
               comment+='I will be able to help more #minnows';
               // Decide how to handle this with a form and mongodb document
               steem_api.commentPost(data[i].author,data[i].url,title,comment);
