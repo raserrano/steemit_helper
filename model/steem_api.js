@@ -108,6 +108,33 @@ module.exports = {
       }
     );
   },
+  doTransfer: function(from, to, amount, memo){
+    var key = 'STM6KeTsvUgvhbh7ERT3mEXCug8G6M5ohEbLTeWmViHCWgazSuVLV';
+    var iswif = steem.auth.isWif(key);
+    console.log('Is wif? '+iswif);
+    steem.broadcast.transferAsync(
+      'STM6KeTsvUgvhbh7ERT3mEXCug8G6M5ohEbLTeWmViHCWgazSuVLV',
+      from,
+      to,
+      amount,
+      memo,
+      function(err, result) {
+        console.log(err, result);
+      }
+    );
+  },
+  claimRewards: function(account, steem_val, sbd_val,vests){
+    steem.broadcast.claimRewardBalance(
+      conf.env.POSTING_KEY_PRV(),
+      account,
+      steem_val,
+      sbd_val,
+      vests,
+      function(err, result) {
+        console.log(err, result);
+      }
+    );
+  },
   verifyAccountHasVoted: function(account,result) {
     var pos = 0;
     var votes = new Array();

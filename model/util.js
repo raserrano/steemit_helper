@@ -165,6 +165,31 @@ module.exports = {
       }
     }
   },
+  startRefundingProcess: function(account,data,voter){
+    for(var i = 0; i< data.length;i++){
+      if(data[i].status === 'due date'){
+        var memo = "Could not vote on: "+data[i].memo;
+        var transfer = wait.for(
+          steem_api.doTransfer,
+          account,
+          data[i].payer,
+          data[i].amount+' '+data[i].currency,
+          memo
+        );
+        db.model('Transfer').update(
+          {_id: data[i]._id},
+          {status:'refunded'},
+          function(err) {
+            if (err) {
+              console.log(res);
+              throw err;
+            }
+          }
+        );
+      }
+    }
+
+  },
   commentOnNewUserPost: function(posts,weight) {
     var report = new Array();
     var comment = '';
@@ -285,8 +310,25 @@ module.exports = {
       });
   },
   getQueue: function(callback) {
-    // Add calculation to be less than 6 days and a half (to be able to vote it)
     db.model('Transfer').find({voted: false,processed: false,status:{$in:["pending","processed"]},created: {$ne: null}}).sort({number: 1}).exec(
+      function(err,data) {
+        callback(err,data);
+      });
+  },
+  getRefunds: function(callback) {
+    db.model('Transfer').find(
+      {
+        voted: false,
+        processed: true,
+        status:{
+          $in:[
+          "due date",
+          "url not valid",
+          "content-not-found",
+          "url-not-found"
+          ]},
+      }
+    ).sort({number: 1}).exec(
       function(err,data) {
         callback(err,data);
       });

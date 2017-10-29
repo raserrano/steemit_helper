@@ -62,6 +62,14 @@ module.exports = {
       }
       return value;
     },
+    WIF: function() {
+      var value = '';
+      if ((process.env.WIF !== undefined)
+        && (process.env.WIF !== null)) {
+        value = process.env.WIF;
+      }
+      return value;
+    },
     VOTING_ACCS: function() {
       var value = '';
       if ((process.env.VOTING_ACCS !== undefined)
