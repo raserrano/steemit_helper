@@ -92,28 +92,25 @@ module.exports = {
       if (data[i].amount >= conf.env.MIN_DONATION()) {
         var amount_to_be_voted = data[i].amount;
         if (data[i].amount > conf.env.MAX_DONATION()) {
+          this.debug('Amount is bigger than max');
           amount_to_be_voted = conf.env.MAX_DONATION();
           data[i].donation = data[i].amount - conf.env.MAX_DONATION();
+          this.debug('Donation is: '+data[i].donation);
         }
         var voter = wait.for(
           steem_api.steem_getAccounts_wrapper,[conf.env.ACCOUNT_NAME()]
         );
-        var vp = voter.voting_power;
+        var vp = voter[0].voting_power;
         var weight = steem_api.calculateVoteWeight(
           voter[0],
           (amount_to_be_voted * conf.env.VOTE_MULTIPLIER())
         );
         if (conf.env.VOTE_ACTIVE()) {
+          this.debug('VP is :'+vp);
           if (vp >= (conf.env.MIN_VOTING_POWER() * conf.env.VOTE_POWER_1_PC())) {
-
-            // Author = 'content-not-found';
-            // author = 'url-not-found';
-            // author = 'comment';
-            // author = 'donation';
-            // and created == null
             if (conf.env.VOTE_ACTIVE()) {
               voted_ok = true;
-              Steem_api.votePost(data[i].author,data[i].memo,weight);
+              steem_api.votePost(data[i].author,data[i].url,weight);
               wait.for(this.timeout_wrapper,5000);
             }else {
               this.debug(
@@ -122,10 +119,10 @@ module.exports = {
             }
             if (conf.env.COMMENT_ACTIVE()) {
               var title = 'Thanks for your donation';
-              var comment = 'Thank you @'+data[i].author+' with this donation';
-              comment+='I will be able to help more minnows';
+              var comment = 'Thank you @'+data[i].author+' with this donation ';
+              comment+='I will be able to help more #minnows';
               // Decide how to handle this with a form and mongodb document
-              steem_api.commentPost(data[i].author,data[i].memo,title,comment);
+              steem_api.commentPost(data[i].author,data[i].url,title,comment);
               wait.for(this.timeout_wrapper,20000);
             }else {
               this.debug(
@@ -152,6 +149,7 @@ module.exports = {
           );
         }
       }else {
+        this.debug('Amount not enough, assuming donation');
         db.model('Transfer').update(
           {_id: data[i]._id},
           {donation: data[i].amount,processed: true,status:'min amount'},
