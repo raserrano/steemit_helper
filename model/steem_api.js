@@ -139,6 +139,7 @@ module.exports = {
       for (var i = 0; i < result.active_votes.length;i++) {
         votes.push(result.active_votes[i].voter);
       }
+      // console.log(votes);
       for (var j = 0;j < account.length;j++) {
         var match = '';
         if (account[j] instanceof Function) {

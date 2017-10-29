@@ -6,7 +6,7 @@ const
 
 // Voting for donations
 wait.launchFiber(function() {
-  var RECORDS_FETCH_LIMIT = 1000;
+  var RECORDS_FETCH_LIMIT = 100;
 
   var accounts = wait.for(
     steem_api.steem_getAccounts_wrapper,[conf.env.ACCOUNT_NAME()]
@@ -17,7 +17,7 @@ wait.launchFiber(function() {
   if (last_voted.length === 0) {
     last_voted = 0;
   }else {
-    last_voted = last_voted[0].number + 1;
+    last_voted = last_voted[0].number;
   }
   console.log('Last: ' + last_voted);
 
@@ -44,11 +44,9 @@ wait.launchFiber(function() {
     );
     utils.getTransfersToVote(
       conf.env.ACCOUNT_NAME(),
-      results,
-      conf.env.MIN_DONATION(),
-      conf.env.MAX_DONATION()
+      results
     );
-    last_voted += RECORDS_FETCH_LIMIT;
+      last_voted += RECORDS_FETCH_LIMIT;
   }
   // Get not voted posts from DB
   // var refunds = wait.for(utils.getRefunds);
@@ -58,13 +56,13 @@ wait.launchFiber(function() {
   //   refunds,
   //   accounts[0]
   // );
-  var queue = wait.for(utils.getQueue);
-  console.log('Queue to vote: '+queue.length);
-  utils.startVotingDonationsProcess(
-    conf.env.ACCOUNT_NAME(),
-    queue,
-    accounts[0]
-  );
+  // var queue = wait.for(utils.getQueue);
+  // console.log('Queue to vote: '+queue.length);
+  // utils.startVotingDonationsProcess(
+  //   conf.env.ACCOUNT_NAME(),
+  //   queue,
+  //   accounts[0]
+  // );
   console.log('Finish voting donations');
   process.exit();
 });

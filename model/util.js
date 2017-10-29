@@ -28,13 +28,15 @@ module.exports = {
       }
     }
   },
-  getTransfersToVote: function(account,data,min,max) {
-    for (var i = 0; i < data.length;i++) {
+  getTransfersToVote: function(account,data) {
+    var i = 0;
+    while(i < data.length) {
       if (data[i][1].op[0] == 'transfer') {
         if (data[i][1].op[1].to == account) {
           var res = this.getContent([account],data[i]);
           var query = {number: data[i][0]};
-          db.model('Transfer').update(query,res,{upsert: true},function(err) {
+          db.model('Transfer').update(query,res,{upsert: true,new:true},function(err) {
+            console.log(query);
             if (err) {
               console.log(res);
               throw err;
@@ -42,6 +44,7 @@ module.exports = {
           });
         }
       }
+      i++;
     }
   },
   startVotingProcess: function(account,data,weight,voter) {
