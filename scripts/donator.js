@@ -51,9 +51,20 @@ wait.launchFiber(function() {
     last_voted += RECORDS_FETCH_LIMIT;
   }
   // Get not voted posts from DB
+  // var refunds = wait.for(utils.getRefunds);
+  // console.log('Refunds to process: '+refunds.length);
+  // utils.startRefundingProcess(
+  //   conf.env.ACCOUNT_NAME(),
+  //   refunds,
+  //   accounts[0]
+  // );
   var queue = wait.for(utils.getQueue);
-  console.log('Queue: '+queue.length);
-  utils.startVotingDonationsProcess(conf.env.ACCOUNT_NAME(),queue,accounts[0]);
+  console.log('Queue to vote: '+queue.length);
+  utils.startVotingDonationsProcess(
+    conf.env.ACCOUNT_NAME(),
+    queue,
+    accounts[0]
+  );
   console.log('Finish voting donations');
   process.exit();
 });

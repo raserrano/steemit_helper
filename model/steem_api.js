@@ -109,11 +109,8 @@ module.exports = {
     );
   },
   doTransfer: function(from, to, amount, memo){
-    var key = 'STM6KeTsvUgvhbh7ERT3mEXCug8G6M5ohEbLTeWmViHCWgazSuVLV';
-    var iswif = steem.auth.isWif(key);
-    console.log('Is wif? '+iswif);
-    steem.broadcast.transferAsync(
-      'STM6KeTsvUgvhbh7ERT3mEXCug8G6M5ohEbLTeWmViHCWgazSuVLV',
+    steem.broadcast.transfer(
+      conf.env.WIF(),
       from,
       to,
       amount,
