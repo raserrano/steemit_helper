@@ -4,17 +4,9 @@
 
 - [x] Voting feature
 - [x] Welcome message feature
-- [ ] Transfer funds feature
+- [x] Transfer funds feature
 - [x] Commenting feature
 - [x] Donator transfers tracker
 - [x] Poster creator
 - [x] Reporter with a set of filters
-
-#Work in progress:#
-* Create a front end page to get reports exported to txt file
-* Visualize transfers
-* donation feature work in progress
-
-#Not developed yet#
-* webpage
-* refunder
+- [x] Queue view, trees report view, last transactions and all transactions
