@@ -15,12 +15,12 @@ wait.launchFiber(function() {
   // Trees
   var options_trees = {
     rate: 0.93,
-    trees:true
+    trees: true,
   };
   // Period
   var options_period = {
     period: 6,
-    voted:false
+    voted: false,
   };
 
   var data = wait.for(utils.getReport,options_period);

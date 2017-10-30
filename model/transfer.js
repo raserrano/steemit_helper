@@ -2,7 +2,6 @@ var mongoose = require('mongoose');
 
 var Schema = mongoose.Schema;
 
-// {number,payer,memo,amount,donation,currency,author,url,voted,processed,status,created};
 var transferSchema = new Schema({
   number: { type: Number, index: {unique: true,dropDups: true}, required: true},
   payer: { type: String, required: true},

@@ -3,10 +3,9 @@ const steem = require('steem'),
   request = require('request'),
   conf = require('../config/dev');
 
-var conversionInfo = new Object()
+var ci = new Object()
 
 steem.config.set('websocket',conf.websockets[0]);
-
 module.exports = {
   getTransfers: function(name,max,limit,callback) {
     steem.api.getAccountHistory(name,max,limit,function(err,result) {
@@ -108,7 +107,7 @@ module.exports = {
       }
     );
   },
-  doTransfer: function(from, to, amount, memo){
+  doTransfer: function(from, to, amount, memo,callback) {
     steem.broadcast.transfer(
       conf.env.WIF(),
       from,
@@ -116,11 +115,11 @@ module.exports = {
       amount,
       memo,
       function(err, result) {
-        console.log(err, result);
+        callback(err, result);
       }
     );
   },
-  claimRewards: function(account, steem_val, sbd_val,vests){
+  claimRewards: function(account, steem_val, sbd_val,vests,callback) {
     steem.broadcast.claimRewardBalance(
       conf.env.POSTING_KEY_PRV(),
       account,
@@ -128,7 +127,7 @@ module.exports = {
       sbd_val,
       vests,
       function(err, result) {
-        console.log(err, result);
+        callback(err, result);
       }
     );
   },
@@ -139,7 +138,7 @@ module.exports = {
       for (var i = 0; i < result.active_votes.length;i++) {
         votes.push(result.active_votes[i].voter);
       }
-      // console.log(votes);
+      // Console.log(votes);
       for (var j = 0;j < account.length;j++) {
         var match = '';
         if (account[j] instanceof Function) {
@@ -157,82 +156,75 @@ module.exports = {
   },
   calculateVoteWeight: function(account,target_value) {
     // Still need to figure out what is this for
-    var globalData = wait.for(steem_api.steem_getSteemGlobaleProperties_wrapper);
-    //Console.log('Global data: '+JSON.stringify(globalData));
-    var conversionInfo = steem_api.init_conversion(globalData);
-    //Console.log('Conversion infor: '+JSON.stringify(conversionInfo));
+    var globalData = wait.for(
+      steem_api.steem_getSteemGlobaleProperties_wrapper
+    );
+    var ci = steem_api.init_conversion(globalData);
 
     // Manual calcs
     var vp = account.voting_power;
-    //Console.log('voting_power: '+vp);
     var vestingSharesParts = account.vesting_shares.split(' ');
-    //Console.log('vesting_shares: '+vestingSharesParts[0]);
     var receivedSharesParts = account.received_vesting_shares.split(' ');
 
-    //Console.log('received_vesting_shares: '+receivedSharesParts[0]);
     var totalVests =
       parseFloat(vestingSharesParts[0]) + parseFloat(receivedSharesParts[0]);
-    //Console.log('Total vests: '+totalVests);
 
     var steempower = this.getSteemPowerFromVest(globalData,totalVests);
-    //Console.log('Steempower: '+steempower);
 
-    var sp_scaled_vests = steempower / conversionInfo.steem_per_vest;
-    //Console.log('sp_scaled_vests: '+sp_scaled_vests);
+    var sp_scaled_vests = steempower / ci.steem_per_vest;
 
     var voteweight = 100;
     var up = target_value * 52;
-    //Console.log('Up: '+up);
-    var down = sp_scaled_vests * 100 * conversionInfo.reward_pool * conversionInfo.sbd_per_steem;
-    //Console.log('Down: '+down);
+    var down = sp_scaled_vests * 100 * ci.reward_pool
+      * ci.sbd_per_steem;
     var oneval = up / down;
-    //Console.log("oneval: " + oneval);
 
-    var votingpower = (oneval / (100 * (100 * voteweight) / conf.env.VOTE_POWER_1_PC())) * 100;
-    //Console.log('Voting power: '+votingpower);
+    var votingpower = (oneval / (100 * (100 * voteweight)
+      / conf.env.VOTE_POWER_1_PC())) * 100;
     if (votingpower > 100) {
       votingpower = 100;
     }
     return parseInt(votingpower * conf.env.VOTE_POWER_1_PC());
   },
   init_conversion: function(globalData,callback) {
-    var conversionInfo = new Object();
+    var ci = new Object();
     // Get some info first
     var headBlock = wait.for(
       this.steem_getBlockHeader_wrapper,
       globalData.head_block_number
     );
     latestBlockMoment = new Date(headBlock.timestamp);
-    conversionInfo.rewardfund_info = wait.for(
+    ci.rewardfund_info = wait.for(
       this.steem_getRewardFund_wrapper,
       'post'
       );
-    conversionInfo.price_info = wait.for(
+    ci.price_info = wait.for(
       this.steem_getCurrentMedianHistoryPrice_wrapper
     );
 
-    conversionInfo.reward_balance = conversionInfo.rewardfund_info.reward_balance;
-    conversionInfo.recent_claims = conversionInfo.rewardfund_info.recent_claims;
-    conversionInfo.reward_pool = conversionInfo.reward_balance.replace(' STEEM', '')
-      / conversionInfo.recent_claims;
+    ci.reward_balance = ci.rewardfund_info.reward_balance;
+    ci.recent_claims = ci.rewardfund_info.recent_claims;
+    ci.reward_pool = ci.reward_balance.replace(' STEEM', '')
+      / ci.recent_claims;
 
-    conversionInfo.sbd_per_steem = conversionInfo.price_info.base.replace(' SBD', '')
-      / conversionInfo.price_info.quote.replace(' STEEM', '');
+    ci.sbd_per_steem = ci.price_info.base.replace(' SBD', '')
+      / ci.price_info.quote.replace(' STEEM', '');
 
-    conversionInfo.steem_per_vest = globalData.total_vesting_fund_steem.replace(' STEEM', '')
+    ci.steem_per_vest =
+      globalData.total_vesting_fund_steem.replace(' STEEM', '')
       / globalData.total_vesting_shares.replace(' VESTS', '');
     request(
       'https://api.coinmarketcap.com/v1/ticker/steem/',
       function(err, response, body) {
         if (err) {
-          conversionInfo.steem_to_dollar = 1;
+          ci.steem_to_dollar = 1;
         } else {
           var data = JSON.parse('{"data":' + body + '}');
-          conversionInfo.steem_to_dollar = data['data'][0]['price_usd'];
+          ci.steem_to_dollar = data['data'][0]['price_usd'];
         }
       }
     );
-    return conversionInfo;
+    return ci;
   },
   getSteemPowerFromVest: function(globalData,vest) {
     try {

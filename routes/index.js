@@ -26,7 +26,9 @@ router.get('/', function(req, res, next) {
   // };
 
   // var data = wait.for(utils.getReport,options_period);
-  mongoose.model('Transfer').find({created:{$ne:null}}).limit(500).sort({number: -1}).exec(
+  mongoose.model('Transfer').find(
+      {created: {$ne: null}}
+    ).limit(500).sort({number: -1}).exec(
     function(err, transfers) {
       if (err) {
         return console.error(err);
@@ -54,7 +56,7 @@ router.get('/votes', function(req, res, next) {
         res.render('index', {
           title: 'Not voted report',
           transfers: data,
-          type:'votes',
+          type: 'votes',
         });
       },
     });
@@ -64,7 +66,7 @@ router.get('/trees', function(req, res, next) {
   // Trees
   var options_trees = {
     rate: 0.93,
-    trees:true
+    trees: true,
   };
   wait.launchFiber(function() {
     var data = wait.for(utils.getReport,options_trees);
@@ -73,7 +75,7 @@ router.get('/trees', function(req, res, next) {
         res.render('index', {
           title: 'Trees planted report',
           transfers: data,
-          type:'trees',
+          type: 'trees',
         });
       },
     });
@@ -87,7 +89,7 @@ router.get('/queue', function(req, res, next) {
         res.render('index', {
           title: 'Queue',
           transfers: data,
-          type:'queue',
+          type: 'queue',
         });
       },
     });
@@ -101,7 +103,7 @@ router.get('/full', function(req, res, next) {
         res.render('index', {
           title: 'Full',
           transfers: data,
-          type:'full',
+          type: 'full',
         });
       },
     });
