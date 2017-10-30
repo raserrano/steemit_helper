@@ -1,6 +1,8 @@
 var config = require('../config/current'),
   mongoose = require('mongoose');
 
+mongoose.Promise = global.Promise;
+
 var db = mongoose.connect(
   config.database.conn(
     config.database.options
