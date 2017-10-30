@@ -207,10 +207,11 @@ module.exports = {
             var comment = 'Welcome to steemit @' + posts[i].author
             + '. Join #minnowsupportproject for more help. ' +
             'Leave a comment with #helpmein tag so I will' +
-            ' transfer registration fee. @OriginalWorks ' +
-            'If you want a little boost in your posts and also help the ' +
-            ' evironment try @treeplanter .' +
-            'Use @tipu to give users a 0.1 SBD tip. ';
+            ' transfer registration fee.\n @OriginalWorks ' +
+            ' will help you verify original content .\n' +
+            'If you want to plant a tree ' +
+            'try @treeplanter \n' +
+            'Use @tipu to give users a 0.1 SBD tip. \n';
             steem_api.commentPost(
               posts[i].author,
               posts[i].permlink,
