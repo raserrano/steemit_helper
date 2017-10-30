@@ -127,10 +127,9 @@ module.exports = {
             if (conf.env.COMMENT_ACTIVE()) {
               var title = 'Thanks for your donation';
               var comment = 'Congratulations @' + data[i].author + '!';
-              comment += ' You have received a vote as';
-              comment += 'part of a donation.\n';
-              comment += 'Thank you @' + data[i].payer;
-              comment += ' for this donation.\n';
+              comment += ' You have received a vote as ';
+              comment += 'part of  @' + data[i].payer;
+              comment += ' donation to this project.\n';
               comment += 'I will be able to help more #minnows';
               // Decide how to handle this with a form and mongodb document
               steem_api.commentPost(data[i].author,data[i].url,title,comment);
@@ -207,10 +206,11 @@ module.exports = {
             var comment = 'Welcome to steemit @' + posts[i].author
             + '. Join #minnowsupportproject for more help. ' +
             'Leave a comment with #helpmein tag so I will' +
-            ' transfer registration fee. @OriginalWorks ' +
-            'If you want a little boost in your posts and also help the ' +
-            ' evironment try @treeplanter .' +
-            'Use @tipu to give users a 0.1 SBD tip. ';
+            ' transfer registration fee.\n @OriginalWorks ' +
+            ' will help you verify original content .\n' +
+            'If you want to plant a tree ' +
+            'try @treeplanter \n' +
+            'Use @tipu to give users a 0.1 SBD tip. \n';
             steem_api.commentPost(
               posts[i].author,
               posts[i].permlink,
