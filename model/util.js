@@ -126,7 +126,7 @@ module.exports = {
               var title = '';
               var comment = '';
               if (conf.env.ACCOUNT_NAME() === 'treeplanter') {
-                var sp = this.getSteemPower(voter);
+                var sp = this.getSteemPower(voter[0]);
                 var trees = data[i].amount / 2;
                 title = 'Thanks for your donation';
                 comment = 'Good job! Thanks to @' + data[i].payer;
