@@ -142,7 +142,8 @@ module.exports = {
                 comment += 'more information about our conservation program. ';
                 comment += 'My current SP is ' + sp + '. Help me to plant ';
                 comment += 'more trees with your delegated SP. \n\n';
-                comment += 'Thanks a lot,\nyour @treeplanter';
+                comment += 'Thanks a lot,\nyour @treeplanter \n';
+                comment += 'www.kedjom-keku.com';
               }else {
                 title = 'Thanks for your donation';
                 comment = 'Congratulations @' + data[i].author + '!';
@@ -336,12 +337,13 @@ module.exports = {
           processed = true;
         }
       }else {
-        var post_url = post[1].op[1].memo.split('/');
-        post_url = post_url.filter(function(e) {return e});
-        if (post_url[post_url.length - 2][0] === '@') {
-          author = post_url[post_url.length - 2]
-          .substr(1, post_url[post_url.length - 2].length);
-          url = post_url[post_url.length - 1];
+        var post_url_comments = post[1].op[1].memo.split('#');
+        post_url_comments = post_url_comments.filter(function(e) {return e});
+        post_url_comments = post_url_comments.split('/');
+        if (post_url_comments[0][0] === '@') {
+          author = post_url_comments[0][0]
+          .substr(1, post_url_comments[0].length);
+          url = post_url[1];
           if (url != undefined && author != undefined
             && url != null && author != null) {
             if (payer !== author) {
