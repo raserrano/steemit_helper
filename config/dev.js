@@ -158,5 +158,13 @@ module.exports = {
       }
       return value;
     },
+    REFUNDS_ACTIVE: function() {
+      var value = false;
+      if ((process.env.REFUNDS_ACTIVE !== undefined) &&
+        (process.env.REFUNDS_ACTIVE !== null)) {
+        value = parseInt(process.env.REFUNDS_ACTIVE);
+      }
+      return value;
+    },
   },
 };

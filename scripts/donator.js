@@ -56,13 +56,15 @@ wait.launchFiber(function() {
     last_refunded = last_refunded[0].number;
   }
   console.log('Last refunded: ' + last_refunded);
-  var refunds = wait.for(utils.getRefunds,last_refunded);
-  console.log('Refunds to process: ' + refunds.length);
-  utils.startRefundingProcess(
-    conf.env.ACCOUNT_NAME(),
-    refunds,
-    accounts[0]
-  );
+  if(conf.env.REFUNDS_ACTIVE()){
+    var refunds = wait.for(utils.getRefunds,last_refunded);
+    console.log('Refunds to process: ' + refunds.length);
+    utils.startRefundingProcess(
+      conf.env.ACCOUNT_NAME(),
+      refunds,
+      accounts[0]
+    );    
+  }
   var queue = wait.for(utils.getQueue);
   console.log('Queue to vote: ' + queue.length);
   utils.startVotingDonationsProcess(
