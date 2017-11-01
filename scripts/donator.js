@@ -66,6 +66,8 @@ wait.launchFiber(function() {
       refunds,
       accounts[0]
     );    
+  }else {
+    console.log('Refunds not active');
   }
   var queue = wait.for(utils.getQueue);
   console.log('Queue to vote: ' + queue.length);
