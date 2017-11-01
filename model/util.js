@@ -130,8 +130,7 @@ module.exports = {
                 var trees = data[i].amount / 2;
                 title = 'Thanks for your donation';
                 comment = 'Good job! Thanks to @' + data[i].payer;
-                comment += ' you have planted ' + trees.toFixed(2);
-                comment += 'part of  @' + data[i].payer + ' ';
+                comment += ' you have planted ' + trees.toFixed(2) + ' ';
                 comment += 'tree to save Abongphen Highland ';
                 comment += 'Forest in Cameroon. Help me to plant 1,000,000 ';
                 comment += 'trees and share my Steem Power to the others. ';
@@ -153,8 +152,8 @@ module.exports = {
                 comment += 'I will be able to help more #minnows';
               }
               // Decide how to handle this with a form and mongodb document
-              // steem_api.commentPost(data[i].author, data[i].url, title,comment);
-              // wait.for(this.timeout_wrapper,20000);
+              steem_api.commentPost(data[i].author, data[i].url, title,comment);
+              wait.for(this.timeout_wrapper,20000);
             }else {
               this.debug(
                 'Commenting is not active, commenting: '
@@ -202,8 +201,8 @@ module.exports = {
         );
         wait.for(this.upsertTransfer,{_id: data[i]._id},{status: 'refunded'});
       }
-      if (data[i].status === 'comment') {
-        memo = 'Not voting comments: ' + data[i].memo;
+      if (data[i].status === 'self-comment') {
+        memo = 'Not voting self comments: ' + data[i].memo;
         send = data[i].amount.toFixed(3) + ' ' + data[i].currency;
         this.debug(send,account,data[i].payer,memo);
         wait.for(
@@ -337,8 +336,42 @@ module.exports = {
           processed = true;
         }
       }else {
-        status = 'comment';
-        processed = true;
+        var post_url = post[1].op[1].memo.split('/');
+        post_url = post_url.filter(function(e) {return e});
+        if (post_url[post_url.length - 2][0] === '@') {
+          author = post_url[post_url.length - 2]
+          .substr(1, post_url[post_url.length - 2].length);
+          url = post_url[post_url.length - 1];
+          if (url != undefined && author != undefined
+            && url != null && author != null) {
+            if (payer !== author) {
+              var result = wait.for(steem_api.steem_getContent,author,url);
+              if ((result !== undefined) && (result !== null)) {
+                created = result.created;
+                if (this.dateDiff(created) < (86400 * 6.5)) {
+                  voted = steem_api.verifyAccountHasVoted(account,result);
+                  status = 'processed';
+                  processed = voted;
+                }else {
+                  status = 'due date';
+                  processed = true;
+                }
+              }else {
+                status = 'content-not-found';
+                processed = true;
+              }
+            }else {
+              status = 'self-comment';
+              processed = true;
+            }
+          }else {
+            status = 'url-not-found';
+            processed = true;
+          }
+        }else {
+          status = 'url not valid';
+          processed = true;
+        }
       }
     }else {
       status = 'donation';
@@ -377,7 +410,7 @@ module.exports = {
       {
         voted: false,
         processed: false,
-        status: {$in: ['pending','processed']},
+        status: {$in: ['pending','processed','comment']},
         created: {$ne: null},
       }
       ).sort({number: 1}).exec(
@@ -396,7 +429,7 @@ module.exports = {
           'url not valid',
           'content-not-found',
           'url-not-found',
-          'comment',
+          'self-comment',
           'self-vote',
           ],},
         number: {$gt: last_refunded},
