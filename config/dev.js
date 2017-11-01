@@ -143,7 +143,7 @@ module.exports = {
       return value;
     },
     LAST_VOTED: function() {
-      var value = 0;
+      var value;
       if ((process.env.LAST_VOTED !== undefined) &&
         (process.env.LAST_VOTED !== null)) {
         value = parseInt(process.env.LAST_VOTED);
