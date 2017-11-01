@@ -571,11 +571,13 @@ module.exports = {
     this.debug('Steem VESTS: ' + account.vesting_shares);
     this.debug('Delegated VESTS: ' + account.received_vesting_shares);
     var delegatedSteemPower = steem_api.getSteemPowerFromVest(
-      account.received_vesting_shares
+      account.received_vesting_shares.replace(' VESTS', '')
     );
-    var steemPower = steem_api.getSteemPowerFromVest(
-      account.vesting_shares
-    ) + delegatedSteemPower;
+    var ownSteemPower = steem_api.getSteemPowerFromVest(
+      account.vesting_shares.replace(' VESTS', '')
+    );
+    var steemPower = parseFloat(delegatedSteemPower) +
+      parseFloat(ownSteemPower);
     console.log('Steem power: ' + steemPower);
   },
   dateDiff: function(when) {
