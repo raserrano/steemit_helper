@@ -162,7 +162,7 @@ module.exports = {
       var value = false;
       if ((process.env.REFUNDS_ACTIVE !== undefined) &&
         (process.env.REFUNDS_ACTIVE !== null)) {
-        value = parseInt(process.env.REFUNDS_ACTIVE);
+        value = process.env.REFUNDS_ACTIVE;
       }
       return value;
     },
