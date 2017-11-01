@@ -340,34 +340,40 @@ module.exports = {
         var post_url_comments = post[1].op[1].memo.split('#');
         post_url_comments = post_url_comments[1].split('/');
         post_url_comments = post_url_comments.filter(function(e) {return e});
-        if (post_url_comments[0][0] === '@') {
-          author = post_url_comments[0]
-          .substr(1, post_url_comments[0].length);
-          url = post_url_comments[1];
-          if (url != undefined && author != undefined
-            && url != null && author != null) {
-            if (payer !== author) {
-              var result = wait.for(steem_api.steem_getContent,author,url);
-              if ((result !== undefined) && (result !== null)) {
-                created = result.created;
-                if (this.dateDiff(created) < (86400 * 6.5)) {
-                  voted = steem_api.verifyAccountHasVoted(account,result);
-                  status = 'processed';
-                  processed = voted;
+        if(post_url_comments.length > 0) {
+          console.log(post_url_comments);
+          if (post_url_comments[0][0] === '@') {
+            author = post_url_comments[0]
+            .substr(1, post_url_comments[0].length);
+            url = post_url_comments[1];
+            if (url != undefined && author != undefined
+              && url != null && author != null) {
+              if (payer !== author) {
+                var result = wait.for(steem_api.steem_getContent,author,url);
+                if ((result !== undefined) && (result !== null)) {
+                  created = result.created;
+                  if (this.dateDiff(created) < (86400 * 6.5)) {
+                    voted = steem_api.verifyAccountHasVoted(account,result);
+                    status = 'processed';
+                    processed = voted;
+                  }else {
+                    status = 'due date';
+                    processed = true;
+                  }
                 }else {
-                  status = 'due date';
+                  status = 'content-not-found';
                   processed = true;
                 }
               }else {
-                status = 'content-not-found';
+                status = 'self-comment';
                 processed = true;
               }
             }else {
-              status = 'self-comment';
+              status = 'url-not-found';
               processed = true;
             }
           }else {
-            status = 'url-not-found';
+            status = 'url not valid';
             processed = true;
           }
         }else {
