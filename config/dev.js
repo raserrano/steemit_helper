@@ -98,7 +98,7 @@ module.exports = {
       var value = false;
       if ((process.env.VOTE_ACTIVE !== undefined) &&
         (process.env.VOTE_ACTIVE !== null)) {
-        value = process.env.VOTE_ACTIVE;
+        value = JSON.parse(process.env.VOTE_ACTIVE);
       }
       return value;
     },
@@ -106,7 +106,7 @@ module.exports = {
       var value = false;
       if ((process.env.COMMENT_ACTIVE !== undefined) &&
         (process.env.COMMENT_ACTIVE !== null)) {
-        value = process.env.COMMENT_ACTIVE;
+        value = JSON.parse(process.env.COMMENT_ACTIVE);
       }
       return value;
     },
@@ -114,7 +114,7 @@ module.exports = {
       var value = false;
       if ((process.env.REPORT_ACTIVE !== undefined) &&
         (process.env.REPORT_ACTIVE !== null)) {
-        value = process.env.REPORT_ACTIVE;
+        value = JSON.parse(process.env.REPORT_ACTIVE);
       }
       return value;
     },
@@ -162,7 +162,7 @@ module.exports = {
       var value = false;
       if ((process.env.REFUNDS_ACTIVE !== undefined) &&
         (process.env.REFUNDS_ACTIVE !== null)) {
-        value = process.env.REFUNDS_ACTIVE;
+        value = JSON.parse(process.env.REFUNDS_ACTIVE);
       }
       return value;
     },

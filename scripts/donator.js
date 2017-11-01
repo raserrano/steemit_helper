@@ -58,7 +58,7 @@ wait.launchFiber(function() {
     last_refunded = last_refunded[0].number;
   }
   console.log('Last refunded: ' + last_refunded);
-  if(conf.env.REFUNDS_ACTIVE() === true){
+  if(conf.env.REFUNDS_ACTIVE()){
     var refunds = wait.for(utils.getRefunds,last_refunded);
     console.log('Refunds to process: ' + refunds.length);
     utils.startRefundingProcess(
@@ -66,6 +66,8 @@ wait.launchFiber(function() {
       refunds,
       accounts[0]
     );    
+  }else {
+    console.log('Refunds not active');
   }
   var queue = wait.for(utils.getQueue);
   console.log('Queue to vote: ' + queue.length);
