@@ -126,7 +126,7 @@ module.exports = {
               var title = '';
               var comment = '';
               if (conf.env.ACCOUNT_NAME() === 'treeplanter') {
-                var sp = this.getSteemPower(voter[0]);
+                var sp = this.getSteemPower(voter[0]).toFixed(2);
                 var trees = data[i].amount / 2;
                 title = 'Thanks for your donation';
                 comment = 'Good job! Thanks to @' + data[i].payer;
@@ -341,7 +341,7 @@ module.exports = {
         post_url_comments = post_url_comments[1].split('/');
         post_url_comments = post_url_comments.filter(function(e) {return e});
         if (post_url_comments[0][0] === '@') {
-          author = post_url_comments[0][0]
+          author = post_url_comments[0]
           .substr(1, post_url_comments[0].length);
           url = post_url_comments[1];
           if (url != undefined && author != undefined
@@ -569,18 +569,23 @@ module.exports = {
     }
     return vp;
   },
+  
   getSteemPower: function(account) {
+    var globalData = wait.for(
+      steem_api.steem_getSteemGlobaleProperties_wrapper
+    );
     this.debug('Steem VESTS: ' + account.vesting_shares);
     this.debug('Delegated VESTS: ' + account.received_vesting_shares);
     var delegatedSteemPower = steem_api.getSteemPowerFromVest(
-      account.received_vesting_shares.replace(' VESTS', '')
+      globalData,
+      account.received_vesting_shares
     );
     var ownSteemPower = steem_api.getSteemPowerFromVest(
-      account.vesting_shares.replace(' VESTS', '')
+      globalData,
+      account.vesting_shares
     );
-    var steemPower = parseFloat(delegatedSteemPower) +
+    return parseFloat(delegatedSteemPower) +
       parseFloat(ownSteemPower);
-    console.log('Steem power: ' + steemPower);
   },
   dateDiff: function(when) {
     var then = new Date(when);
