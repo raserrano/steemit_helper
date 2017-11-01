@@ -3,6 +3,8 @@ var config = require('../config/current'),
 
 mongoose.Promise = global.Promise;
 
+console.log(config.database.conn(config.database.options));
+
 var db = mongoose.connect(
   config.database.conn(
     config.database.options

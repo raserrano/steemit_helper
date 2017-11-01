@@ -95,6 +95,23 @@ router.get('/queue', function(req, res, next) {
     });
   });
 });
+router.get('/refunded', function(req, res, next) {
+  var options_status = {
+    status: 'refunded',
+  };
+  wait.launchFiber(function() {
+    var data = wait.for(utils.getReport,options_status);
+    res.format({
+      html: function() {
+        res.render('index', {
+          title: 'Refunded transfers',
+          transfers: data,
+          type: 'refunded',
+        });
+      },
+    });
+  });
+});
 router.get('/full', function(req, res, next) {
   wait.launchFiber(function() {
     var data = wait.for(utils.getReport,{});
