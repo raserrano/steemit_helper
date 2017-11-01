@@ -92,7 +92,7 @@ module.exports = {
   startVotingDonationsProcess: function(account,data) {
     for (var i = 0;i < data.length;i++) {
       var voted_ok = false;
-      if (data[i].amount > conf.env.MIN_DONATION()) {
+      if (data[i].amount >= conf.env.MIN_DONATION()) {
         var amount_to_be_voted = data[i].amount;
         if (data[i].amount > conf.env.MAX_DONATION()) {
           this.debug('Amount is bigger than max');
@@ -126,12 +126,11 @@ module.exports = {
               var title = '';
               var comment = '';
               if (conf.env.ACCOUNT_NAME() === 'treeplanter') {
-                var sp = this.getSteemPower(voter);
+                var sp = this.getSteemPower(voter[0]);
                 var trees = data[i].amount / 2;
                 title = 'Thanks for your donation';
                 comment = 'Good job! Thanks to @' + data[i].payer;
-                comment += ' you have planted ' + trees.toFixed(2);
-                comment += 'part of  @' + data[i].payer + ' ';
+                comment += ' you have planted ' + trees.toFixed(2) + ' ';
                 comment += 'tree to save Abongphen Highland ';
                 comment += 'Forest in Cameroon. Help me to plant 1,000,000 ';
                 comment += 'trees and share my Steem Power to the others. ';
@@ -143,7 +142,8 @@ module.exports = {
                 comment += 'more information about our conservation program. ';
                 comment += 'My current SP is ' + sp + '. Help me to plant ';
                 comment += 'more trees with your delegated SP. \n\n';
-                comment += 'Thanks a lot,\nyour @treeplanter';
+                comment += 'Thanks a lot,\nyour @treeplanter \n';
+                comment += 'www.kedjom-keku.com';
               }else {
                 title = 'Thanks for your donation';
                 comment = 'Congratulations @' + data[i].author + '!';
@@ -153,8 +153,8 @@ module.exports = {
                 comment += 'I will be able to help more #minnows';
               }
               // Decide how to handle this with a form and mongodb document
-              // steem_api.commentPost(data[i].author, data[i].url, title,comment);
-              // wait.for(this.timeout_wrapper,20000);
+              steem_api.commentPost(data[i].author, data[i].url, title,comment);
+              wait.for(this.timeout_wrapper,20000);
             }else {
               this.debug(
                 'Commenting is not active, commenting: '
@@ -202,8 +202,8 @@ module.exports = {
         );
         wait.for(this.upsertTransfer,{_id: data[i]._id},{status: 'refunded'});
       }
-      if (data[i].status === 'comment') {
-        memo = 'Not voting comments: ' + data[i].memo;
+      if (data[i].status === 'self-comment') {
+        memo = 'Not voting self comments: ' + data[i].memo;
         send = data[i].amount.toFixed(3) + ' ' + data[i].currency;
         this.debug(send,account,data[i].payer,memo);
         wait.for(
@@ -337,8 +337,43 @@ module.exports = {
           processed = true;
         }
       }else {
-        status = 'comment';
-        processed = true;
+        var post_url_comments = post[1].op[1].memo.split('#');
+        post_url_comments = post_url_comments[1].split('/');
+        post_url_comments = post_url_comments.filter(function(e) {return e});
+        if (post_url_comments[0][0] === '@') {
+          author = post_url_comments[0]
+          .substr(1, post_url_comments[0].length);
+          url = post_url_comments[1];
+          if (url != undefined && author != undefined
+            && url != null && author != null) {
+            if (payer !== author) {
+              var result = wait.for(steem_api.steem_getContent,author,url);
+              if ((result !== undefined) && (result !== null)) {
+                created = result.created;
+                if (this.dateDiff(created) < (86400 * 6.5)) {
+                  voted = steem_api.verifyAccountHasVoted(account,result);
+                  status = 'processed';
+                  processed = voted;
+                }else {
+                  status = 'due date';
+                  processed = true;
+                }
+              }else {
+                status = 'content-not-found';
+                processed = true;
+              }
+            }else {
+              status = 'self-comment';
+              processed = true;
+            }
+          }else {
+            status = 'url-not-found';
+            processed = true;
+          }
+        }else {
+          status = 'url not valid';
+          processed = true;
+        }
       }
     }else {
       status = 'donation';
@@ -377,7 +412,7 @@ module.exports = {
       {
         voted: false,
         processed: false,
-        status: {$in: ['pending','processed']},
+        status: {$in: ['pending','processed','comment']},
         created: {$ne: null},
       }
       ).sort({number: 1}).exec(
@@ -396,7 +431,7 @@ module.exports = {
           'url not valid',
           'content-not-found',
           'url-not-found',
-          'comment',
+          'self-comment',
           'self-vote',
           ],},
         number: {$gt: last_refunded},
@@ -534,16 +569,23 @@ module.exports = {
     }
     return vp;
   },
+  
   getSteemPower: function(account) {
+    var globalData = wait.for(
+      steem_api.steem_getSteemGlobaleProperties_wrapper
+    );
     this.debug('Steem VESTS: ' + account.vesting_shares);
     this.debug('Delegated VESTS: ' + account.received_vesting_shares);
     var delegatedSteemPower = steem_api.getSteemPowerFromVest(
+      globalData,
       account.received_vesting_shares
     );
-    var steemPower = steem_api.getSteemPowerFromVest(
+    var ownSteemPower = steem_api.getSteemPowerFromVest(
+      globalData,
       account.vesting_shares
-    ) + delegatedSteemPower;
-    console.log('Steem power: ' + steemPower);
+    );
+    return parseFloat(delegatedSteemPower) +
+      parseFloat(ownSteemPower);
   },
   dateDiff: function(when) {
     var then = new Date(when);
