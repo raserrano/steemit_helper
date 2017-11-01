@@ -50,12 +50,12 @@ wait.launchFiber(function() {
   }
   // Get not voted posts from DB
   var last_refunded = wait.for(utils.getLastRefunded);
-  if(last_refunded.length === 0){
-    last_refunded=conf.env.LAST_REFUNDED();
-  }else{
+  if (last_refunded.length === 0) {
+    last_refunded = conf.env.LAST_REFUNDED();
+  }else {
     last_refunded = last_refunded[0].number;
   }
-  console.log('Last refunded: '+last_refunded);
+  console.log('Last refunded: ' + last_refunded);
   var refunds = wait.for(utils.getRefunds,last_refunded);
   console.log('Refunds to process: ' + refunds.length);
   utils.startRefundingProcess(
