@@ -338,8 +338,8 @@ module.exports = {
         }
       }else {
         var post_url_comments = post[1].op[1].memo.split('#');
+        post_url_comments = post_url_comments[1].split('/');
         post_url_comments = post_url_comments.filter(function(e) {return e});
-        post_url_comments = post_url_comments.split('/');
         if (post_url_comments[0][0] === '@') {
           author = post_url_comments[0][0]
           .substr(1, post_url_comments[0].length);
