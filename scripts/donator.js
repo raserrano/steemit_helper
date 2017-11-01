@@ -58,7 +58,7 @@ wait.launchFiber(function() {
     last_refunded = last_refunded[0].number;
   }
   console.log('Last refunded: ' + last_refunded);
-  if(conf.env.REFUNDS_ACTIVE()){
+  if(conf.env.REFUNDS_ACTIVE() === true){
     var refunds = wait.for(utils.getRefunds,last_refunded);
     console.log('Refunds to process: ' + refunds.length);
     utils.startRefundingProcess(
