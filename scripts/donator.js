@@ -6,7 +6,7 @@ const
 
 // Voting for donations
 wait.launchFiber(function() {
-  var RECORDS_FETCH_LIMIT = 100;
+  var RECORDS_FETCH_LIMIT = 1000;
 
   var accounts = wait.for(
     steem_api.steem_getAccounts_wrapper,[conf.env.ACCOUNT_NAME()]
@@ -15,7 +15,7 @@ wait.launchFiber(function() {
   // Find last voted post number
   var last_voted = wait.for(utils.getLastTransfer);
   if (last_voted.length === 0) {
-    last_voted = 0;
+    last_voted = conf.env.LAST_VOTED();
   }else {
     last_voted = last_voted[0].number;
   }
@@ -49,7 +49,14 @@ wait.launchFiber(function() {
     last_voted += RECORDS_FETCH_LIMIT;
   }
   // Get not voted posts from DB
-  var refunds = wait.for(utils.getRefunds);
+  var last_refunded = wait.for(utils.getLastRefunded);
+  if(last_refunded.length === 0){
+    last_refunded=conf.env.LAST_REFUNDED();
+  }else{
+    last_refunded = last_refunded[0].number;
+  }
+  console.log('Last refunded: '+last_refunded);
+  var refunds = wait.for(utils.getRefunds,last_refunded);
   console.log('Refunds to process: ' + refunds.length);
   utils.startRefundingProcess(
     conf.env.ACCOUNT_NAME(),
@@ -60,8 +67,7 @@ wait.launchFiber(function() {
   console.log('Queue to vote: ' + queue.length);
   utils.startVotingDonationsProcess(
     conf.env.ACCOUNT_NAME(),
-    queue,
-    accounts[0]
+    queue
   );
   console.log('Finish voting donations');
   process.exit();

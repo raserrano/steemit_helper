@@ -82,15 +82,15 @@ module.exports = {
       var value = 100;
       if ((process.env.VOTE_POWER_1_PC !== undefined)
         && (process.env.VOTE_POWER_1_PC !== null)) {
-        value = process.env.VOTE_POWER_1_PC;
+        value = parseInt(process.env.VOTE_POWER_1_PC);
       }
       return value;
     },
     MIN_VOTING_POWER: function() {
-      var value = 70;
+      var value = 80;
       if ((process.env.MIN_VOTING_POWER !== undefined)
         && (process.env.MIN_VOTING_POWER !== null)) {
-        value = process.env.MIN_VOTING_POWER;
+        value = parseInt(process.env.MIN_VOTING_POWER);
       }
       return value;
     },
@@ -122,7 +122,7 @@ module.exports = {
       var value = 0.1;
       if ((process.env.MIN_DONATION !== undefined)
         && (process.env.MIN_DONATION !== null)) {
-        value = process.env.MIN_DONATION;
+        value = parseFloat(process.env.MIN_DONATION);
       }
       return value;
     },
@@ -130,7 +130,7 @@ module.exports = {
       var value = 0.25;
       if ((process.env.MAX_DONATION !== undefined)
         && (process.env.MAX_DONATION !== null)) {
-        value = process.env.MAX_DONATION;
+        value = parseFloat(process.env.MAX_DONATION);
       }
       return value;
     },
@@ -138,7 +138,23 @@ module.exports = {
       var value = 1.5;
       if ((process.env.VOTE_MULTIPLIER !== undefined)
         && (process.env.VOTE_MULTIPLIER !== null)) {
-        value = process.env.VOTE_MULTIPLIER;
+        value = parseFloat(process.env.VOTE_MULTIPLIER);
+      }
+      return value;
+    },
+    LAST_VOTED: function() {
+      var value = 0;
+      if ((process.env.LAST_VOTED !== undefined)
+        && (process.env.LAST_VOTED !== null)) {
+        value = parseInt(process.env.LAST_VOTED);
+      }
+      return value;
+    },
+    LAST_REFUNDED: function() {
+      var value = 0;
+      if ((process.env.LAST_REFUNDED !== undefined)
+        && (process.env.LAST_REFUNDED !== null)) {
+        value = parseInt(process.env.LAST_REFUNDED);
       }
       return value;
     },
