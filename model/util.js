@@ -11,7 +11,7 @@ module.exports = {
           var res = this.getContent([account],data[i]);
           if (res !== null) {
             if (!res.voted) {
-              if (res.amount > min) {
+              if (res.amount >= min) {
                 console.log(JSON.stringify(res));
               }else {
                 this.debug('Transfered amount is not greater than MIN: ' + min);
@@ -190,7 +190,8 @@ module.exports = {
     var send = '';
     for (var i = 0; i < data.length;i++) {
       if (data[i].status === 'due date') {
-        memo = 'Could not vote on: ' + data[i].memo;
+        memo = ' am sorry my SP was not enough to upvote the post you sent ';
+        memo += 'me in memo. Send me different (not so old) post. Thank you.';
         send = data[i].amount.toFixed(3) + ' ' + data[i].currency;
         this.debug(send,account,data[i].payer,memo);
         wait.for(
@@ -202,21 +203,13 @@ module.exports = {
         );
         wait.for(this.upsertTransfer,{_id: data[i]._id},{status: 'refunded'});
       }
-      if (data[i].status === 'self-comment') {
-        memo = 'Not voting self comments: ' + data[i].memo;
-        send = data[i].amount.toFixed(3) + ' ' + data[i].currency;
-        this.debug(send,account,data[i].payer,memo);
-        wait.for(
-          steem_api.doTransfer,
-          account,
-          data[i].payer,
-          send,
-          memo
-        );
-        wait.for(this.upsertTransfer,{_id: data[i]._id},{status: 'refunded'});
-      }
-      if (data[i].status === 'self-vote') {
-        memo = 'Not doing self votes: ' + data[i].memo;
+      if (data[i].status === 'self-comment' || data[i].status === 'self-vote') {
+        memo = 'Sorry, I cannot do selfvoting anymore. Instead I would like ';
+        memo += 'to see you sharing my STEEM POWER with others. Distribute ';
+        memo += 'your donation to five of yours influenced followers to get ';
+        memo += 'their attention and help me to spread the Steem world and ';
+        memo += 'plant 1,000,000 trees to save and restore Abongphen Highland ';
+        memo += 'Forest in Cameroon.';
         send = data[i].amount.toFixed(3) + ' ' + data[i].currency;
         this.debug(send,account,data[i].payer,memo);
         wait.for(
@@ -341,7 +334,6 @@ module.exports = {
         post_url_comments = post_url_comments[1].split('/');
         post_url_comments = post_url_comments.filter(function(e) {return e});
         if(post_url_comments.length > 0) {
-          console.log(post_url_comments);
           if (post_url_comments[0][0] === '@') {
             author = post_url_comments[0]
             .substr(1, post_url_comments[0].length);
