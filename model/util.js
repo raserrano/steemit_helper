@@ -92,7 +92,7 @@ module.exports = {
   startVotingDonationsProcess: function(account,data) {
     for (var i = 0;i < data.length;i++) {
       var voted_ok = false;
-      if (data[i].amount > conf.env.MIN_DONATION()) {
+      if (data[i].amount >= conf.env.MIN_DONATION()) {
         var amount_to_be_voted = data[i].amount;
         if (data[i].amount > conf.env.MAX_DONATION()) {
           this.debug('Amount is bigger than max');
