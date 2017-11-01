@@ -343,7 +343,7 @@ module.exports = {
         if (post_url_comments[0][0] === '@') {
           author = post_url_comments[0][0]
           .substr(1, post_url_comments[0].length);
-          url = post_url[1];
+          url = post_url_comments[1];
           if (url != undefined && author != undefined
             && url != null && author != null) {
             if (payer !== author) {
