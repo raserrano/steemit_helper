@@ -143,7 +143,7 @@ module.exports = {
                 comment += 'My current SP is ' + sp + '. Help me to plant ';
                 comment += 'more trees with your delegated SP. \n\n';
                 comment += 'Thanks a lot,\nyour @treeplanter \n';
-                comment += 'www.kedjom-keku.com';
+                comment += '[www.kedjom-keku.com](www.kedjom-keku.com)';
               }else {
                 title = 'Thanks for your donation';
                 comment = 'Congratulations @' + data[i].author + '!';
