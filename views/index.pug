@@ -6,6 +6,9 @@ block content
   div.table-responsive
   table.table.table-striped
     if type === 'trees'
+      - var total_trees = trees[0].total.toFixed(2)
+      div.trees_total Total planted trees 
+        strong=total_trees
       thead
         tr
           th Payer

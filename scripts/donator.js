@@ -17,12 +17,10 @@ wait.launchFiber(function() {
   if (last_voted.length !== 0) {
     last_voted = last_voted[0].number;
   }
-  if(conf.env.LAST_VOTED() !== null && conf.env.LAST_VOTED() !== undefined){
+  if (conf.env.LAST_VOTED() !== null && conf.env.LAST_VOTED() !== undefined) {
     last_voted = conf.env.LAST_VOTED();
   }
-  
   console.log('Last: ' + last_voted);
-
   // Get latest transfer
   var max = wait.for(
     steem_api.getTransfers,
@@ -58,14 +56,14 @@ wait.launchFiber(function() {
     last_refunded = last_refunded[0].number;
   }
   console.log('Last refunded: ' + last_refunded);
-  if(conf.env.REFUNDS_ACTIVE()){
+  if (conf.env.REFUNDS_ACTIVE()) {
     var refunds = wait.for(utils.getRefunds,last_refunded);
     console.log('Refunds to process: ' + refunds.length);
     utils.startRefundingProcess(
       conf.env.ACCOUNT_NAME(),
       refunds,
       accounts[0]
-    );    
+    );
   }else {
     console.log('Refunds not active');
   }
