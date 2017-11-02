@@ -7,25 +7,7 @@ var express = require('express'),
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-  // // Report types
-  // // Full
-  // var options_full = {};
-  // // Not voted
-  // var options_notvoted = {
-  //   voted: false,
-  // };
-  // // Trees
-  // var options_trees = {
-  //   rate: 0.93,
-  //   trees:true
-  // };
-  // // Period
-  // var options_period = {
-  //   period: 6,
-  //   voted:false
-  // };
 
-  // var data = wait.for(utils.getReport,options_period);
   mongoose.model('Transfer').find(
       {created: {$ne: null}}
     ).limit(500).sort({number: -1}).exec(
@@ -69,12 +51,14 @@ router.get('/trees', function(req, res, next) {
     trees: true,
   };
   wait.launchFiber(function() {
+    var trees = wait.for(utils.getTreesTotal);
     var data = wait.for(utils.getReport,options_trees);
     res.format({
       html: function() {
         res.render('index', {
           title: 'Trees planted report',
           transfers: data,
+          trees: trees,
           type: 'trees',
         });
       },

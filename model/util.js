@@ -150,7 +150,8 @@ module.exports = {
                 comment += ' You have received a vote as ';
                 comment += 'part of  @' + data[i].payer;
                 comment += ' donation to this project.\n';
-                comment += 'I will be able to help more #minnows';
+                comment += 'I will be able to help more #minnows \n';
+                comment += '@OriginalWorks @steem-untalented';
               }
               // Decide how to handle this with a form and mongodb document
               steem_api.commentPost(data[i].author, data[i].url, title,comment);
@@ -222,7 +223,6 @@ module.exports = {
         wait.for(this.upsertTransfer,{_id: data[i]._id},{status: 'refunded'});
       }
     }
-
   },
   commentOnNewUserPost: function(posts,weight) {
     var report = new Array();
@@ -248,7 +248,7 @@ module.exports = {
             var comment = 'Welcome to steemit @' + posts[i].author
             + '. Join #minnowsupportproject for more help. ' +
             'Leave a comment with #helpmein tag so I will' +
-            ' transfer registration fee.\n @OriginalWorks ' +
+            ' transfer registration fee.\n @OriginalWorks @steem-untalented' +
             ' will help you verify original content .\n' +
             'If you want to plant a tree ' +
             'try @treeplanter \n' +
@@ -397,13 +397,15 @@ module.exports = {
     db.model('Transfer').find({voted: true}).limit(1).sort({number: -1}).exec(
       function(err,data) {
         callback(err,data);
-      });
+      }
+    );
   },
   getLastTransfer: function(callback) {
     db.model('Transfer').find().limit(1).sort({number: -1}).exec(
       function(err,data) {
         callback(err,data);
-      });
+      }
+    );
   },
   getQueue: function(callback) {
     db.model('Transfer').find(
@@ -416,7 +418,8 @@ module.exports = {
       ).sort({number: 1}).exec(
       function(err,data) {
         callback(err,data);
-      });
+      }
+    );
   },
   getRefunds: function(last_refunded,callback) {
     db.model('Transfer').find(
@@ -437,7 +440,8 @@ module.exports = {
     ).sort({number: 1}).exec(
       function(err,data) {
         callback(err,data);
-      });
+      }
+    );
   },
   getLastRefunded: function(callback) {
     db.model('Transfer').find({
@@ -445,18 +449,32 @@ module.exports = {
       }).limit(1).sort({number: -1}).exec(
       function(err,data) {
         callback(err,data);
-      });
+      }
+    );
   },
   getTransfer: function(query,callback) {
     db.model('Transfer').find(query).exec(
       function(err,data) {
         callback(err,data);
-      });
+      }
+    );
   },
   upsertTransfer: function(query,doc,callback) {
     db.model('Transfer').update(
       query,doc,{upsert: true,new: true},
       function(err,data) {callback(err,data);}
+    );
+  },
+  getTreesTotal: function(callback){
+    var stages=[
+      {$match: {status:{$ne:'refunded'}}},
+      {$project: {_id:false,total: {$sum:'$amount'},},},
+      {$group: {_id:'total',total: {$sum:'$total'},},},
+      ];
+    db.model('Transfer').aggregate(stages).exec(
+      function(err,data) {
+        callback(err,data);
+      }
     );
   },
   getReport: function(options,callback) {
@@ -515,7 +533,8 @@ module.exports = {
     db.model('Transfer').aggregate(stages).exec(
       function(err,data) {
         callback(err,data);
-      });
+      }
+    );
   },
   generateCommentedReport: function(posts) {
     var when = this.getDate(new Date());
@@ -550,7 +569,6 @@ module.exports = {
       this.debug('Debug is active not posting but body is:');
       this.debug(body);
     }
-
   },
   getVotingPower: function(account) {
     var vp = account.voting_power;
@@ -567,7 +585,6 @@ module.exports = {
     }
     return vp;
   },
-  
   getSteemPower: function(account) {
     var globalData = wait.for(
       steem_api.steem_getSteemGlobaleProperties_wrapper
