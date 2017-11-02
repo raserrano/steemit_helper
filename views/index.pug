@@ -16,7 +16,7 @@ block content
         each transfer, i in transfers
           tr
             td
-              - var text='@'+transfer._id.payer+' | '+transfer.total
+              - var text='@'+transfer._id.payer+' | '+transfer.total.toFixed(2)
               div=text
     else if type === 'votes'
       thead
