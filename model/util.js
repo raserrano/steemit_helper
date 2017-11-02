@@ -333,7 +333,7 @@ module.exports = {
         var post_url_comments = post[1].op[1].memo.split('#');
         post_url_comments = post_url_comments[1].split('/');
         post_url_comments = post_url_comments.filter(function(e) {return e});
-        if(post_url_comments.length > 0) {
+        if (post_url_comments.length > 0) {
           if (post_url_comments[0][0] === '@') {
             author = post_url_comments[0]
             .substr(1, post_url_comments[0].length);
@@ -465,11 +465,11 @@ module.exports = {
       function(err,data) {callback(err,data);}
     );
   },
-  getTreesTotal: function(callback){
-    var stages=[
-      {$match: {status:{$ne:'refunded'}}},
-      {$project: {_id:false,total: {$sum:'$amount'},},},
-      {$group: {_id:'total',total: {$sum:'$total'},},},
+  getTreesTotal: function(callback) {
+    var stages = [
+      {$match: {status: {$ne: 'refunded'}}},
+      {$project: {_id: false,total: {$sum: '$amount'},},},
+      {$group: {_id: 'total',total: {$sum: '$total'},},},
       ];
     db.model('Transfer').aggregate(stages).exec(
       function(err,data) {
