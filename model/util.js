@@ -151,7 +151,6 @@ module.exports = {
                 comment += 'part of  @' + data[i].payer;
                 comment += ' donation to this project.\n';
                 comment += 'I will be able to help more #minnows \n';
-                comment += '@OriginalWorks @steem-untalented';
               }
               // Decide how to handle this with a form and mongodb document
               steem_api.commentPost(data[i].author, data[i].url, title,comment);
