@@ -102,7 +102,7 @@ module.exports = {
   },
   steem_getPostsByTag: function(tag,callback) {
     steem.api.getDiscussionsByCreated(
-      {tag: tag, limit: 50},
+      {tag: tag, limit: 100},
       function(err, result) {
         callback(err,result);
       }

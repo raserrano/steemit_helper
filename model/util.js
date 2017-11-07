@@ -191,7 +191,7 @@ module.exports = {
     var send = '';
     for (var i = 0; i < data.length;i++) {
       if (data[i].status === 'due date') {
-        memo = ' am sorry my SP was not enough to upvote the post you sent ';
+        memo = 'I am sorry my SP was not enough to upvote the post you sent ';
         memo += 'me in memo. Send me different (not so old) post. Thank you.';
         send = data[i].amount.toFixed(3) + ' ' + data[i].currency;
         this.debug(send,account,data[i].payer,memo);
