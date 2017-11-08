@@ -13,6 +13,9 @@ module.exports = {
     });
   },
   votePost: function(author,permlink,weight) {
+    var action = "Voting " + author + " " + permlink;
+    action += " with weight of "+ weight;
+    console.log(action); 
     return wait.for(
       steem.broadcast.vote,
       conf.env.POSTING_KEY_PRV(),
@@ -156,13 +159,11 @@ module.exports = {
     return pos !== 0;
   },
   calculateVoteWeight: function(account,target_value) {
-    // Still need to figure out what is this for
     var globalData = wait.for(
       steem_api.steem_getSteemGlobaleProperties_wrapper
     );
     var ci = steem_api.init_conversion(globalData);
 
-    // Manual calcs
     var vp = account.voting_power;
     var vestingSharesParts = account.vesting_shares.split(' ');
     var receivedSharesParts = account.received_vesting_shares.split(' ');

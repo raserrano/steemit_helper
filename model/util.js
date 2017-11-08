@@ -232,46 +232,51 @@ module.exports = {
       var author = posts[i].author;
       var account = wait.for(steem_api.steem_getAccounts_wrapper,[author]);
       var created = account[0].created;
-      if (this.dateDiff(created) < (86400 * 7)) {
-        if (!steem_api.verifyAccountHasVoted(
-          [conf.env.ACCOUNT_NAME],posts[i]
-          )) {
-          if (conf.env.VOTE_ACTIVE()) {
-            steem_api.votePost(posts[i].author,posts[i].permlink,weight);
-            wait.for(this.timeout_wrapper,5000);
+      if(account[0].post_count < 10){
+        if (this.dateDiff(created) < (86400 * 30)) {
+          if (!steem_api.verifyAccountHasVoted(
+            [conf.env.ACCOUNT_NAME],posts[i]
+            )) {
+            if (conf.env.VOTE_ACTIVE()) {
+              steem_api.votePost(posts[i].author,posts[i].permlink,weight);
+              wait.for(this.timeout_wrapper,5000);
+            }else {
+              this.debug(
+                'Voting is not active, voting: ' + JSON.stringify(posts[i])
+              );
+            }
+            if (conf.env.COMMENT_ACTIVE()) {
+              var comment = 'Welcome to steemit @' + posts[i].author
+              + '. Join #minnowsupportproject for more help. ' +
+              'Leave a comment with #helpmein tag so I will' +
+              ' transfer registration fee.\n ' + 
+              '@OriginalWorks @steem-untalented' +
+              ' will help you verify original content .\n' +
+              'If you want to plant a tree ' +
+              'try @treeplanter \n' +
+              'Use @tipu to give users a 0.1 SBD tip. \n';
+              steem_api.commentPost(
+                posts[i].author,
+                posts[i].permlink,
+                title,
+                comment
+              );
+              wait.for(this.timeout_wrapper,20000);
+            }else {
+              this.debug(
+                'Commenting is not active, commenting: '
+                + JSON.stringify(posts[i])
+              );
+            }
+            report.push(posts[i]);
           }else {
-            this.debug(
-              'Voting is not active, voting: ' + JSON.stringify(posts[i])
-            );
+            this.debug('Account was already voted');
           }
-          if (conf.env.COMMENT_ACTIVE()) {
-            var comment = 'Welcome to steemit @' + posts[i].author
-            + '. Join #minnowsupportproject for more help. ' +
-            'Leave a comment with #helpmein tag so I will' +
-            ' transfer registration fee.\n @OriginalWorks @steem-untalented' +
-            ' will help you verify original content .\n' +
-            'If you want to plant a tree ' +
-            'try @treeplanter \n' +
-            'Use @tipu to give users a 0.1 SBD tip. \n';
-            steem_api.commentPost(
-              posts[i].author,
-              posts[i].permlink,
-              title,
-              comment
-            );
-            wait.for(this.timeout_wrapper,20000);
-          }else {
-            this.debug(
-              'Commenting is not active, commenting: '
-              + JSON.stringify(posts[i])
-            );
-          }
-          report.push(posts[i]);
         }else {
-          this.debug('Account was already voted')
+          this.debug('Account is old');
         }
-      }else {
-        this.debug('Account is old')
+      }else{
+        this.debug('Account has more than 10 posts');
       }
     }
     return report;
