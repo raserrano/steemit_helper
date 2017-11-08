@@ -247,7 +247,7 @@ module.exports = {
             var comment = 'Welcome to steemit @' + posts[i].author
             + '. Join #minnowsupportproject for more help. ' +
             'Leave a comment with #helpmein tag so I will' +
-            ' transfer registration fee.\n @OriginalWorks @steem-untalented' +
+            ' transfer registration fee.\n @OriginalWorks ' +
             ' will help you verify original content .\n' +
             'If you want to plant a tree ' +
             'try @treeplanter \n' +
