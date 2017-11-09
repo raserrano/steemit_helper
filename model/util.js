@@ -260,7 +260,7 @@ module.exports = {
               'Use @tipu to give users a 0.1 SBD tip. \n';
 
               if ((sbd <= 0.002) && (steem <= 0.002)) {
-                comment += '!tip 0.002';
+                comment += 'tip! 0.002';
                 posts[i].fee = 0.002;
               }else {
                 posts[i].fee = 0;
