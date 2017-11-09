@@ -231,46 +231,64 @@ module.exports = {
       var author = posts[i].author;
       var account = wait.for(steem_api.steem_getAccounts_wrapper,[author]);
       var created = account[0].created;
-      if (this.dateDiff(created) < (86400 * 7)) {
-        if (!steem_api.verifyAccountHasVoted(
-          [conf.env.ACCOUNT_NAME],posts[i]
-          )) {
-          if (conf.env.VOTE_ACTIVE()) {
-            steem_api.votePost(posts[i].author,posts[i].permlink,weight);
-            wait.for(this.timeout_wrapper,5000);
+      if (account[0].post_count < 50) {
+        if (this.dateDiff(created) < (86400 * 30)) {
+          if (!steem_api.verifyAccountHasVoted(
+            [conf.env.ACCOUNT_NAME],posts[i]
+            )) {
+            var sbd = account[0].sbd_balance.split(' ');
+            var steem = account[0].balance.split(' ');
+            sbd = parseFloat(sbd[0]);
+            steem = parseFloat(steem[0]);
+            this.debug('SBD: ' + sbd);
+            this.debug('STEEM: ' + steem);
+            if (conf.env.VOTE_ACTIVE()) {
+              steem_api.votePost(posts[i].author,posts[i].permlink,weight);
+              wait.for(this.timeout_wrapper,5000);
+            }else {
+              this.debug(
+                'Voting is not active, voting: ' + JSON.stringify(posts[i])
+              );
+            }
+            if (conf.env.COMMENT_ACTIVE()) {
+              comment = 'Welcome to steemit @' + posts[i].author +
+              '. Join #minnowsupportproject for more help. ' +
+              '@OriginalWorks ' +
+              ' will help you verify original content .\n' +
+              'If you want to plant a tree ' +
+              'try @treeplanter \n' +
+              'Use @tipu to give users a 0.1 SBD tip. \n';
+
+              if ((sbd <= 0.002) && (steem <= 0.002)) {
+                comment += '!tip 0.002';
+                posts[i].fee = 0.002;
+              }else {
+                posts[i].fee = 0;
+              }
+
+              steem_api.commentPost(
+                posts[i].author,
+                posts[i].permlink,
+                title,
+                comment
+              );
+              wait.for(this.timeout_wrapper,20000);
+            }else {
+              this.debug(
+                'Commenting is not active, commenting: ' +
+                JSON.stringify(posts[i])
+              );
+              this.debug('Comment: ' + comment);
+            }
+            report.push(posts[i]);
           }else {
-            this.debug(
-              'Voting is not active, voting: ' + JSON.stringify(posts[i])
-            );
+            this.debug('Account was already voted');
           }
-          if (conf.env.COMMENT_ACTIVE()) {
-            var comment = 'Welcome to steemit @' + posts[i].author
-            + '. Join #minnowsupportproject for more help. ' +
-            'Leave a comment with #helpmein tag so I will' +
-            ' transfer registration fee.\n @OriginalWorks ' +
-            ' will help you verify original content .\n' +
-            'If you want to plant a tree ' +
-            'try @treeplanter \n' +
-            'Use @tipu to give users a 0.1 SBD tip. \n';
-            steem_api.commentPost(
-              posts[i].author,
-              posts[i].permlink,
-              title,
-              comment
-            );
-            wait.for(this.timeout_wrapper,20000);
-          }else {
-            this.debug(
-              'Commenting is not active, commenting: '
-              + JSON.stringify(posts[i])
-            );
-          }
-          report.push(posts[i]);
         }else {
-          this.debug('Account was already voted')
+          this.debug('Account is old');
         }
       }else {
-        this.debug('Account is old')
+        this.debug('Account has more than 10 posts');
       }
     }
     return report;
@@ -541,14 +559,18 @@ module.exports = {
     var title = 'Welcome report for ' + when;
     var body = 'Starting my duty report. \n';
     var tags = {tags: ['helpmejoin','minnowsupportproject']}
+    var total = 0;
     body += '\n\nToday, I\'ve welcome the following users: \n';
     for (var i = 0; i < posts.length; i++) {
+      total += posts[i].fee;
       body += '- @' + posts[i].author;
       body += ' [post](https://steemit.com' + posts[i].url + ')\n';
     }
 
+    body += '\n\n## Total sent in fees: ' + total.toFixed(3) + ' ##';
     body += '\n\nMake sure to visit their profile and welcome them as well.\n';
     body += 'Long live Steemit, the social revolution platform.';
+    console.log(body);
     if (conf.env.REPORT_ACTIVE()) {
       var voter = wait.for(
         steem_api.publishPost,
