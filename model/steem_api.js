@@ -13,9 +13,9 @@ module.exports = {
     });
   },
   votePost: function(author,permlink,weight) {
-    var action = "Voting " + author + " " + permlink;
-    action += " with weight of "+ weight;
-    console.log(action); 
+    var action = 'Voting ' + author + ' ' + permlink;
+    action += ' with weight of ' + weight;
+    console.log(action);
     return wait.for(
       steem.broadcast.vote,
       conf.env.POSTING_KEY_PRV(),
