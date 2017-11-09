@@ -251,8 +251,8 @@ module.exports = {
               );
             }
             if (conf.env.COMMENT_ACTIVE()) {
-              var comment = 'Welcome to steemit @' + posts[i].author
-              + '. Join #minnowsupportproject for more help. ' +
+              comment = 'Welcome to steemit @' + posts[i].author +
+              '. Join #minnowsupportproject for more help. ' +
               '@OriginalWorks ' +
               ' will help you verify original content .\n' +
               'If you want to plant a tree ' +
@@ -262,7 +262,7 @@ module.exports = {
               if ((sbd <= 0.002) && (steem <= 0.002)) {
                 comment += '!tip 0.002';
                 posts[i].fee = 0.002;
-              }else{
+              }else {
                 posts[i].fee = 0;
               }
 
@@ -275,8 +275,8 @@ module.exports = {
               wait.for(this.timeout_wrapper,20000);
             }else {
               this.debug(
-                'Commenting is not active, commenting: '
-                + JSON.stringify(posts[i])
+                'Commenting is not active, commenting: ' +
+                JSON.stringify(posts[i])
               );
               this.debug('Comment: ' + comment);
             }
@@ -567,7 +567,7 @@ module.exports = {
       body += ' [post](https://steemit.com' + posts[i].url + ')\n';
     }
 
-    body += '\n\n## Total sent in fees: ' + total.toFixed(3) + ' ##'
+    body += '\n\n## Total sent in fees: ' + total.toFixed(3) + ' ##';
     body += '\n\nMake sure to visit their profile and welcome them as well.\n';
     body += 'Long live Steemit, the social revolution platform.';
     console.log(body);
