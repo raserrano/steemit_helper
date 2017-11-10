@@ -24,7 +24,7 @@ wait.launchFiber(function() {
         sbd,
         vests
       );
-      utils.debug(rewards);
+      // utils.debug(rewards);
     }else {
       utils.debug('Nothing to claim');
     }
