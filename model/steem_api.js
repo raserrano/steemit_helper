@@ -30,7 +30,7 @@ module.exports = {
     var comment_permlink = steem.formatter.commentPermlink(
       author,
       permlink
-    ).toLowerCase();
+    ).toLowerCase().replace('.','');
     console.log('Comment permlink: ' + comment_permlink);
     return wait.for(
       steem.broadcast.comment,
