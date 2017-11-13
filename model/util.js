@@ -272,7 +272,7 @@ module.exports = {
                     conf.env.ACCOUNT_NAME(),
                     posts[i].author,
                     '0.002 SBD',
-                    '#minnowsupport project registration fee'
+                    'MSP Registrations funds, welcome to Steemit!'
                   );
                   posts[i].fee = 0.002;
                 }else {
