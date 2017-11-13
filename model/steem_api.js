@@ -26,16 +26,19 @@ module.exports = {
   },
   commentPost: function(author,permlink,title,comment) {
     var permlink = permlink.replace('.','');
+    console.log('Commenting post: ' + permlink);
+    var comment_permlink = steem.formatter.commentPermlink(
+      author,
+      permlink
+    ).toLowerCase();
+    console.log('Comment permlink: ' + comment_permlink);
     return wait.for(
       steem.broadcast.comment,
       conf.env.POSTING_KEY_PRV(),
       author,
       permlink,
       conf.env.ACCOUNT_NAME(),
-      steem.formatter.commentPermlink(
-        author,
-        permlink
-      ).toLowerCase(),
+      comment_permlink,
       title,
       comment,
       {}
@@ -43,6 +46,7 @@ module.exports = {
   },
   publishPost: function(author, permlink, tags,title, body) {
     var permlink = permlink.replace('.','');
+    console.log('Publising post:' + permlink);
     return wait.for(
       steem.broadcast.comment,
       conf.env.POSTING_KEY_PRV(),
