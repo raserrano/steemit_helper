@@ -223,9 +223,11 @@ module.exports = {
       }
     }
   },
-  commentOnNewUserPost: function(posts,weight) {
+  commentOnNewUserPost: function(posts,weight,donator) {
     var report = new Array();
     var minnows = new Array();
+    var donator_sbd = donator.sbd_balance.split(' ');
+    donator_sbd = parseFloat(donator_sbd[0]);
     var comment = '';
     var title = 'Welcome';
     for (var i = 0; i < posts.length;i++) {
@@ -264,7 +266,8 @@ module.exports = {
                 'Use @tipu to give users a 0.1 SBD tip. \n' +
                 'Upvote this comment to keep helping more new steemians';
 
-                if ((sbd <= 0.002) && (steem <= 0.002)) {
+                if (((sbd <= 0.002) && (steem <= 0.002)) &&
+                  (donator_sbd > 0.002)) {
                   this.debug('SBD: ' + sbd);
                   this.debug('STEEM: ' + steem);
                   wait.for(
@@ -275,6 +278,8 @@ module.exports = {
                     'MSP Registrations funds, welcome to Steemit!'
                   );
                   posts[i].fee = 0.002;
+                  donator_sbd -= 0.002;
+                  this.debug('Donator balance: ' + donator_sbd);
                 }else {
                   posts[i].fee = 0;
                 }
