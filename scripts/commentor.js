@@ -11,7 +11,7 @@ wait.launchFiber(function() {
   );
   var weight = steem_api.calculateVoteWeight(accounts[0],0.01);
   var posts = wait.for(steem_api.steem_getPostsByTag,'introduceyourself');
-  var report = utils.commentOnNewUserPost(posts,weight);
+  var report = utils.commentOnNewUserPost(posts,weight,accounts[0]);
   if (report.length > 0) {
     utils.generateCommentedReport(report);
   }
