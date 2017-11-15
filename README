@@ -1,6 +1,9 @@
-#Steemit helper#
+# Steemit helper #
+
+[![Coverage Status](https://coveralls.io/repos/github/raserrano/steemit_helper/badge.svg?branch=develop)](https://coveralls.io/github/raserrano/steemit_helper?branch=develop)
 
 ## Features ##
+
 
 - [x] Voting feature
 - [x] Welcome message feature
@@ -16,4 +19,3 @@ TODO
 - Auto FREE SBD giveaway with automatic transfers
 - Games like minnow frenzy ead competition
 - Follow X user votes like guild feature
-- 
