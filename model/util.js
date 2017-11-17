@@ -116,7 +116,7 @@ module.exports = {
             if (conf.env.VOTE_ACTIVE()) {
               voted_ok = true;
               steem_api.votePost(data[i].author, data[i].url, weight);
-              wait.for(this.timeout_wrapper,5000);
+              wait.for(this.timeout_wrapper,5500);
             }else {
               this.debug(
                 'Voting is not active, voting: ' + JSON.stringify(data[i])
@@ -154,7 +154,7 @@ module.exports = {
               }
               // Decide how to handle this with a form and mongodb document
               steem_api.commentPost(data[i].author, data[i].url, title,comment);
-              wait.for(this.timeout_wrapper,20000);
+              wait.for(this.timeout_wrapper,22000);
             }else {
               this.debug(
                 'Commenting is not active, commenting: '
@@ -259,12 +259,13 @@ module.exports = {
               if (conf.env.COMMENT_ACTIVE()) {
                 comment = 'Welcome to steemit @' + posts[i].author +
                 '. Join #minnowsupportproject for more help. ' +
-                '@OriginalWorks ' +
-                ' will help you verify original content .\n' +
-                'If you want to plant a tree ' +
-                'try @treeplanter \n' +
-                'Use @tipu to give users a 0.1 SBD tip. \n' +
-                'Upvote this comment to keep helping more new steemians';
+                'Type in the comments of a post @OriginalWorks ' +
+                ' and it will help you verify that content is original.\n' +
+                'Transfer SBD to @treeplanter to plant trees and get an ' +
+                'get an upvote in exchange of your donation (Min 0.01 SDB) \n' +
+                'Upvote this comment to keep helping more new steemians \n' +
+                'Transfer SBD to @tuanis in exchange of an upvote and ' +
+                'support this project';
 
                 if (((sbd <= 0.002) && (steem <= 0.002)) &&
                   (donator_sbd > 0.002)) {
