@@ -19,7 +19,7 @@ wait.launchFiber(function() {
   );
   var ci = steem_api.init_conversion(globalData);
   // console.log(ci);
-  var steempower = steem_api.getSteemPower(voter[0],globalData);
+  var steempower = steem_api.getSteemPower(voter[0]);
   // console.log('Steem power is ' + steempower);
   var report_date = new Date();
   var lastDayOfMonth = new Date(
