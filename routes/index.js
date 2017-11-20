@@ -3,6 +3,7 @@ var express = require('express'),
   wait = require('wait.for'),
   utils = require('../model/util'),
   conf = require('../config/dev'),
+  steem_api = require('../model/steem_api'),
   router = express.Router();
 
 /* GET home page. */
@@ -45,12 +46,16 @@ router.get('/votes', function(req, res, next) {
   });
 });
 router.get('/trees', function(req, res, next) {
-  // Trees
-  var options_trees = {
-    rate: 0.93,
-    trees: true,
-  };
   wait.launchFiber(function() {
+    var globalData = wait.for(
+      steem_api.steem_getSteemGlobaleProperties_wrapper
+    );
+    var ci = steem_api.init_conversion(globalData);
+    // Trees
+    var options_trees = {
+      rate: ci.sbd_per_steem,
+      trees: true,
+    };
     var trees = wait.for(utils.getTreesTotal);
     var data = wait.for(utils.getReport,options_trees);
     res.format({
