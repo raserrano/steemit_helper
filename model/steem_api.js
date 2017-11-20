@@ -87,6 +87,21 @@ module.exports = {
       callback(err, result);
     });
   },
+  steem_getAccountCount_wrapper: function(callback) {
+    steem.api.getAccountCount(function(err, result) {
+      callback(err, result);
+    });
+  },
+  steem_getFollowers: function(following,start,type,limit,callback) {
+    steem.api.getFollowers(following,start,type,limit,function(err,result) {
+      callback(err,result);
+    });
+  },
+  steem_getFollowersCount: function(following,callback) {
+    steem.api.getFollowCount(following,function(err,result) {
+      callback(err,result);
+    });
+  },
   steem_getSteemGlobaleProperties_wrapper: function(callback) {
     steem.api.getDynamicGlobalProperties(function(err, properties) {
       callback(err, properties);
@@ -162,20 +177,20 @@ module.exports = {
     }
     return pos !== 0;
   },
-  calculateVoteWeight: function(account,target_value) {
-    var globalData = wait.for(
-      steem_api.steem_getSteemGlobaleProperties_wrapper
-    );
-    var ci = steem_api.init_conversion(globalData);
-
+  getSteemPower: function(account,globalData) {
     var vp = account.voting_power;
     var vestingSharesParts = account.vesting_shares.split(' ');
     var receivedSharesParts = account.received_vesting_shares.split(' ');
-
     var totalVests =
       parseFloat(vestingSharesParts[0]) + parseFloat(receivedSharesParts[0]);
-
-    var steempower = this.getSteemPowerFromVest(globalData,totalVests);
+    return this.getSteemPowerFromVest(globalData,totalVests);
+  },
+  calculateVoteWeight: function(account,target_value) {
+    var globalData = wait.for(
+      this.steem_getSteemGlobaleProperties_wrapper
+    );
+    var ci = this.init_conversion(globalData);
+    var steempower = this.getSteemPower(account);
 
     var sp_scaled_vests = steempower / ci.steem_per_vest;
 

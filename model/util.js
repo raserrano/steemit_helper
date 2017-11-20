@@ -1,8 +1,10 @@
 const
   wait = require('wait.for'),
   conf = require('../config/dev'),
-  db = require('./db')
-steem_api = require('./steem_api');
+  db = require('./db'),
+  fs = require('fs'),
+  steem_api = require('./steem_api');
+
 module.exports = {
   getTransfersToVoteReport: function(account,data,min,max) {
     for (var i = 0; i < data.length;i++) {
@@ -513,6 +515,13 @@ module.exports = {
       }
     );
   },
+  getDonatorsTotal: function(callback) {
+    db.model('Transfer').distinct('payer').exec(
+      function(err,data) {
+        callback(err,data);
+      }
+    );
+  },
   getReport: function(options,callback) {
 
     var stages = new Array();
@@ -565,6 +574,10 @@ module.exports = {
     }else {
       stages.push({$sort: {number: -1}});
     }
+    if ((options.limit !== undefined) && (options.limit !== null)) {
+      stages.push({$limit: options.limit});
+    }
+
 
     db.model('Transfer').aggregate(stages).exec(
       function(err,data) {
@@ -592,6 +605,70 @@ module.exports = {
     body += '\n\n## Total sent in fees: ' + total.toFixed(3) + ' ##';
     body += '\n\nMake sure to visit their profile and welcome them as well.\n';
     body += 'Long live Steemit, the social revolution platform.';
+    if (conf.env.REPORT_ACTIVE()) {
+      var voter = wait.for(
+        steem_api.publishPost,
+        conf.env.ACCOUNT_NAME(),
+        permlink,
+        tags,
+        title,
+        body
+      );
+      var options = wait.for(
+        steem_api.publishPostOptions,
+        conf.env.ACCOUNT_NAME(),
+        permlink,
+        0
+      );
+    }else {
+      this.debug('Debug is active not posting but body is:');
+      this.debug(body);
+    }
+  },
+  generateTreeplanterReport: function(
+    total,count,donators,average,steempower,rate,period,trees,specific,report) {
+    var when = this.getDate(new Date());
+    var permlink = 'treeplanter-report-' + when;
+    var title = 'Treeplanter report for ' + when;
+    var tags = {tags: ['nature','charity','treeplanter','life','fundraising']};
+
+    // Magic to generate body
+    var header = 'Rank | Username | Total \n---|---|---\n';
+    var body = 'Hello all tree planters.\n';
+    body += 'We can plant ' + total + ' of trees thanks to you.\n\n';
+    body += 'Followers: ' + count + '\nNumber of tree planters: ' + donators;
+    body += '\nTrees planted: ' + total + '\n';
+    body += 'Average amount of trees planted daily: ' + average + '\n';
+    body += 'STEEM POWER: ' + steempower + '\nDOLLAR/STEEM exchange rate: ';
+    body += rate + '\n\n';
+
+    var range = 'TODAY';
+    if (period > 8) {
+      range = 'THIS MONTH';
+    }else {
+      if (period > 1) {
+        range = 'THIS WEEK';
+      }
+    }
+    body += 'TOTAL RANKING OF ' + range + '\n';
+    body += 'RANK  STEEMIAN  AMOUNT OF TREES PLANTED\n';
+    body += header;
+    for (var i = 0; i < specific.length;i++) {
+      body += (i + 1) + ' | @' + specific[i]._id.payer +
+      ' | ' + specific[i].total.toFixed(2) + '\n';
+    }
+
+    body += '\n\nTOTAL RANKING OF ALL TREE PLANTERS\n';
+    body += header;
+    for (var j = 0; j < trees.length;j++) {
+      body += (j + 1) + ' | @' + trees[j]._id.payer +
+      ' | ' + trees[j].total.toFixed(2) + '\n';
+    }
+
+    // Read file and add it to body
+    var contents = fs.readFileSync('./reports/treeplanter.md', 'utf8');
+    body += '\n' + contents;
+
     if (conf.env.REPORT_ACTIVE()) {
       var voter = wait.for(
         steem_api.publishPost,
