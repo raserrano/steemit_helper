@@ -187,7 +187,7 @@ module.exports = {
   },
   calculateVoteWeight: function(account,target_value) {
     var globalData = wait.for(
-      steem_api.steem_getSteemGlobaleProperties_wrapper
+      this.steem_getSteemGlobaleProperties_wrapper
     );
     var ci = steem_api.init_conversion(globalData);
     var steempower = getSteemPower(account);
