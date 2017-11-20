@@ -630,7 +630,7 @@ module.exports = {
     var when = this.getDate(new Date());
     var permlink = 'treeplanter-report-' + when;
     var title = 'Treeplanter report for ' + when;
-    var tags = {tags: ['nature','charity','treeplanter','life','fundraising']}
+    var tags = {tags: ['nature','charity','treeplanter','life','fundraising']};
 
     // Magic to generate body
     var header = 'Rank | Username | Total \n---|---|---\n';
