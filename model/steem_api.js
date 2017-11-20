@@ -190,7 +190,7 @@ module.exports = {
       this.steem_getSteemGlobaleProperties_wrapper
     );
     var ci = this.init_conversion(globalData);
-    var steempower = getSteemPower(account);
+    var steempower = this.getSteemPower(account);
 
     var sp_scaled_vests = steempower / ci.steem_per_vest;
 
