@@ -181,8 +181,10 @@ module.exports = {
     var vp = account.voting_power;
     var vestingSharesParts = account.vesting_shares.split(' ');
     var receivedSharesParts = account.received_vesting_shares.split(' ');
+    var delegatedSharesParts = account.delegated_vesting_shares.split(' ');
     var totalVests =
-      parseFloat(vestingSharesParts[0]) + parseFloat(receivedSharesParts[0]);
+      parseFloat(vestingSharesParts[0]) + parseFloat(receivedSharesParts[0]) -
+      parseFloat(delegatedSharesParts[0]);
     return this.getSteemPowerFromVest(globalData,totalVests);
   },
   calculateVoteWeight: function(account,target_value) {
