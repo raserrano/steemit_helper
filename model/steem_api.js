@@ -92,13 +92,13 @@ module.exports = {
       callback(err, result);
     });
   },
-  steem_getFollowers: function(following,start,type,limit,callback){
-    steem.api.getFollowers(following,start,type,limit,function(err,result){
+  steem_getFollowers: function(following,start,type,limit,callback) {
+    steem.api.getFollowers(following,start,type,limit,function(err,result) {
       callback(err,result);
     });
   },
-  steem_getFollowersCount: function(following,callback){
-    steem.api.getFollowCount(following,function(err,result){
+  steem_getFollowersCount: function(following,callback) {
+    steem.api.getFollowCount(following,function(err,result) {
       callback(err,result);
     });
   },
@@ -177,7 +177,7 @@ module.exports = {
     }
     return pos !== 0;
   },
-  getSteemPower: function(account,globalData){
+  getSteemPower: function(account,globalData) {
     var vp = account.voting_power;
     var vestingSharesParts = account.vesting_shares.split(' ');
     var receivedSharesParts = account.received_vesting_shares.split(' ');

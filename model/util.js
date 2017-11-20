@@ -515,6 +515,13 @@ module.exports = {
       }
     );
   },
+  getDonatorsTotal: function(callback) {
+    db.model('Transfer').distinct('payer').exec(
+      function(err,data) {
+        callback(err,data);
+      }
+    );
+  },
   getReport: function(options,callback) {
 
     var stages = new Array();
@@ -619,7 +626,7 @@ module.exports = {
     }
   },
   generateTreeplanterReport: function(
-    total,count,donators,average,steempower,rate,period,trees,specific,report){
+    total,count,donators,average,steempower,rate,period,trees,specific,report) {
     var when = this.getDate(new Date());
     var permlink = 'treeplanter-report-' + when;
     var title = 'Treeplanter report for ' + when;
@@ -636,27 +643,29 @@ module.exports = {
     body += rate + '\n\n';
 
     var range = 'TODAY';
-    if(period > 8){
+    if (period > 8) {
       range = 'THIS MONTH';
-    }else{
-      if(period > 1){
-      range = 'THIS WEEK';
+    }else {
+      if (period > 1) {
+        range = 'THIS WEEK';
       }
     }
     body += 'TOTAL RANKING OF ' + range + '\n';
     body += 'RANK  STEEMIAN  AMOUNT OF TREES PLANTED\n';
     body += header;
-    for(var i = 0; i < specific.length;i++){
-      body += (i+1) + ' | ' + specific[i]._id.payer + ' | ' + specific[i].total + '\n';
+    for (var i = 0; i < specific.length;i++) {
+      body += (i + 1) + ' | @' + specific[i]._id.payer +
+      ' | ' + specific[i].total.toFixed(2) + '\n';
     }
 
     body += '\n\nTOTAL RANKING OF ALL TREE PLANTERS\n';
     body += header;
-    for(var j = 0; j < trees.length;j++){
-      body += (j+1) + ' | ' + trees[j]._id.payer + ' | ' + trees[j].total + '\n';
+    for (var j = 0; j < trees.length;j++) {
+      body += (j + 1) + ' | @' + trees[j]._id.payer +
+      ' | ' + trees[j].total.toFixed(2) + '\n';
     }
 
-    // read file and add it to body
+    // Read file and add it to body
     var contents = fs.readFileSync('./reports/treeplanter.md', 'utf8');
     body += '\n' + contents;
 

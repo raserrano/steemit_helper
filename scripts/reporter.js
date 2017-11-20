@@ -8,53 +8,50 @@ wait.launchFiber(function() {
   var voter = wait.for(
     steem_api.steem_getAccounts_wrapper,[conf.env.ACCOUNT_NAME()]
   );
-  //console.log(voter[0]);
+  // console.log(voter[0]);
   var followers = wait.for(
     steem_api.steem_getFollowersCount,
     conf.env.ACCOUNT_NAME()
   );
-  //console.log('Total followers ' + followers.follower_count);
+  // console.log('Total followers ' + followers.follower_count);
   var globalData = wait.for(
     steem_api.steem_getSteemGlobaleProperties_wrapper
   );
   var ci = steem_api.init_conversion(globalData);
-  //console.log(ci);
+  // console.log(ci);
   var steempower = steem_api.getSteemPower(voter[0],globalData);
-  //console.log('Steem power is ' + steempower);
+  // console.log('Steem power is ' + steempower);
   var report_date = new Date();
   var lastDayOfMonth = new Date(
     report_date.getFullYear(),
-    report_date.getMonth()+1,
+    report_date.getMonth() + 1,
     0
   );
   // console.log('Last day of the month is: ' + lastDayOfMonth.getDate());
-  // report of today: 1.1. 2017
-  // report of week (every sunday)
-  // report of month (every last day of month)
-
   var report_period = 1;
-  if(report_date.getDay() === 0){
+  if (report_date.getDay() === 0) {
     report_period = 7;
   }
-  if(report_date.getDate() === lastDayOfMonth.getDate()){
+  if (report_date.getDate() === lastDayOfMonth.getDate()) {
     report_period = lastDayOfMonth.getDate();
   }
   console.log('Creating report for ' + report_period);
   // Calculate rate
   var sdb_steem = ci.sbd_per_steem;
-  //console.log('Rate is ' + sdb_steem);
+  // console.log('Rate is ' + sdb_steem);
   // Total trees
   var trees = wait.for(utils.getTreesTotal);
-  //console.log('Total trees planted: ' + (trees[0].total.toFixed(2)/2));
+  // onsole.log('Total trees planted: ' + (trees[0].total.toFixed(2)/2));
   // Calculate unique donators
-  var donators = 222;
-  // Average trees per day 
+  var donators = wait.for(utils.getDonatorsTotal);
+  // console.log(donators.length);
+  // Average trees per day
   var average = 8.6;
   // Trees
   var options_trees = {
     rate: sdb_steem,
     trees: true,
-    limit: 10
+    limit: 10,
   };
   var report_full = wait.for(utils.getReport,options_trees);
   // Period
@@ -67,11 +64,11 @@ wait.launchFiber(function() {
   var report_specific = wait.for(utils.getReport,options_period);
 
   utils.generateTreeplanterReport(
-    (trees[0].total.toFixed(2)/2),
+    (trees[0].total.toFixed(2) / 2),
     followers.follower_count,
-    donators,
+    donators.length,
     average,
-    steempower,
+    steempower.toFixed(0),
     sdb_steem,
     report_period,
     report_full,
