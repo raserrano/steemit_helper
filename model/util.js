@@ -659,7 +659,6 @@ module.exports = {
     // read file and add it to body
     var contents = fs.readFileSync('./reports/treeplanter.md', 'utf8');
     body += '\n' + contents;
-    console.log(body);
 
     if (conf.env.REPORT_ACTIVE()) {
       var voter = wait.for(
