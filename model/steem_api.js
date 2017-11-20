@@ -177,14 +177,19 @@ module.exports = {
     }
     return pos !== 0;
   },
-  getSteemPower: function(account,globalData) {
+  getSteemPower: function(account) {
+    var globalData = wait.for(
+      this.steem_getSteemGlobaleProperties_wrapper
+    );
     var vp = account.voting_power;
     var vestingSharesParts = account.vesting_shares.split(' ');
     var receivedSharesParts = account.received_vesting_shares.split(' ');
     var delegatedSharesParts = account.delegated_vesting_shares.split(' ');
-    var totalVests =
-      parseFloat(vestingSharesParts[0]) + parseFloat(receivedSharesParts[0]) -
-      parseFloat(delegatedSharesParts[0]);
+    var totalVests = 
+      (
+        parseFloat(vestingSharesParts[0]) + parseFloat(receivedSharesParts[0])
+        ) - parseFloat(delegatedSharesParts[0]);
+      console.log('Total vests: ' + totalVests);
     return this.getSteemPowerFromVest(globalData,totalVests);
   },
   calculateVoteWeight: function(account,target_value) {
@@ -193,17 +198,16 @@ module.exports = {
     );
     var ci = this.init_conversion(globalData);
     var steempower = this.getSteemPower(account);
-
     var sp_scaled_vests = steempower / ci.steem_per_vest;
 
     var voteweight = 100;
     var up = target_value * 52;
-    var down = sp_scaled_vests * 100 * ci.reward_pool
-      * ci.sbd_per_steem;
+    var down = sp_scaled_vests * 100 * ci.reward_pool * ci.sbd_per_steem;
     var oneval = up / down;
 
     var votingpower = (oneval / (100 * (100 * voteweight)
       / conf.env.VOTE_POWER_1_PC())) * 100;
+    console.log('Voting power is: ' + votingpower);
     if (votingpower > 100) {
       votingpower = 100;
     }
