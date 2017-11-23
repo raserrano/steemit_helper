@@ -10,11 +10,8 @@ wait.launchFiber(function() {
     steem_api.steem_getAccounts_wrapper,[conf.env.ACCOUNT_NAME()]
   );
   var weight = steem_api.calculateVoteWeight(accounts[0],0.01);
-  var posts = wait.for(steem_api.steem_getPostsByTag,'introduceyourself',100);
-  var report = utils.commentOnNewUserPost(posts,weight,accounts[0]);
-  if (report.length > 0) {
-    utils.generateCommentedReport(report);
-  }
-  console.log('Finish commenting new users');
+  var posts = wait.for(steem_api.steem_getPostsByTag,'utopian-io',10);
+  var report = utils.votePostsByTag(posts,weight);
+  console.log('Finish voting utopian-io posts');
   process.exit();
 });

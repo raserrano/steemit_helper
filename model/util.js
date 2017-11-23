@@ -252,10 +252,11 @@ module.exports = {
               steem = parseFloat(steem[0]);
               if (conf.env.VOTE_ACTIVE()) {
                 steem_api.votePost(posts[i].author,posts[i].permlink,weight);
-                wait.for(this.timeout_wrapper,5000);
+                wait.for(this.timeout_wrapper,5100);
               }else {
                 this.debug(
-                  'Voting is not active, voting: ' + JSON.stringify(posts[i])
+                  'Voting is not active, voting: ' + posts[i].author +
+                  'url: ' + posts[i].permlink
                 );
               }
               if (conf.env.COMMENT_ACTIVE()) {
@@ -292,11 +293,11 @@ module.exports = {
                   title,
                   comment
                 );
-                wait.for(this.timeout_wrapper,20000);
+                wait.for(this.timeout_wrapper,22000);
               }else {
                 this.debug(
-                  'Commenting is not active, commenting: ' +
-                  JSON.stringify(posts[i])
+                  'Commenting is not active, commenting: ' + posts[i].author +
+                  'url: ' + posts[i].permlink
                 );
                 this.debug('Comment: ' + comment);
               }
@@ -308,11 +309,32 @@ module.exports = {
             this.debug('Account is old');
           }
         }else {
-          this.debug('Account has more than 10 posts');
+          this.debug('Account has more than 50 posts');
         }
       }
     }
     return report;
+  },
+  votePostsByTag: function(posts,weight) {
+    for (var i = 0; i < posts.length;i++) {
+      var author = posts[i].author;
+      var account = wait.for(steem_api.steem_getAccounts_wrapper,[author]);
+      if (!steem_api.verifyAccountHasVoted(
+        [conf.env.ACCOUNT_NAME],posts[i]
+        )) {
+        if (conf.env.VOTE_ACTIVE()) {
+          steem_api.votePost(posts[i].author,posts[i].permlink,weight);
+          wait.for(this.timeout_wrapper,5100);
+        }else {
+          this.debug(
+            'Voting is not active, voting: ' + posts[i].author +
+            'url: ' + posts[i].permlink
+          );
+        }
+      }else {
+        this.debug('Account was already voted');
+      }
+    }
   },
   getContent: function(account,post) {
     var obj = null;

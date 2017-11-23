@@ -122,9 +122,9 @@ module.exports = {
       callback(err, result);
     });
   },
-  steem_getPostsByTag: function(tag,callback) {
+  steem_getPostsByTag: function(tag,amount,callback) {
     steem.api.getDiscussionsByCreated(
-      {tag: tag, limit: 100},
+      {tag: tag, limit: amount},
       function(err, result) {
         callback(err,result);
       }
@@ -185,11 +185,11 @@ module.exports = {
     var vestingSharesParts = account.vesting_shares.split(' ');
     var receivedSharesParts = account.received_vesting_shares.split(' ');
     var delegatedSharesParts = account.delegated_vesting_shares.split(' ');
-    var totalVests = 
+    var totalVests =
       (
         parseFloat(vestingSharesParts[0]) + parseFloat(receivedSharesParts[0])
         ) - parseFloat(delegatedSharesParts[0]);
-      console.log('Total vests: ' + totalVests);
+    console.log('Total vests: ' + totalVests);
     return this.getSteemPowerFromVest(globalData,totalVests);
   },
   calculateVoteWeight: function(account,target_value) {
