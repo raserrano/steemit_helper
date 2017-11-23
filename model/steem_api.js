@@ -185,11 +185,11 @@ module.exports = {
     var vestingSharesParts = account.vesting_shares.split(' ');
     var receivedSharesParts = account.received_vesting_shares.split(' ');
     var delegatedSharesParts = account.delegated_vesting_shares.split(' ');
-    var totalVests = 
+    var totalVests =
       (
         parseFloat(vestingSharesParts[0]) + parseFloat(receivedSharesParts[0])
         ) - parseFloat(delegatedSharesParts[0]);
-      console.log('Total vests: ' + totalVests);
+    console.log('Total vests: ' + totalVests);
     return this.getSteemPowerFromVest(globalData,totalVests);
   },
   calculateVoteWeight: function(account,target_value) {

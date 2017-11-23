@@ -255,8 +255,8 @@ module.exports = {
                 wait.for(this.timeout_wrapper,5100);
               }else {
                 this.debug(
-                  'Voting is not active, voting: ' + posts[i].author + 
-                  'url: ' +posts[i].permlink
+                  'Voting is not active, voting: ' + posts[i].author +
+                  'url: ' + posts[i].permlink
                 );
               }
               if (conf.env.COMMENT_ACTIVE()) {
@@ -296,7 +296,7 @@ module.exports = {
                 wait.for(this.timeout_wrapper,22000);
               }else {
                 this.debug(
-                  'Commenting is not active, commenting: ' + posts[i].author + 
+                  'Commenting is not active, commenting: ' + posts[i].author +
                   'url: ' + posts[i].permlink
                 );
                 this.debug('Comment: ' + comment);
@@ -315,7 +315,7 @@ module.exports = {
     }
     return report;
   },
-  votePosts: function(posts,weight,account){
+  votePosts: function(posts,weight,account) {
     for (var i = 0; i < posts.length;i++) {
       var author = posts[i].author;
       var account = wait.for(steem_api.steem_getAccounts_wrapper,[author]);
@@ -327,8 +327,8 @@ module.exports = {
           wait.for(this.timeout_wrapper,5100);
         }else {
           this.debug(
-            'Voting is not active, voting: ' + posts[i].author + 
-            'url: ' +posts[i].permlink
+            'Voting is not active, voting: ' + posts[i].author +
+            'url: ' + posts[i].permlink
           );
         }
       }else {
