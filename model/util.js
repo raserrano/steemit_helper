@@ -315,7 +315,7 @@ module.exports = {
     }
     return report;
   },
-  votePosts: function(posts,weight,account) {
+  votePostsByTag: function(posts,weight) {
     for (var i = 0; i < posts.length;i++) {
       var author = posts[i].author;
       var account = wait.for(steem_api.steem_getAccounts_wrapper,[author]);

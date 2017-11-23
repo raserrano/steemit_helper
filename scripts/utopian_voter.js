@@ -11,7 +11,7 @@ wait.launchFiber(function() {
   );
   var weight = steem_api.calculateVoteWeight(accounts[0],0.01);
   var posts = wait.for(steem_api.steem_getPostsByTag,'utopian-io',10);
-  var report = utils.votePosts(posts,weight,accounts[0]);
+  var report = utils.votePostsByTag(posts,weight);
   console.log('Finish voting utopian-io posts');
   process.exit();
 });
