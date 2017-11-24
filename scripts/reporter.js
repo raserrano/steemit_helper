@@ -27,12 +27,14 @@ wait.launchFiber(function() {
     report_date.getMonth() + 1,
     0
   );
-  // console.log('Last day of the month is: ' + lastDayOfMonth.getDate());
+  console.log('Report date: ' + report_date);
   var report_period = 1;
   if (report_date.getDay() === 0) {
+    console.log('Report weekly');
     report_period = 7;
   }
   if (report_date.getDate() === lastDayOfMonth.getDate()) {
+    console.log('Last day of the month is: ' + lastDayOfMonth.getDate());
     report_period = lastDayOfMonth.getDate();
   }
   console.log('Creating report for ' + report_period);
