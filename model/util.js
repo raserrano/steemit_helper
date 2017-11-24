@@ -347,6 +347,7 @@ module.exports = {
     var currency = amount_parts[1];
     var voted = false;
     var processed = false;
+    var processed_date = null;
     var status = 'pending';
     var author = '';
     var url = '';
@@ -450,6 +451,7 @@ module.exports = {
       url,
       voted,
       processed,
+      processed_date,
       status,
       created,
     };
