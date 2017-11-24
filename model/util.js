@@ -450,6 +450,7 @@ module.exports = {
       url,
       voted,
       processed,
+      processed_date,
       status,
       created,
     };
