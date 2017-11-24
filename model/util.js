@@ -369,6 +369,7 @@ module.exports = {
                   voted = steem_api.verifyAccountHasVoted(account,result);
                   status = 'processed';
                   processed = voted;
+                  processed_date = new Date();
                 }else {
                   status = 'due date';
                   processed = true;
@@ -408,6 +409,7 @@ module.exports = {
                     voted = steem_api.verifyAccountHasVoted(account,result);
                     status = 'processed';
                     processed = voted;
+                    processed_date = new Date();
                   }else {
                     status = 'due date';
                     processed = true;
@@ -579,7 +581,7 @@ module.exports = {
     if ((options.period !== undefined) && (options.period !== null)) {
       var cutoff = new Date();
       cutoff.setDate(cutoff.getDate() - options.period);
-      stages.push({$match: {created: {$gt: cutoff}}});
+      stages.push({$match: {processed_date: {$gte: cutoff}}});
     }
     if ((options.voted !== undefined) && (options.voted !== null)) {
       stages.push({$match: {voted: options.voted}});
@@ -599,8 +601,6 @@ module.exports = {
     if ((options.limit !== undefined) && (options.limit !== null)) {
       stages.push({$limit: options.limit});
     }
-
-
     db.model('Transfer').aggregate(stages).exec(
       function(err,data) {
         callback(err,data);
