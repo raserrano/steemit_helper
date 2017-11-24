@@ -24,7 +24,7 @@ wait.launchFiber(function() {
     0
   );
   console.log('Report date: ' + report_date);
-  var report_period = 2;
+  var report_period = 1;
   if (report_date.getDay() === 0) {
     console.log('Report weekly');
     report_period = 7;
