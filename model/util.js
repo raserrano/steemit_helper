@@ -574,6 +574,7 @@ module.exports = {
         currency: '$currency',
         voted: '$voted',
         processed: '$processed',
+        processed_date: '$processed_date',
         status: '$status',
         created: '$created',
       },
@@ -583,7 +584,10 @@ module.exports = {
     if ((options.period !== undefined) && (options.period !== null)) {
       var cutoff = new Date();
       cutoff.setDate(cutoff.getDate() - options.period);
-      stages.push({$match: {processed_date: {$gte: cutoff}}});
+      console.log(cutoff);
+      stages.push(
+        {$match: {processed_date: {$gt: cutoff}}}
+      );
     }
     if ((options.voted !== undefined) && (options.voted !== null)) {
       stages.push({$match: {voted: options.voted}});
