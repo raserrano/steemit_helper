@@ -361,7 +361,7 @@ module.exports = {
           obj.author = post_url[post_url.length - 2]
           .substr(1, post_url[post_url.length - 2].length);
           obj.url = post_url[post_url.length - 1];
-          if (obj.url != undefined && obj.author != undefined
+          if (obj.url !== undefined && obj.author !== undefined
             && obj.url != null && obj.author != null) {
             var result = wait.for(
               steem_api.steem_getContent,
