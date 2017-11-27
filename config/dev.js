@@ -110,6 +110,30 @@ module.exports = {
       }
       return value;
     },
+    SELF_VOTE: function() {
+      var value = false;
+      if ((process.env.SELF_VOTE !== undefined) &&
+        (process.env.SELF_VOTE !== null)) {
+        value = JSON.parse(process.env.SELF_VOTE);
+      }
+      return value;
+    },
+    COMMENT_VOTE: function() {
+      var value = false;
+      if ((process.env.COMMENT_VOTE !== undefined) &&
+        (process.env.COMMENT_VOTE !== null)) {
+        value = JSON.parse(process.env.COMMENT_VOTE);
+      }
+      return value;
+    },
+    REFUND_TEXT: function() {
+      var value = 'Sorry, I cannot do selfvoting anymore.';
+      if ((process.env.REFUND_TEXT !== undefined) &&
+        (process.env.REFUND_TEXT !== null)) {
+        value = JSON.parse(process.env.REFUND_TEXT);
+      }
+      return value;
+    },
     REPORT_ACTIVE: function() {
       var value = false;
       if ((process.env.REPORT_ACTIVE !== undefined) &&

@@ -205,13 +205,10 @@ module.exports = {
         );
         wait.for(this.upsertTransfer,{_id: data[i]._id},{status: 'refunded'});
       }
-      if (data[i].status === 'self-comment' || data[i].status === 'self-vote') {
-        memo = 'Sorry, I cannot do selfvoting anymore. Instead I would like ';
-        memo += 'to see you sharing my STEEM POWER with others. Distribute ';
-        memo += 'your donation to five of yours influenced followers to get ';
-        memo += 'their attention and help me to spread the Steem world and ';
-        memo += 'plant 1,000,000 trees to save and restore Abongphen Highland ';
-        memo += 'Forest in Cameroon.';
+      if (data[i].status === 'self-comment' || 
+        data[i].status === 'comment' ||
+        data[i].status === 'self-vote') {
+        memo = conf.env.REFUND_TEXT();
         send = data[i].amount.toFixed(3) + ' ' + data[i].currency;
         this.debug(send,account,data[i].payer,memo);
         wait.for(
@@ -338,123 +335,85 @@ module.exports = {
   },
   getContent: function(account,post) {
     var obj = null;
-    var number = post[0];
-    var payer = post[1].op[1].from;
-    var memo = post[1].op[1].memo;
+    obj.number = post[0];
+    obj.payer = post[1].op[1].from;
+    obj.memo = post[1].op[1].memo;
     var amount_parts = post[1].op[1].amount.split(' ');
-    var amount = parseFloat(amount_parts[0]);
-    var donation = 0;
-    var currency = amount_parts[1];
-    var voted = false;
-    var processed = false;
-    var processed_date = null;
-    var status = 'pending';
-    var author = '';
-    var url = '';
-    var created = '';
+    obj.amount = parseFloat(amount_parts[0]);
+    obj.donation = 0;
+    obj.currency = amount_parts[1];
+    obj.voted = false;
+    obj.processed = false;
+    obj.processed_date = null;
+    obj.status = 'pending';
+    obj.author = '';
+    obj.url = '';
+    obj.created = '';
     if (memo.indexOf('/') != -1) {
-      if (memo.indexOf('#') == -1) {
+      if(conf.env.COMMENT_VOTE()){
         var post_url = post[1].op[1].memo.split('/');
         post_url = post_url.filter(function(e) {return e});
         if (post_url[post_url.length - 2][0] === '@') {
-          author = post_url[post_url.length - 2]
+          obj.author = post_url[post_url.length - 2]
           .substr(1, post_url[post_url.length - 2].length);
-          url = post_url[post_url.length - 1];
+          obj.url = post_url[post_url.length - 1];
           if (url != undefined && author != undefined
             && url != null && author != null) {
-            if (payer !== author) {
-              var result = wait.for(steem_api.steem_getContent,author,url);
-              if ((result !== undefined) && (result !== null)) {
-                created = result.created;
-                if (this.dateDiff(created) < (86400 * 6.5)) {
-                  voted = steem_api.verifyAccountHasVoted(account,result);
-                  status = 'processed';
-                  processed = voted;
-                  processed_date = new Date();
-                }else {
-                  status = 'due date';
-                  processed = true;
-                }
-              }else {
-                status = 'content-not-found';
-                processed = true;
-              }
-            }else {
-              status = 'self-vote';
-              processed = true;
-            }
-          }else {
-            status = 'url-not-found';
-            processed = true;
-          }
-        }else {
-          status = 'url not valid';
-          processed = true;
-        }
-      }else {
-        var post_url_comments = post[1].op[1].memo.split('#');
-        post_url_comments = post_url_comments[1].split('/');
-        post_url_comments = post_url_comments.filter(function(e) {return e});
-        if (post_url_comments.length > 0) {
-          if (post_url_comments[0][0] === '@') {
-            author = post_url_comments[0]
-            .substr(1, post_url_comments[0].length);
-            url = post_url_comments[1];
-            if (url != undefined && author != undefined
-              && url != null && author != null) {
+            if(conf.env.SELF_VOTE()){
               if (payer !== author) {
                 var result = wait.for(steem_api.steem_getContent,author,url);
                 if ((result !== undefined) && (result !== null)) {
-                  created = result.created;
+                  obj.created = result.created;
                   if (this.dateDiff(created) < (86400 * 6.5)) {
-                    voted = steem_api.verifyAccountHasVoted(account,result);
-                    status = 'processed';
-                    processed = voted;
-                    processed_date = new Date();
+                    obj.voted = steem_api.verifyAccountHasVoted(account,result);
+                    obj.status = 'processed';
+                    obj.processed = voted;
+                    obj.processed_date = new Date();
                   }else {
-                    status = 'due date';
-                    processed = true;
+                    obj.status = 'due date';
+                    obj.processed = true;
                   }
                 }else {
-                  status = 'content-not-found';
-                  processed = true;
+                  obj.status = 'content-not-found';
+                  obj.processed = true;
+                }
+              }
+            }else{
+              var result = wait.for(steem_api.steem_getContent,author,url);
+              if ((result !== undefined) && (result !== null)) {
+                obj.created = result.created;
+                if (this.dateDiff(created) < (86400 * 6.5)) {
+                  obj.voted = steem_api.verifyAccountHasVoted(account,result);
+                  obj.status = 'processed';
+                  obj.processed = voted;
+                  obj.processed_date = new Date();
+                }else {
+                  obj.status = 'due date';
+                  obj.processed = true;
                 }
               }else {
-                status = 'self-comment';
-                processed = true;
+                obj.status = 'content-not-found';
+                obj.processed = true;
               }
-            }else {
-              status = 'url-not-found';
-              processed = true;
             }
           }else {
-            status = 'url not valid';
-            processed = true;
+            obj.status = 'url-not-found';
+            obj.processed = true;
           }
         }else {
-          status = 'url not valid';
-          processed = true;
+          obj.status = 'url not valid';
+          obj.processed = true;
+        }
+      }else{
+        if (!(memo.indexOf('#') == -1)) {
+          obj.status = 'comment';
+          obj.processed = true;
         }
       }
     }else {
-      status = 'donation';
-      processed = true;
+      obj.status = 'donation';
+      obj.processed = true;
     }
-    obj = {
-      number,
-      payer,
-      memo,
-      amount,
-      donation,
-      currency,
-      author,
-      url,
-      voted,
-      processed,
-      processed_date,
-      status,
-      created,
-    };
     return obj;
   },
   getLastVoted: function(callback) {
