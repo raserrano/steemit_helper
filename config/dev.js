@@ -130,7 +130,7 @@ module.exports = {
       var value = 'Sorry, I cannot do selfvoting anymore.';
       if ((process.env.REFUND_TEXT !== undefined) &&
         (process.env.REFUND_TEXT !== null)) {
-        value = JSON.parse(process.env.REFUND_TEXT);
+        value = process.env.REFUND_TEXT;
       }
       return value;
     },

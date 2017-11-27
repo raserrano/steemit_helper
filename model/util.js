@@ -75,12 +75,14 @@ module.exports = {
           var to_vote = posts[posts.length - 1];
           if ((to_vote.author !== undefined) && (to_vote.author !== null)
             && (to_vote.url !== undefined) && (to_vote.url !== null)) {
-            steem_api.votePost(
-              to_vote.author,
-              to_vote.url,
-              weight
-            );
-            wait.for(this.timeout_wrapper,5000);
+            if(!to_vote.voted){
+              steem_api.votePost(
+                to_vote.author,
+                to_vote.url,
+                weight
+              );
+              wait.for(this.timeout_wrapper,5000);
+            }
           }
         }
       }else {
@@ -117,8 +119,10 @@ module.exports = {
             )) {
             if (conf.env.VOTE_ACTIVE()) {
               voted_ok = true;
-              steem_api.votePost(data[i].author, data[i].url, weight);
-              wait.for(this.timeout_wrapper,5500);
+              if(!data[i].voted){
+                steem_api.votePost(data[i].author, data[i].url, weight);
+                wait.for(this.timeout_wrapper,5500);                
+              }
             }else {
               this.debug(
                 'Voting is not active, voting: ' + JSON.stringify(data[i])
@@ -334,7 +338,7 @@ module.exports = {
     }
   },
   getContent: function(account,post) {
-    var obj = null;
+    var obj = {};
     obj.number = post[0];
     obj.payer = post[1].op[1].from;
     obj.memo = post[1].op[1].memo;
@@ -348,26 +352,33 @@ module.exports = {
     obj.status = 'pending';
     obj.author = '';
     obj.url = '';
-    obj.created = '';
-    if (memo.indexOf('/') != -1) {
+    obj.created = null;
+    if (obj.memo.indexOf('/') != -1) {
       if (conf.env.COMMENT_VOTE()) {
-        var post_url = post[1].op[1].memo.split('/');
+        var post_url = obj.memo.split('/');
         post_url = post_url.filter(function(e) {return e});
         if (post_url[post_url.length - 2][0] === '@') {
           obj.author = post_url[post_url.length - 2]
           .substr(1, post_url[post_url.length - 2].length);
           obj.url = post_url[post_url.length - 1];
-          if (url != undefined && author != undefined
-            && url != null && author != null) {
-            if (conf.env.SELF_VOTE()) {
-              if (payer !== author) {
-                var result = wait.for(steem_api.steem_getContent,author,url);
+          if (obj.url !== undefined && obj.author !== undefined
+            && obj.url != null && obj.author != null) {
+            var result = wait.for(
+              steem_api.steem_getContent,
+              obj.author,
+              obj.url
+            );
+            if (!conf.env.SELF_VOTE()) {
+              if (obj.payer !== obj.author) {
                 if ((result !== undefined) && (result !== null)) {
                   obj.created = result.created;
-                  if (this.dateDiff(created) < (86400 * 6.5)) {
-                    obj.voted = steem_api.verifyAccountHasVoted(account,result);
+                  if (this.dateDiff(obj.created) < (86400 * 6.5)) {
+                    obj.voted = steem_api.verifyAccountHasVoted(
+                      account,
+                      result
+                    );
                     obj.status = 'processed';
-                    obj.processed = voted;
+                    obj.processed = obj.voted;
                     obj.processed_date = new Date();
                   }else {
                     obj.status = 'due date';
@@ -379,13 +390,15 @@ module.exports = {
                 }
               }
             }else {
-              var result = wait.for(steem_api.steem_getContent,author,url);
               if ((result !== undefined) && (result !== null)) {
                 obj.created = result.created;
-                if (this.dateDiff(created) < (86400 * 6.5)) {
-                  obj.voted = steem_api.verifyAccountHasVoted(account,result);
+                if (this.dateDiff(obj.created) < (86400 * 6.5)) {
+                  obj.voted = steem_api.verifyAccountHasVoted(
+                    account,
+                    result
+                  );
                   obj.status = 'processed';
-                  obj.processed = voted;
+                  obj.processed = obj.voted;
                   obj.processed_date = new Date();
                 }else {
                   obj.status = 'due date';
@@ -405,7 +418,7 @@ module.exports = {
           obj.processed = true;
         }
       }else {
-        if (!(memo.indexOf('#') == -1)) {
+        if (!(obj.memo.indexOf('#') == -1)) {
           obj.status = 'comment';
           obj.processed = true;
         }
