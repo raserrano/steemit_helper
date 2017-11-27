@@ -75,12 +75,14 @@ module.exports = {
           var to_vote = posts[posts.length - 1];
           if ((to_vote.author !== undefined) && (to_vote.author !== null)
             && (to_vote.url !== undefined) && (to_vote.url !== null)) {
-            steem_api.votePost(
-              to_vote.author,
-              to_vote.url,
-              weight
-            );
-            wait.for(this.timeout_wrapper,5000);
+            if(!to_vote.voted){
+              steem_api.votePost(
+                to_vote.author,
+                to_vote.url,
+                weight
+              );
+              wait.for(this.timeout_wrapper,5000);
+            }
           }
         }
       }else {
@@ -359,13 +361,13 @@ module.exports = {
           obj.url = post_url[post_url.length - 1];
           if (obj.url != undefined && obj.author != undefined
             && obj.url != null && obj.author != null) {
+            var result = wait.for(
+              steem_api.steem_getContent,
+              obj.author,
+              obj.url
+            );
             if (conf.env.SELF_VOTE()) {
               if (obj.payer !== obj.author) {
-                var result = wait.for(
-                  steem_api.steem_getContent,
-                  obj.author,
-                  obj.url
-                );
                 if ((result !== undefined) && (result !== null)) {
                   obj.created = result.created;
                   if (this.dateDiff(obj.created) < (86400 * 6.5)) {
@@ -373,6 +375,7 @@ module.exports = {
                       account,
                       result
                     );
+                    console.log('Voted (self) : '+obj.voted);
                     obj.status = 'processed';
                     obj.processed = obj.voted;
                     obj.processed_date = new Date();
@@ -386,11 +389,6 @@ module.exports = {
                 }
               }
             }else {
-              var result = wait.for(
-                steem_api.steem_getContent,
-                obj.author,
-                obj.url
-              );
               if ((result !== undefined) && (result !== null)) {
                 obj.created = result.created;
                 if (this.dateDiff(obj.created) < (86400 * 6.5)) {
