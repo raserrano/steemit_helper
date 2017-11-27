@@ -119,8 +119,10 @@ module.exports = {
             )) {
             if (conf.env.VOTE_ACTIVE()) {
               voted_ok = true;
-              steem_api.votePost(data[i].author, data[i].url, weight);
-              wait.for(this.timeout_wrapper,5500);
+              if(!data[i].voted){
+                steem_api.votePost(data[i].author, data[i].url, weight);
+                wait.for(this.timeout_wrapper,5500);                
+              }
             }else {
               this.debug(
                 'Voting is not active, voting: ' + JSON.stringify(data[i])
@@ -350,7 +352,7 @@ module.exports = {
     obj.status = 'pending';
     obj.author = '';
     obj.url = '';
-    obj.created = '';
+    obj.created = null;
     if (obj.memo.indexOf('/') != -1) {
       if (conf.env.COMMENT_VOTE()) {
         var post_url = obj.memo.split('/');
@@ -366,7 +368,7 @@ module.exports = {
               obj.author,
               obj.url
             );
-            if (conf.env.SELF_VOTE()) {
+            if (!conf.env.SELF_VOTE()) {
               if (obj.payer !== obj.author) {
                 if ((result !== undefined) && (result !== null)) {
                   obj.created = result.created;
@@ -375,7 +377,6 @@ module.exports = {
                       account,
                       result
                     );
-                    console.log('Voted (self) : '+obj.voted);
                     obj.status = 'processed';
                     obj.processed = obj.voted;
                     obj.processed_date = new Date();
