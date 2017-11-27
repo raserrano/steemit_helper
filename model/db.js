@@ -39,5 +39,6 @@ process.on('SIGINT', function() {
 
 // Models
 require('../model/transfer');
+require('../model/accounts');
 
 module.exports = db;

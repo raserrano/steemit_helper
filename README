@@ -13,6 +13,7 @@
 - [x] Poster creator
 - [x] Reporter with a set of filters
 - [x] Queue view, trees report view, last transactions and all transactions
+- [x] Reputation calculation
 
 TODO
 - Commentor upvote roulette
@@ -20,10 +21,13 @@ TODO
 - Games like minnow frenzy eat competition
 - Follow X user votes like guild feature
 - Weekly Service status report
-- Reputation calculation
 - Daily STEEM/SBD price
 - Upvote and comment minnows comments
 - Include vote calculation
 - Finish the comentor upvote
 - Implement good comment/post rating
 - Tuanis weekly report - program funding
+
+- Add self-vote setting
+- Add 100% power up posts
+- Add refunding messages
