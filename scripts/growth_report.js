@@ -8,7 +8,7 @@ wait.launchFiber(function() {
   // Things that I need to do for the growth report
   // capture SP, reputation, followers count
   // Calculate vote value
-  var account = null;
+  var account = {};
   var voter = wait.for(
     steem_api.steem_getAccounts_wrapper,[conf.env.ACCOUNT_NAME()]
   );
