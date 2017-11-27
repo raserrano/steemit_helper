@@ -642,12 +642,6 @@ module.exports = {
         title,
         body
       );
-      var options = wait.for(
-        steem_api.publishPostOptions,
-        conf.env.ACCOUNT_NAME(),
-        permlink,
-        0
-      );
     }else {
       this.debug('Debug is active not posting but body is:');
       this.debug(body);
@@ -706,11 +700,35 @@ module.exports = {
         title,
         body
       );
-      var options = wait.for(
-        steem_api.publishPostOptions,
+    }else {
+      this.debug('Debug is active not posting but body is:');
+      this.debug(body);
+    }
+  },
+  generateGrowthReport: function(account){
+    var when = this.getDate(account.created);
+    var permlink = account.username + '-report-' + when;
+    var title = 'Growth report for ' + when;
+    var body = '<h3>Growth Report</h3>\n With your help I have grow and ';
+    body += 'I am able to help more new users. Thanks for your support.\n ';
+    body += '\n';
+    body += '- **Followers:** ' + account.followers + '\n';
+    body += '- **Reputation:** ' + account.reputation + '\n';
+    body += '- **Vote value:** ' + account.vote + '\n';
+    body += '- **Steem power:** ' + account.sp + '\n';
+    body += '\n\n';
+    body += '![tuanis.jpeg](https://steemitimages.com/DQmUdo4Ngm8JgDqRL4FndKksi7HzgbGMkFXwNpbYACWMQVu/tuanis.jpeg) \n';
+    body += 'Upvote this report to keep supporting this project.';
+    var tags = {tags: ['helpmejoin','minnowsupportproject','minnows']}
+
+    if (conf.env.REPORT_ACTIVE()) {
+      var voter = wait.for(
+        steem_api.publishPost,
         conf.env.ACCOUNT_NAME(),
         permlink,
-        0
+        tags,
+        title,
+        body
       );
     }else {
       this.debug('Debug is active not posting but body is:');
@@ -732,22 +750,14 @@ module.exports = {
     }
     return vp;
   },
-  getSteemPower: function(account) {
-    var globalData = wait.for(
-      steem_api.steem_getSteemGlobaleProperties_wrapper
-    );
-    this.debug('Steem VESTS: ' + account.vesting_shares);
-    this.debug('Delegated VESTS: ' + account.received_vesting_shares);
-    var delegatedSteemPower = steem_api.getSteemPowerFromVest(
-      globalData,
-      account.received_vesting_shares
-    );
-    var ownSteemPower = steem_api.getSteemPowerFromVest(
-      globalData,
-      account.vesting_shares
-    );
-    return parseFloat(delegatedSteemPower) +
-      parseFloat(ownSteemPower);
+  getReputation: function(account) {
+    var rep = account.reputation;
+    var multi = (rep < 0)?-9:9;
+    rep = Math.log10(Math.abs(rep));
+    rep = Math.max(rep - 9, 0);
+    rep *= multi;
+    rep += 25;
+    return rep.toFixed(3);
   },
   dateDiff: function(when) {
     var then = new Date(when);
