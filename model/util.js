@@ -388,6 +388,9 @@ module.exports = {
                   obj.status = 'content-not-found';
                   obj.processed = true;
                 }
+              }else{
+                obj.status = 'self-vote';
+                obj.processed = true;
               }
             }else {
               if ((result !== undefined) && (result !== null)) {
@@ -614,6 +617,12 @@ module.exports = {
         title,
         body
       );
+      // var options = wait.for(
+      //   steem_api.publishPostOptions,
+      //   conf.env.ACCOUNT_NAME(),
+      //   permlink,
+      //   0
+      // );
     }else {
       this.debug('Debug is active not posting but body is:');
       this.debug(body);
