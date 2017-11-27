@@ -30,7 +30,7 @@ wait.launchFiber(function() {
   account.sp = steempower.toFixed(3);
   account.votingpower = parseInt(utils.getVotingPower(voter[0])) / 100;
 
-  var m = parseInt(100 * votingpower * (100 * 100) / 10000);
+  var m = parseInt(100 * account.votingpower * (100 * 100) / 10000);
   m = parseInt((m + 49) / 50);
   var i = parseFloat(ci.reward_balance.replace(' STEEM', '')) /
     parseFloat(ci.recent_claims);
