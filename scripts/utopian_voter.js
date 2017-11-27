@@ -10,7 +10,7 @@ wait.launchFiber(function() {
     steem_api.steem_getAccounts_wrapper,[conf.env.ACCOUNT_NAME()]
   );
   var weight = steem_api.calculateVoteWeight(accounts[0],0.01);
-  var posts = wait.for(steem_api.steem_getPostsByTag,'utopian-io',10);
+  var posts = wait.for(steem_api.steem_getPostsByTag,'utopian-io',2);
   var report = utils.votePostsByTag(posts,weight);
   console.log('Finish voting utopian-io posts');
   process.exit();
