@@ -25,18 +25,18 @@ wait.launchFiber(function() {
 
   // Saving the data
   var username = conf.env.ACCOUNT_NAME();
-  var followers = followers.follower_count;
+  followers = followers.follower_count;
   var sp = steempower.toFixed(3);
   var votingpower = parseInt(utils.getVotingPower(voter[0])) / 100;
 
   var m = parseInt(100 * votingpower * (100 * 100) / 10000);
   m = parseInt((m + 49) / 50);
-  var i = parseFloat(ci.reward_balance.replace(' STEEM', ''))
-    / parseFloat(ci.recent_claims);
-  var o = parseFloat(ci.price_info.base.replace(' SBD', ''))
-    / parseFloat(ci.price_info.quote.replace(' STEEM', ''));
-  var a = globalData.total_vesting_fund_steem.replace(' STEEM', '')
-    / globalData.total_vesting_shares.replace(' VESTS', '')
+  var i = parseFloat(ci.reward_balance.replace(' STEEM', '')) /
+    parseFloat(ci.recent_claims);
+  var o = parseFloat(ci.price_info.base.replace(' SBD', '')) / 
+    parseFloat(ci.price_info.quote.replace(' STEEM', ''));
+  var a = globalData.total_vesting_fund_steem.replace(' STEEM', '') /
+    globalData.total_vesting_shares.replace(' VESTS', '');
   var r = sp / a;
   var vote = parseInt(r * m * 100) * i * o;
   vote = vote.toFixed(2);
@@ -50,7 +50,7 @@ wait.launchFiber(function() {
     sp,
     vote,
     created,
-  }
+  };
   if (created.getDay() === 1) {
     utils.generateGrowthReport(
       account

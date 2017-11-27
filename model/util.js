@@ -705,7 +705,7 @@ module.exports = {
       this.debug(body);
     }
   },
-  generateGrowthReport: function(account){
+  generateGrowthReport: function(account) {
     var when = this.getDate(account.created);
     var permlink = account.username + '-report-' + when;
     var title = 'Growth report for ' + when;
@@ -719,7 +719,7 @@ module.exports = {
     body += '\n\n';
     body += '![tuanis.jpeg](https://steemitimages.com/DQmUdo4Ngm8JgDqRL4FndKksi7HzgbGMkFXwNpbYACWMQVu/tuanis.jpeg) \n';
     body += 'Upvote this report to keep supporting this project.';
-    var tags = {tags: ['helpmejoin','minnowsupportproject','minnows']}
+    var tags = {tags: ['helpmejoin','minnowsupportproject','minnows']};
 
     if (conf.env.REPORT_ACTIVE()) {
       var voter = wait.for(
