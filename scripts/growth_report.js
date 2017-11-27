@@ -33,7 +33,7 @@ wait.launchFiber(function() {
   m = parseInt((m + 49) / 50);
   var i = parseFloat(ci.reward_balance.replace(' STEEM', '')) /
     parseFloat(ci.recent_claims);
-  var o = parseFloat(ci.price_info.base.replace(' SBD', '')) / 
+  var o = parseFloat(ci.price_info.base.replace(' SBD', '')) /
     parseFloat(ci.price_info.quote.replace(' STEEM', ''));
   var a = globalData.total_vesting_fund_steem.replace(' STEEM', '') /
     globalData.total_vesting_shares.replace(' VESTS', '');

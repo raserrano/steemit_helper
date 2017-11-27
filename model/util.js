@@ -205,7 +205,7 @@ module.exports = {
         );
         wait.for(this.upsertTransfer,{_id: data[i]._id},{status: 'refunded'});
       }
-      if (data[i].status === 'self-comment' || 
+      if (data[i].status === 'self-comment' ||
         data[i].status === 'comment' ||
         data[i].status === 'self-vote') {
         memo = conf.env.REFUND_TEXT();
@@ -350,7 +350,7 @@ module.exports = {
     obj.url = '';
     obj.created = '';
     if (memo.indexOf('/') != -1) {
-      if(conf.env.COMMENT_VOTE()){
+      if (conf.env.COMMENT_VOTE()) {
         var post_url = post[1].op[1].memo.split('/');
         post_url = post_url.filter(function(e) {return e});
         if (post_url[post_url.length - 2][0] === '@') {
@@ -359,7 +359,7 @@ module.exports = {
           obj.url = post_url[post_url.length - 1];
           if (url != undefined && author != undefined
             && url != null && author != null) {
-            if(conf.env.SELF_VOTE()){
+            if (conf.env.SELF_VOTE()) {
               if (payer !== author) {
                 var result = wait.for(steem_api.steem_getContent,author,url);
                 if ((result !== undefined) && (result !== null)) {
@@ -378,7 +378,7 @@ module.exports = {
                   obj.processed = true;
                 }
               }
-            }else{
+            }else {
               var result = wait.for(steem_api.steem_getContent,author,url);
               if ((result !== undefined) && (result !== null)) {
                 obj.created = result.created;
@@ -404,7 +404,7 @@ module.exports = {
           obj.status = 'url not valid';
           obj.processed = true;
         }
-      }else{
+      }else {
         if (!(memo.indexOf('#') == -1)) {
           obj.status = 'comment';
           obj.processed = true;
