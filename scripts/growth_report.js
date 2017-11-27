@@ -7,7 +7,8 @@ const
 wait.launchFiber(function() {
   // Things that I need to do for the growth report
   // capture SP, reputation, followers count
-  // Calculate vote value0
+  // Calculate vote value
+  var account = null;
   var voter = wait.for(
     steem_api.steem_getAccounts_wrapper,[conf.env.ACCOUNT_NAME()]
   );
@@ -20,14 +21,14 @@ wait.launchFiber(function() {
   );
   var ci = steem_api.init_conversion(globalData);
   var steempower = steem_api.getSteemPower(voter[0]);
-  var created = new Date();
+  account.created = new Date();
 
 
   // Saving the data
-  var username = conf.env.ACCOUNT_NAME();
-  followers = followers.follower_count;
-  var sp = steempower.toFixed(3);
-  var votingpower = parseInt(utils.getVotingPower(voter[0])) / 100;
+  account.username = conf.env.ACCOUNT_NAME();
+  account.followers = followers.follower_count;
+  account.sp = steempower.toFixed(3);
+  account.votingpower = parseInt(utils.getVotingPower(voter[0])) / 100;
 
   var m = parseInt(100 * votingpower * (100 * 100) / 10000);
   m = parseInt((m + 49) / 50);
@@ -37,20 +38,11 @@ wait.launchFiber(function() {
     parseFloat(ci.price_info.quote.replace(' STEEM', ''));
   var a = globalData.total_vesting_fund_steem.replace(' STEEM', '') /
     globalData.total_vesting_shares.replace(' VESTS', '');
-  var r = sp / a;
+  var r = account.sp / a;
   var vote = parseInt(r * m * 100) * i * o;
-  vote = vote.toFixed(2);
+  account.vote = vote.toFixed(2);
 
-  var reputation = utils.getReputation(voter[0]);
-
-  var account = {
-    username,
-    reputation,
-    followers,
-    sp,
-    vote,
-    created,
-  };
+  account.reputation = utils.getReputation(voter[0]);
   if (created.getDay() === 1) {
     utils.generateGrowthReport(
       account
