@@ -608,27 +608,13 @@ module.exports = {
     body += '\n\n## Total sent in fees: ' + total.toFixed(3) + ' ##';
     body += '\n\nMake sure to visit their profile and welcome them as well.\n';
     body += 'Long live Steemit, the social revolution platform.';
-    if (conf.env.REPORT_ACTIVE()) {
-      var voter = wait.for(
-        steem_api.publishPost,
-        conf.env.ACCOUNT_NAME(),
-        permlink,
-        tags,
-        title,
-        body
-      );
-      if(conf.env.POWERUP_POST()){
-        var options = wait.for(
-          steem_api.publishPostOptions,
-          conf.env.ACCOUNT_NAME(),
-          permlink,
-          0
-        );   
-      }
-    }else {
-      this.debug('Debug is active not posting but body is:');
-      this.debug(body);
-    }
+    this.preparePost(
+      conf.env.ACCOUNT_NAME(),
+      permlink,
+      title,
+      body,
+      tags
+    );
   },
   generateTreeplanterReport: function(
     total,count,donators,average,steempower,rate,period,trees,specific,report) {
@@ -674,31 +660,17 @@ module.exports = {
     var contents = fs.readFileSync('./reports/treeplanter.md', 'utf8');
     body += '\n' + contents;
 
-    if (conf.env.REPORT_ACTIVE()) {
-      var voter = wait.for(
-        steem_api.publishPost,
-        conf.env.ACCOUNT_NAME(),
-        permlink,
-        tags,
-        title,
-        body
-      );
-      if(conf.env.POWERUP_POST()){
-        var options = wait.for(
-          steem_api.publishPostOptions,
-          conf.env.ACCOUNT_NAME(),
-          permlink,
-          0
-        );   
-      }
-    }else {
-      this.debug('Debug is active not posting but body is:');
-      this.debug(body);
-    }
+    this.preparePost(
+      conf.env.ACCOUNT_NAME(),
+      permlink,
+      title,
+      body,
+      tags
+    );
   },
   generateGrowthReport: function(account) {
     var when = this.getDate(account.created);
-    var permlink = account.username + '-report-' + when;
+    var permlink = account.username + '-growth-' + when;
     var title = 'Growth report for ' + when;
     var body = '<h3>Growth Report</h3>\n With your help I have grown and ';
     body += 'I am able to help more minnows. Thanks for your support.\n ';
@@ -708,32 +680,53 @@ module.exports = {
     body += '- **Vote value:** ' + account.vote + '\n';
     body += '- **Steem power:** ' + account.sp + '\n';
     body += '\n\n';
-    body += '![tuanis.jpeg](https://steemitimages.com/DQmUdo4Ngm8JgDqRL4FndKksi7HzgbGMkFXwNpbYACWMQVu/tuanis.jpeg) \n';
-    body += 'Upvote this report to keep supporting this project.';
-    body += '\nYou can also support this project by sending a transfer and a ';
+    body += '![tuanis.jpeg](https://steemitimages.com/DQmUdo4Ngm8JgDqRL4FndKksi7HzgbGMkFXwNpbYACWMQVu/tuanis.jpeg) \n\n';
+    body += 'Upvote this report to keep supporting this project. \n\n';
+    body += '--- \n'
+    body += 'You can also support this project by sending a transfer and a ';
     body += 'post or comment URL in the memo field. **Minimum is 0.01 SBD**';
     body += 'I will upvote it to a value of 1.5 times your donation. \n';
     body += 'Max upvote value to 0.03 SBD, you can always send more but it ';
     body += 'will be consider a donation.';
     var tags = {tags: ['helpmejoin','minnowsupportproject','minnows']};
-
+    this.preparePost(
+      conf.env.ACCOUNT_NAME(),
+      permlink,
+      title,
+      body,
+      tags
+    );
+  },
+  preparePost: function(author, permlink, title, body, tags){
     if (conf.env.REPORT_ACTIVE()) {
       var voter = wait.for(
         steem_api.publishPost,
-        conf.env.ACCOUNT_NAME(),
+        author,
         permlink,
         tags,
         title,
         body
       );
+      var percentage = 10000;
       if(conf.env.POWERUP_POST()){
-        var options = wait.for(
-          steem_api.publishPostOptions,
-          conf.env.ACCOUNT_NAME(),
-          permlink,
-          0
-        );   
+        percentage = 0;
       }
+      var extensions = 
+        [[0,{beneficiaries:[{account: 'raserrano', weight: 1000 }],},],];
+      //{account: 'raserrano', weight: 1000 },
+      // if(conf.env.BENEFICIARIES() !== null){
+      //   var list = conf.env.BENEFICIARIES();
+      //   extensions = 
+      //     [[0,{beneficiaries:list,},],];
+      // }
+      // console.log(extensions);
+      var options = wait.for(
+        steem_api.publishPostOptions,
+        author,
+        permlink,
+        percentage,
+        extensions
+      );   
     }else {
       this.debug('Debug is active not posting but body is:');
       this.debug(body);

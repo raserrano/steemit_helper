@@ -198,5 +198,13 @@ module.exports = {
       }
       return value;
     },
+    BENEFICIARIES: function() {
+      var value = '';
+      if ((process.env.BENEFICIARIES !== undefined) &&
+        (process.env.BENEFICIARIES !== null)) {
+        value = process.env.BENEFICIARIES;
+      }
+      return value;
+    },
   },
 };

@@ -7,12 +7,12 @@ var ci = new Object()
 
 steem.config.set('websocket',conf.websockets[0]);
 module.exports = {
-  getTransfers: function(name,max,limit,callback) {
-    steem.api.getAccountHistory(name,max,limit,function(err,result) {
-      callback(err,result);
+  getTransfers: function(name, max, limit, callback) {
+    steem.api.getAccountHistory(name,max,limit,function(err, result) {
+      callback(err, result);
     });
   },
-  votePost: function(author,permlink,weight) {
+  votePost: function(author, permlink, weight) {
     var action = 'Voting ' + author + ' ' + permlink;
     action += ' with weight of ' + weight;
     console.log(action);
@@ -24,7 +24,7 @@ module.exports = {
       permlink,
       weight);
   },
-  commentPost: function(author,permlink,title,comment) {
+  commentPost: function(author, permlink, title, comment) {
     var permlink = permlink.replace('.','');
     console.log('Commenting post: ' + permlink);
     var comment_permlink = steem.formatter.commentPermlink(
@@ -44,7 +44,7 @@ module.exports = {
       {}
     );
   },
-  publishPost: function(author, permlink, tags,title, body) {
+  publishPost: function(author, permlink, tags, title, body) {
     var permlink = permlink.replace('.','');
     console.log('Publising post:' + permlink);
     return wait.for(
@@ -59,11 +59,11 @@ module.exports = {
       tags
     );
   },
-  publishPostOptions: function(author, permlink,percent) {
+  publishPostOptions: function(author, permlink, percent, ext) {
     var maxAcceptedPayout = '1000000.000 SBD';
     var allowVotes = true;
     var allowCurationRewards = true;
-    var extensions = [];
+    var extensions = ext;
     return wait.for(
       steem.broadcast.commentOptions,
       conf.env.POSTING_KEY_PRV(),
@@ -77,9 +77,9 @@ module.exports = {
 
     );
   },
-  steem_getContent: function(author,post,callback) {
+  steem_getContent: function(author, post, callback) {
     steem.api.getContent(author, post,function(err,result) {
-      callback(err,result);
+      callback(err, result);
     });
   },
   steem_getAccounts_wrapper: function(accounts, callback) {
@@ -92,14 +92,14 @@ module.exports = {
       callback(err, result);
     });
   },
-  steem_getFollowers: function(following,start,type,limit,callback) {
-    steem.api.getFollowers(following,start,type,limit,function(err,result) {
-      callback(err,result);
+  steem_getFollowers: function(following, start, type, limit, callback) {
+    steem.api.getFollowers(following,start,type,limit,function(err, result) {
+      callback(err, result);
     });
   },
-  steem_getFollowersCount: function(following,callback) {
-    steem.api.getFollowCount(following,function(err,result) {
-      callback(err,result);
+  steem_getFollowersCount: function(following, callback) {
+    steem.api.getFollowCount(following,function(err, result) {
+      callback(err, result);
     });
   },
   steem_getSteemGlobaleProperties_wrapper: function(callback) {
@@ -122,15 +122,15 @@ module.exports = {
       callback(err, result);
     });
   },
-  steem_getPostsByTag: function(tag,amount,callback) {
+  steem_getPostsByTag: function(tag, amount, callback) {
     steem.api.getDiscussionsByCreated(
       {tag: tag, limit: amount},
       function(err, result) {
-        callback(err,result);
+        callback(err, result);
       }
     );
   },
-  doTransfer: function(from, to, amount, memo,callback) {
+  doTransfer: function(from, to, amount, memo, callback) {
     steem.broadcast.transfer(
       conf.env.WIF(),
       from,
@@ -142,7 +142,7 @@ module.exports = {
       }
     );
   },
-  claimRewards: function(account, steem_val, sbd_val,vests,callback) {
+  claimRewards: function(account, steem_val, sbd_val, vests, callback) {
     steem.broadcast.claimRewardBalance(
       conf.env.POSTING_KEY_PRV(),
       account,
@@ -154,7 +154,7 @@ module.exports = {
       }
     );
   },
-  verifyAccountHasVoted: function(account,result) {
+  verifyAccountHasVoted: function(account, result) {
     var pos = 0;
     var votes = new Array();
     if (result.active_votes.length > 0) {
@@ -194,7 +194,7 @@ module.exports = {
     console.log('Total vests: ' + totalVests);
     return this.getSteemPowerFromVest(globalData,totalVests);
   },
-  calculateVoteWeight: function(account,target_value) {
+  calculateVoteWeight: function(account, target_value) {
     var globalData = wait.for(
       this.steem_getSteemGlobaleProperties_wrapper
     );
@@ -215,7 +215,7 @@ module.exports = {
     }
     return parseInt(votingpower * conf.env.VOTE_POWER_1_PC());
   },
-  init_conversion: function(globalData,callback) {
+  init_conversion: function(globalData, callback) {
     var ci = new Object();
     // Get some info first
     var headBlock = wait.for(
@@ -255,7 +255,7 @@ module.exports = {
     );
     return ci;
   },
-  getSteemPowerFromVest: function(globalData,vest) {
+  getSteemPowerFromVest: function(globalData, vest) {
     try {
       return steem.formatter.vestToSteem(
         vest,
