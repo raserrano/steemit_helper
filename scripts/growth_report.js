@@ -43,7 +43,7 @@ wait.launchFiber(function() {
   account.vote = vote.toFixed(2);
 
   account.reputation = utils.getReputation(voter[0]);
-  if (created.getDay() === 1) {
+  if (account.created.getDay() === 1) {
     utils.generateGrowthReport(
       account
     );

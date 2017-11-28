@@ -190,5 +190,13 @@ module.exports = {
       }
       return value;
     },
+    POWERUP_POST: function() {
+      var value = false;
+      if ((process.env.POWERUP_POST !== undefined) &&
+        (process.env.POWERUP_POST !== null)) {
+        value = JSON.parse(process.env.POWERUP_POST);
+      }
+      return value;
+    },
   },
 };
