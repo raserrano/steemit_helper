@@ -84,6 +84,8 @@ module.exports = {
               wait.for(this.timeout_wrapper,5000);
             }
           }
+        }else {
+          this.debug('VP to low to vote');
         }
       }else {
         this.debug(
@@ -319,7 +321,10 @@ module.exports = {
   votePostsByTag: function(posts,weight) {
     for (var i = 0; i < posts.length;i++) {
       var author = posts[i].author;
-      var account = wait.for(steem_api.steem_getAccounts_wrapper,[author]);
+      var account = wait.for(
+        steem_api.steem_getAccounts_wrapper,
+        [conf.env.ACCOUNT_NAME()]
+      );
       var vp = this.getVotingPower(account[0]);
       if (vp >= (
             conf.env.MIN_VOTING_POWER() * conf.env.VOTE_POWER_1_PC()
@@ -339,6 +344,8 @@ module.exports = {
         }else {
           this.debug('Account was already voted');
         }
+      }else {
+        this.debug('VP to low to vote');
       }
     }
   },
@@ -678,6 +685,8 @@ module.exports = {
     var permlink = account.username + '-growth-' + when;
     var title = 'Growth report for ' + when;
     var body = '<h3>Growth Report</h3>\n With your help I have grown and ';
+    var image_url =  'https://steemitimages.com/';
+    image_url += 'DQmUdo4Ngm8JgDqRL4FndKksi7HzgbGMkFXwNpbYACWMQVu/tuanis.jpeg';
     body += 'I am able to help more minnows. Thanks for your support.\n ';
     body += '\n';
     body += '- **Followers:** ' + account.followers + '\n';
@@ -685,7 +694,7 @@ module.exports = {
     body += '- **Vote value:** ' + account.vote + '\n';
     body += '- **Steem power:** ' + account.sp + '\n';
     body += '\n\n';
-    body += '![tuanis.jpeg](https://steemitimages.com/DQmUdo4Ngm8JgDqRL4FndKksi7HzgbGMkFXwNpbYACWMQVu/tuanis.jpeg) \n\n';
+    body += '![tuanis.jpeg](' + image_url + ') \n\n';
     body += 'Upvote this report to keep supporting this project. \n\n';
     body += '--- \n';
     body += 'You can also support this project by sending a transfer and a ';
@@ -718,7 +727,7 @@ module.exports = {
       }
       var extensions =
         [[0,{beneficiaries: [{account: 'raserrano', weight: 1000 }],},],];
-      //{account: 'raserrano', weight: 1000 },
+      // {account: 'raserrano', weight: 1000 },
       // if(conf.env.BENEFICIARIES() !== null){
       //   var list = conf.env.BENEFICIARIES();
       //   extensions =
@@ -750,6 +759,7 @@ module.exports = {
     if (vp > 10000) {
       vp = 10000;
     }
+    this.debug('VP is: ' + vp);
     return vp;
   },
   getReputation: function(account) {
