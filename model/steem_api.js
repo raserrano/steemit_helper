@@ -161,8 +161,9 @@ module.exports = {
       for (var i = 0; i < result.active_votes.length;i++) {
         votes.push(result.active_votes[i].voter);
       }
-      //console.log('Votes: '+votes);
-      //console.log(account);
+      // Debug
+      // console.log('Votes: '+votes);
+      // console.log(account);
       for (var j = 0;j < account.length;j++) {
         var match = '';
         if (account[j] instanceof Function) {
@@ -176,7 +177,8 @@ module.exports = {
         }
       }
     }
-    //console.log('Found '+ match +' '+(pos !== 0));
+    // Debug
+    // console.log('Found '+ match +' '+(pos !== 0));
     return pos !== 0;
   },
   getSteemPower: function(account) {
@@ -209,7 +211,7 @@ module.exports = {
 
     var votingpower = (oneval / (100 * (100 * voteweight)
       / conf.env.VOTE_POWER_1_PC())) * 100;
-    console.log('Voting power is: ' + votingpower);
+    console.log('Vote weight is: ' + votingpower);
     if (votingpower > 100) {
       votingpower = 100;
     }
