@@ -75,7 +75,7 @@ module.exports = {
           var to_vote = posts[posts.length - 1];
           if ((to_vote.author !== undefined) && (to_vote.author !== null)
             && (to_vote.url !== undefined) && (to_vote.url !== null)) {
-            if(!to_vote.voted){
+            if (!to_vote.voted) {
               steem_api.votePost(
                 to_vote.author,
                 to_vote.url,
@@ -119,9 +119,9 @@ module.exports = {
             )) {
             if (conf.env.VOTE_ACTIVE()) {
               voted_ok = true;
-              if(!data[i].voted){
+              if (!data[i].voted) {
                 steem_api.votePost(data[i].author, data[i].url, weight);
-                wait.for(this.timeout_wrapper,5500);                
+                wait.for(this.timeout_wrapper,5500);
               }
             }else {
               this.debug(
@@ -320,20 +320,25 @@ module.exports = {
     for (var i = 0; i < posts.length;i++) {
       var author = posts[i].author;
       var account = wait.for(steem_api.steem_getAccounts_wrapper,[author]);
-      if (!steem_api.verifyAccountHasVoted(
-        [conf.env.ACCOUNT_NAME],posts[i]
-        )) {
-        if (conf.env.VOTE_ACTIVE()) {
-          steem_api.votePost(posts[i].author,posts[i].permlink,weight);
-          wait.for(this.timeout_wrapper,5100);
+      var vp = this.getVotingPower(account[0]);
+      if (vp >= (
+            conf.env.MIN_VOTING_POWER() * conf.env.VOTE_POWER_1_PC()
+            )) {
+        if (!steem_api.verifyAccountHasVoted(
+          [conf.env.ACCOUNT_NAME],posts[i]
+          )) {
+          if (conf.env.VOTE_ACTIVE()) {
+            steem_api.votePost(posts[i].author,posts[i].permlink,weight);
+            wait.for(this.timeout_wrapper,5100);
+          }else {
+            this.debug(
+              'Voting is not active, voting: ' + posts[i].author +
+              'url: ' + posts[i].permlink
+            );
+          }
         }else {
-          this.debug(
-            'Voting is not active, voting: ' + posts[i].author +
-            'url: ' + posts[i].permlink
-          );
+          this.debug('Account was already voted');
         }
-      }else {
-        this.debug('Account was already voted');
       }
     }
   },
@@ -388,7 +393,7 @@ module.exports = {
                   obj.status = 'content-not-found';
                   obj.processed = true;
                 }
-              }else{
+              }else {
                 obj.status = 'self-vote';
                 obj.processed = true;
               }
@@ -684,10 +689,10 @@ module.exports = {
     body += 'Upvote this report to keep supporting this project. \n\n';
     body += '--- \n';
     body += 'You can also support this project by sending a transfer and a ';
-    body += 'post or comment URL in the memo field. **Minimum is 0.01 SBD**';
+    body += 'post or comment URL in the memo field. **Minimum is 0.01 SBD** ';
     body += 'I will upvote it to a value of 1.5 times your donation. \n';
-    body += 'Max upvote value to 0.03 SBD, you can always send more but it ';
-    body += 'will be consider a donation.';
+    body += '**Max upvote value to 0.03 SBD**, you can always send more  ';
+    body += 'but it will be consider a donation.';
     var tags = {tags: ['helpmejoin','minnowsupportproject','minnows']};
     this.preparePost(
       conf.env.ACCOUNT_NAME(),
@@ -697,7 +702,7 @@ module.exports = {
       tags
     );
   },
-  preparePost: function(author, permlink, title, body, tags){
+  preparePost: function(author, permlink, title, body, tags) {
     if (conf.env.REPORT_ACTIVE()) {
       var voter = wait.for(
         steem_api.publishPost,
@@ -708,15 +713,15 @@ module.exports = {
         body
       );
       var percentage = 10000;
-      if(conf.env.POWERUP_POST()){
+      if (conf.env.POWERUP_POST()) {
         percentage = 0;
       }
-      var extensions = 
-        [[0,{beneficiaries:[{account: 'raserrano', weight: 1000 }],},],];
+      var extensions =
+        [[0,{beneficiaries: [{account: 'raserrano', weight: 1000 }],},],];
       //{account: 'raserrano', weight: 1000 },
       // if(conf.env.BENEFICIARIES() !== null){
       //   var list = conf.env.BENEFICIARIES();
-      //   extensions = 
+      //   extensions =
       //     [[0,{beneficiaries:list,},],];
       // }
       // console.log(extensions);
@@ -726,7 +731,7 @@ module.exports = {
         permlink,
         percentage,
         extensions
-      );   
+      );
     }else {
       this.debug('Debug is active not posting but body is:');
       this.debug(body);
