@@ -369,6 +369,15 @@ module.exports = {
       if (conf.env.COMMENT_VOTE()) {
         var post_url = obj.memo.split('/');
         post_url = post_url.filter(function(e) {return e});
+        if (!(post_url[post_url.length - 2].indexOf('#') == -1)) {
+          var items = post_url[post_url.length - 2].split('#');
+          post_url.splice(
+            (post_url.length - 2),
+            1,
+            items[0],
+            items[1]
+          );
+        }
         if (post_url[post_url.length - 2][0] === '@') {
           obj.author = post_url[post_url.length - 2]
           .substr(1, post_url[post_url.length - 2].length);
