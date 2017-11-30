@@ -46,10 +46,10 @@ voting bot: *@treeplanter* – Plant trees and get paid for it!
 1. Donate to our NGO’s account @kedjom-keku any amount of STEEM or SBD
 2. Use our voting bot @treeplanter. Plant trees and get paid for it!
 3. Delegate STEEM POWER to @treeplanter to allow her to plant more trees - each 1,000 STEEM POWER allows her to plant 1 more tree every day
-4. Donate BTC to our *blockchain wallet*
-5. Donate Solarcoins to *our wallet*
-6. Send donation to our bank account
-7. Use Crowdfunding portal of our new website www.kedjom-keku.com
+4. Donate BTC to our *[blockchain wallet](https://blockchain.info/address/1GVCsYsf2LzvyqDUYhXPjQbb2uKtW6dDDH)*
+5. Donate Solarcoins to *[our wallet](https://chainz.cryptoid.info/slr/address.dws?8LsW14JHnbvpq6RefqASJMgySN6K8SgAiG.htm)*
+6. Send donation to our [bank account](http://kedjom-keku.com/contact/)
+7. Use Crowdfunding portal of our new website [www.kedjom-keku.com](http://kedjom-keku.com/)
 
 ### Read, upvote and resteem other active articles of me @martin.mikes, NGO @kedjom-keku or voting bot @treeplanter - all revenue is going to be spend for natural conservation.
 

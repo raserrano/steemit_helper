@@ -1,10 +1,6 @@
-# Steemit helper #
+# Steemit helper
 
-[![Coverage Status](https://coveralls.io/repos/github/raserrano/steemit_helper/badge.svg?branch=develop)](https://coveralls.io/github/raserrano/steemit_helper?branch=develop)
-
-## Features ##
-
-
+## Features
 - [x] Voting feature
 - [x] Welcome message feature
 - [x] Transfer funds feature
@@ -13,17 +9,18 @@
 - [x] Poster creator
 - [x] Reporter with a set of filters
 - [x] Queue view, trees report view, last transactions and all transactions
+- [x] Reputation calculation
+- [x] Self-vote setting
+- [x] Refunding messages
+- [x] Weekly Service status report
+- [x] Add 100% power up posts
 
-TODO
-- Commentor upvote roulette
-- Auto FREE SBD giveaway with automatic transfers
-- Games like minnow frenzy eat competition
-- Follow X user votes like guild feature
-- Weekly Service status report
-- Reputation calculation
-- Daily STEEM/SBD price
-- Upvote and comment minnows comments
-- Include vote calculation
-- Finish the comentor upvote
-- Implement good comment/post rating
-- Tuanis weekly report - program funding
+## TODO
+- [ ] Commentor upvote roulette
+- [ ] Finish the comentor upvote
+- [ ] Implement good comment/post rating
+- [ ] Upvote and comment minnows comments
+- [ ] Auto FREE SBD giveaway with automatic transfers
+- [ ] Games like minnow frenzy eat competition
+- [ ] Follow X user votes like guild feature
+- [ ] Daily STEEM/SBD price

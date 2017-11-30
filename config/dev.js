@@ -110,6 +110,30 @@ module.exports = {
       }
       return value;
     },
+    SELF_VOTE: function() {
+      var value = false;
+      if ((process.env.SELF_VOTE !== undefined) &&
+        (process.env.SELF_VOTE !== null)) {
+        value = JSON.parse(process.env.SELF_VOTE);
+      }
+      return value;
+    },
+    COMMENT_VOTE: function() {
+      var value = false;
+      if ((process.env.COMMENT_VOTE !== undefined) &&
+        (process.env.COMMENT_VOTE !== null)) {
+        value = JSON.parse(process.env.COMMENT_VOTE);
+      }
+      return value;
+    },
+    REFUND_TEXT: function() {
+      var value = 'Sorry, I cannot do selfvoting anymore.';
+      if ((process.env.REFUND_TEXT !== undefined) &&
+        (process.env.REFUND_TEXT !== null)) {
+        value = process.env.REFUND_TEXT;
+      }
+      return value;
+    },
     REPORT_ACTIVE: function() {
       var value = false;
       if ((process.env.REPORT_ACTIVE !== undefined) &&
@@ -163,6 +187,22 @@ module.exports = {
       if ((process.env.REFUNDS_ACTIVE !== undefined) &&
         (process.env.REFUNDS_ACTIVE !== null)) {
         value = JSON.parse(process.env.REFUNDS_ACTIVE);
+      }
+      return value;
+    },
+    POWERUP_POST: function() {
+      var value = false;
+      if ((process.env.POWERUP_POST !== undefined) &&
+        (process.env.POWERUP_POST !== null)) {
+        value = JSON.parse(process.env.POWERUP_POST);
+      }
+      return value;
+    },
+    BENEFICIARIES: function() {
+      var value = '';
+      if ((process.env.BENEFICIARIES !== undefined) &&
+        (process.env.BENEFICIARIES !== null)) {
+        value = process.env.BENEFICIARIES;
       }
       return value;
     },
