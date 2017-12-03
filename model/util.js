@@ -197,24 +197,22 @@ module.exports = {
     var memo = '';
     var send = '';
     for (var i = 0; i < data.length;i++) {
-      if (data[i].status === 'due date') {
-        memo = 'I am sorry my SP was not enough to upvote the post you sent ';
-        memo += 'me in memo. Send me different (not so old) post. Thank you.';
-        send = data[i].amount.toFixed(3) + ' ' + data[i].currency;
-        this.debug(send,account,data[i].payer,memo);
-        wait.for(
-          steem_api.doTransfer,
-          account,
-          data[i].payer,
-          send,
-          memo
-        );
-        wait.for(this.upsertTransfer,{_id: data[i]._id},{status: 'refunded'});
+      memo = 'I am sorry my SP was not enough to upvote the post you sent ';
+      memo += 'me in memo. Send me different (not so old) post. Thank you.';
+      if (conf.env.COMMENT_VOTE()) {
+        if (conf.env.SELF_VOTE()) {
+          conditions = data[i].status === 'due-date';
+        }else {
+          memo = conf.env.REFUND_TEXT();
+          conditions = data[i].status === 'due-date' ||
+            data[i].status === 'self-vote';
+        }
+      }else {
+        conditions = data[i].status === 'due-date' ||
+          data[i].status === 'comment' ||
+          data[i].status === 'self-vote';
       }
-      if (data[i].status === 'self-comment' ||
-        data[i].status === 'comment' ||
-        data[i].status === 'self-vote') {
-        memo = conf.env.REFUND_TEXT();
+      if (conditions) {
         send = data[i].amount.toFixed(3) + ' ' + data[i].currency;
         this.debug(send,account,data[i].payer,memo);
         wait.for(
