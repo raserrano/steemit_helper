@@ -199,15 +199,15 @@ module.exports = {
     for (var i = 0; i < data.length;i++) {
       memo = 'I am sorry my SP was not enough to upvote the post you sent ';
       memo += 'me in memo. Send me different (not so old) post. Thank you.';
-      if(conf.env.COMMENT_VOTE()){
-        if(conf.env.SELF_VOTE()){
+      if (conf.env.COMMENT_VOTE()) {
+        if (conf.env.SELF_VOTE()) {
           conditions = data[i].status === 'due-date';
-        }else{
+        }else {
           memo = conf.env.REFUND_TEXT();
           conditions = data[i].status === 'due-date' ||
             data[i].status === 'self-vote';
         }
-      }else{
+      }else {
         conditions = data[i].status === 'due-date' ||
           data[i].status === 'comment' ||
           data[i].status === 'self-vote';
