@@ -627,6 +627,9 @@ module.exports = {
     body += '\n\n## Total sent in fees: ' + total.toFixed(3) + ' ##';
     body += '\n\nMake sure to visit their profile and welcome them as well.\n';
     body += 'Long live Steemit, the social revolution platform.';
+    var msp  = '[![pal-sig-anim-trans](https://i.imgur.com/sBkPplQ.gif)]';
+    msp += '(https://discord.gg/GUuCXgY)';
+    body += '\n---\n <center>' + msp + '</center>';
     this.preparePost(
       conf.env.ACCOUNT_NAME(),
       permlink,
@@ -694,6 +697,7 @@ module.exports = {
     var body = '<h3>Growth Report</h3>\n With your help I have grown and ';
     var image_url =  'https://steemitimages.com/';
     image_url += 'DQmUdo4Ngm8JgDqRL4FndKksi7HzgbGMkFXwNpbYACWMQVu/tuanis.jpeg';
+
     body += 'I am able to help more minnows. Thanks for your support.\n ';
     body += '\n';
     body += '- **Followers:** ' + account.followers + '\n';
@@ -709,6 +713,9 @@ module.exports = {
     body += 'I will upvote it to a value of 1.5 times your donation. \n';
     body += '**Max upvote value to 0.03 SBD**, you can always send more  ';
     body += 'but it will be consider a donation.';
+    var msp  = '[![pal-sig-anim-trans](https://i.imgur.com/sBkPplQ.gif)]';
+    msp += '(https://discord.gg/GUuCXgY)';
+    body += '\n---\n <center>' + msp + '</center>';
     var tags = {tags: ['helpmejoin','minnowsupportproject','minnows']};
     this.preparePost(
       conf.env.ACCOUNT_NAME(),
