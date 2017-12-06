@@ -629,7 +629,7 @@ module.exports = {
     body += 'Long live Steemit, the social revolution platform.';
     var msp  = '[![pal-sig-anim-trans](https://i.imgur.com/sBkPplQ.gif)]';
     msp += '(https://discord.gg/GUuCXgY)';
-    body += '\n---\n <center>' + msp + '</center>'
+    body += '\n---\n <center>' + msp + '</center>';
     this.preparePost(
       conf.env.ACCOUNT_NAME(),
       permlink,
