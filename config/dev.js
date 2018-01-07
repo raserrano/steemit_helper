@@ -30,6 +30,7 @@ module.exports = {
     },
   },
   websockets: [
+    'wss://api.steemit.com',
     'wss://steemd.steemit.com',
     'wss://steemd.steemitdev.com',
     'wss://gtg.steem.house:8090',
