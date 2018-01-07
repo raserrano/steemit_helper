@@ -260,6 +260,23 @@ module.exports = {
                   'url: ' + posts[i].permlink
                 );
               }
+              if (((sbd <= 0.002) && (steem <= 0.002)) && 
+                (donator_sbd > 0.002)) {
+                this.debug('SBD: ' + sbd);
+                this.debug('STEEM: ' + steem);
+                wait.for(
+                  steem_api.doTransfer,
+                  conf.env.ACCOUNT_NAME(),
+                  posts[i].author,
+                  '0.002 SBD',
+                  'MSP Registrations funds, welcome to Steemit!'
+                );
+                posts[i].fee = 0.002;
+                donator_sbd -= 0.002;
+                this.debug('Donator balance: ' + donator_sbd);
+              }else {
+                posts[i].fee = 0;
+              }
               if (conf.env.COMMENT_ACTIVE()) {
                 comment = 'Welcome to steemit @' + posts[i].author +
                 '. Join #minnowsupportproject for more help. ' +
@@ -271,23 +288,6 @@ module.exports = {
                 'Transfer SBD to @tuanis in exchange of an upvote and ' +
                 'support this project';
 
-                if (((sbd <= 0.002) && (steem <= 0.002)) &&
-                  (donator_sbd > 0.002)) {
-                  this.debug('SBD: ' + sbd);
-                  this.debug('STEEM: ' + steem);
-                  wait.for(
-                    steem_api.doTransfer,
-                    conf.env.ACCOUNT_NAME(),
-                    posts[i].author,
-                    '0.002 SBD',
-                    'MSP Registrations funds, welcome to Steemit!'
-                  );
-                  posts[i].fee = 0.002;
-                  donator_sbd -= 0.002;
-                  this.debug('Donator balance: ' + donator_sbd);
-                }else {
-                  posts[i].fee = 0;
-                }
                 steem_api.commentPost(
                   posts[i].author,
                   posts[i].permlink,
@@ -627,6 +627,9 @@ module.exports = {
     body += '\n\n## Total sent in fees: ' + total.toFixed(3) + ' ##';
     body += '\n\nMake sure to visit their profile and welcome them as well.\n';
     body += 'Long live Steemit, the social revolution platform.';
+    var msp  = '[![pal-sig-anim-trans](https://i.imgur.com/sBkPplQ.gif)]';
+    msp += '(https://discord.gg/GUuCXgY)';
+    body += '\n---\n <center>' + msp + '</center>';
     this.preparePost(
       conf.env.ACCOUNT_NAME(),
       permlink,
@@ -694,6 +697,7 @@ module.exports = {
     var body = '<h3>Growth Report</h3>\n With your help I have grown and ';
     var image_url =  'https://steemitimages.com/';
     image_url += 'DQmUdo4Ngm8JgDqRL4FndKksi7HzgbGMkFXwNpbYACWMQVu/tuanis.jpeg';
+
     body += 'I am able to help more minnows. Thanks for your support.\n ';
     body += '\n';
     body += '- **Followers:** ' + account.followers + '\n';
@@ -709,6 +713,9 @@ module.exports = {
     body += 'I will upvote it to a value of 1.5 times your donation. \n';
     body += '**Max upvote value to 0.03 SBD**, you can always send more  ';
     body += 'but it will be consider a donation.';
+    var msp  = '[![pal-sig-anim-trans](https://i.imgur.com/sBkPplQ.gif)]';
+    msp += '(https://discord.gg/GUuCXgY)';
+    body += '\n---\n <center>' + msp + '</center>';
     var tags = {tags: ['helpmejoin','minnowsupportproject','minnows']};
     this.preparePost(
       conf.env.ACCOUNT_NAME(),
