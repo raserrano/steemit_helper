@@ -29,14 +29,6 @@ module.exports = {
       return uri.toString();
     },
   },
-  websockets: [
-    'wss://steemd.steemit.com',
-    'wss://steemd.steemitdev.com',
-    'wss://gtg.steem.house:8090',
-    'wss://seed.bitcoiner.me',
-    'wss://this.piston.rocks',
-    'wss://node.steem.ws',
-  ],
   env: {
     DEBUG: function() {
       var value = false;

@@ -5,7 +5,7 @@ const steem = require('steem'),
 
 var ci = new Object()
 
-steem.config.set('websocket',conf.websockets[0]);
+steem.api.setOptions({ url: 'https://api.steemit.com' })
 module.exports = {
   getTransfers: function(name, max, limit, callback) {
     steem.api.getAccountHistory(name,max,limit,function(err, result) {
