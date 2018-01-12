@@ -517,8 +517,23 @@ module.exports = {
       }
     );
   },
+  getFollowers: function(callback) {
+    db.model('Follower').find(
+      {}
+      ).exec(
+      function(err,data) {
+        callback(err,data);
+      }
+    );
+  },
   upsertTransfer: function(query,doc,callback) {
     db.model('Transfer').update(
+      query,doc,{upsert: true,new: true},
+      function(err,data) {callback(err,data);}
+    );
+  },
+  upsertFollower: function(query,doc,callback) {
+    db.model('Follower').update(
       query,doc,{upsert: true,new: true},
       function(err,data) {callback(err,data);}
     );
