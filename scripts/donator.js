@@ -6,7 +6,7 @@ const
 
 // Voting for donations
 wait.launchFiber(function() {
-  var RECORDS_FETCH_LIMIT = 1000;
+  var RECORDS_FETCH_LIMIT = 10;
 
   var accounts = wait.for(
     steem_api.steem_getAccounts_wrapper,[conf.env.ACCOUNT_NAME()]
