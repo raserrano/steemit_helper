@@ -1,0 +1,47 @@
+{
+  "name": "steemit_helper",
+  "version": "0.0.1",
+  "description": "Steemit task helper",
+  "main": "index.js",
+  "scripts": {
+    "test": "nyc mocha test",
+    "start": "node ./bin/www"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/raserrano/steemit_helper.git"
+  },
+  "keywords": [
+    "steemit",
+    "task",
+    "bot",
+    "helper",
+    "steem"
+  ],
+  "author": "raserrano",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/raserrano/steemit_helper/issues"
+  },
+  "homepage": "https://github.com/raserrano/steemit_helper/blob/develop/README",
+  "dependencies": {
+    "body-parser": "^1.18.2",
+    "cookie-parser": "^1.4.3",
+    "debug": "^2.6.9",
+    "express": "^4.16.2",
+    "mongoose": "^4.13.9",
+    "morgan": "^1.9.0",
+    "nyc": "^11.4.1",
+    "pug": "^2.0.0-rc.4",
+    "request": "^2.83.0",
+    "serve-favicon": "^2.4.5",
+    "steem": "^0.6.7",
+    "wait.for": "^0.6.6"
+  },
+  "devDependencies": {
+    "chai": "^4.1.2",
+    "jscs": "^3.0.7",
+    "mocha": "^4.0.1",
+    "nyc": "^11.3.0"
+  }
+}

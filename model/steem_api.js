@@ -5,7 +5,7 @@ const steem = require('steem'),
 
 var ci = new Object()
 
-steem.api.setOptions({ url: 'https://api.steemit.com' })
+steem.api.setOptions({ url: 'https://rpc.buildteam.io/' })
 module.exports = {
   getTransfers: function(name, max, limit, callback) {
     steem.api.getAccountHistory(name,max,limit,function(err, result) {
@@ -25,6 +25,7 @@ module.exports = {
       weight);
   },
   commentPost: function(author, permlink, title, comment) {
+    var author = author.replace('.','');
     var permlink = permlink.replace('.','');
     console.log('Commenting post: ' + permlink);
     var comment_permlink = steem.formatter.commentPermlink(
@@ -126,6 +127,17 @@ module.exports = {
     steem.api.getDiscussionsByCreated(
       {tag: tag, limit: amount},
       function(err, result) {
+        callback(err, result);
+      }
+    );
+  },
+  steem_getPostsByAuthor: function(author, amount, callback) {
+    steem.api.getDiscussionsByBlog(
+      {tag: author, limit: amount},
+      function(err, result) {
+        if(err){
+          console.log(err);
+        }
         callback(err, result);
       }
     );
