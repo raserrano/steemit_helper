@@ -25,8 +25,6 @@ module.exports = {
       weight);
   },
   commentPost: function(author, permlink, title, comment) {
-    var author = author.replace('.','');
-    var permlink = permlink.replace('.','');
     console.log('Commenting post: ' + permlink);
     var comment_permlink = steem.formatter.commentPermlink(
       author,
