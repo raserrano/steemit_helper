@@ -5,7 +5,8 @@ const steem = require('steem'),
 
 var ci = new Object()
 
-steem.api.setOptions({ url: 'https://rpc.buildteam.io/' })
+//steem.api.setOptions({ url: 'https://rpc.buildteam.io/' })
+steem.api.setOptions({ url: 'https://api.steemit.com/' })
 module.exports = {
   getTransfers: function(name, max, limit, callback) {
     steem.api.getAccountHistory(name,max,limit,function(err, result) {
