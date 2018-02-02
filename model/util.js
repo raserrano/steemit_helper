@@ -667,9 +667,8 @@ module.exports = {
     var title = 'Treeplanter report for ' + when;
     var tags = {tags: ['nature','charity','treeplanter','life','fundraising']};
 
-
     // Calculate new total with current market changes
-    var total = ((total * ci.sbd_to_dollar) / 2).toFixed(2);
+    var total_trees = ((total * ci.sbd_to_dollar) / 2).toFixed(2);
 
     // Calculate daily average
     // Create function to calculate this.
@@ -678,9 +677,9 @@ module.exports = {
     // Magic to generate body
     var header = 'Rank | Username | Total \n---|---|---\n';
     var body = 'Hello all tree planters.\n';
-    body += 'We can plant ' + total + ' of trees thanks to you.\n\n';
+    body += 'We can plant ' + total_trees + ' of trees thanks to you.\n\n';
     body += 'Followers: ' + count + '\nNumber of tree planters: ' + donators;
-    body += '\nTrees planted: ' + total + '\n';
+    body += '\nTrees planted: ' + total_trees + '\n';
     body += 'Average amount of trees planted daily: ' + average + '\n';
     body += 'STEEM POWER: ' + steempower;
     body += '\nDOLLAR/STEEM exchange rate: ' + ci.steem_to_dollar;

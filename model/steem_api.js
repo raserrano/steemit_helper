@@ -261,12 +261,12 @@ module.exports = {
       request,
       'https://api.coinmarketcap.com/v1/ticker/steem/'
     );
-    ci.steem_to_dollar = JSON.parse(ci.steem_to_dollar.body)[0]['price_usd'];
+    ci.steem_to_dollar = JSON.parse(ci.steem_to_dollar.body)[0].price_usd;
     ci.sbd_to_dollar = wait.for(
       request,
       'https://api.coinmarketcap.com/v1/ticker/steem-dollars/'
     );
-    ci.sbd_to_dollar = JSON.parse(ci.sbd_to_dollar.body)[0]['price_usd'];    
+    ci.sbd_to_dollar = JSON.parse(ci.sbd_to_dollar.body)[0].price_usd;    
     return ci;
   },
   getSteemPowerFromVest: function(globalData, vest) {
