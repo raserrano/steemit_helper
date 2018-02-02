@@ -8,6 +8,7 @@ wait.launchFiber(function() {
   var voter = wait.for(
     steem_api.steem_getAccounts_wrapper,[conf.env.ACCOUNT_NAME()]
   );
+  console.log(voter);
   var followers = wait.for(
     steem_api.steem_getFollowersCount,
     conf.env.ACCOUNT_NAME()

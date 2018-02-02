@@ -96,6 +96,7 @@ module.exports = {
     }
   },
   startVotingDonationsProcess: function(account,data) {
+    var ci = this.init_conversion(globalData);
     for (var i = 0;i < data.length;i++) {
       var voted_ok = false;
       if (data[i].amount >= conf.env.MIN_DONATION()) {
@@ -135,10 +136,10 @@ module.exports = {
               var comment = '';
               if (conf.env.ACCOUNT_NAME() === 'treeplanter') {
                 var sp = steem_api.getSteemPower(voter[0]).toFixed(2);
-                var trees = data[i].amount / 2;
+                var trees = ((data[i].amount * ci.sbd_to_dollar) / 2).toFixed(2);
                 title = 'Thanks for your donation';
                 comment = 'Good job! Thanks to @' + data[i].payer;
-                comment += ' you have planted ' + trees.toFixed(2) + ' ';
+                comment += ' you have planted ' + trees + ' ';
                 comment += 'tree to save Abongphen Highland ';
                 comment += 'Forest in Cameroon. Help me to plant 1,000,000 ';
                 comment += 'trees and share my Steem Power to the others. ';
@@ -701,14 +702,14 @@ module.exports = {
     for (var i = 0; i < specific.length;i++) {
       daily_donation += parseFloat(specific[i].total.toFixed(2));
       body += (i + 1) + ' | @' + specific[i]._id.payer +
-      ' | ' + specific[i].total.toFixed(2) + '\n';
+      ' | ' + ((specific[i].total * ci.sbd_to_dollar) / 2).toFixed(2) + '\n';
     }
 
     body += '\n\nTOTAL RANKING OF ALL TREE PLANTERS\n';
     body += header;
     for (var j = 0; j < trees.length;j++) {
       body += (j + 1) + ' | @' + trees[j]._id.payer +
-      ' | ' + trees[j].total.toFixed(2) + '\n';
+      ' | ' + ((trees[j].total * ci.sbd_to_dollar) / 2).toFixed(2) + '\n';
     }
 
     // Read file and add it to body
