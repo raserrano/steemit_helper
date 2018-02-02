@@ -41,5 +41,6 @@ process.on('SIGINT', function() {
 require('../model/transfer');
 require('../model/accounts');
 require('../model/followers');
+require('../model/information');
 
 module.exports = db;
