@@ -29,7 +29,7 @@
     "cookie-parser": "^1.4.3",
     "debug": "^2.6.9",
     "express": "^4.16.2",
-    "mongoose": "^4.13.9",
+    "mongoose": "^4.13.10",
     "morgan": "^1.9.0",
     "nyc": "^11.4.1",
     "pug": "^2.0.0-rc.4",

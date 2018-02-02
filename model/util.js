@@ -96,6 +96,7 @@ module.exports = {
     }
   },
   startVotingDonationsProcess: function(account,data) {
+    var ci = this.init_conversion(globalData);
     for (var i = 0;i < data.length;i++) {
       var voted_ok = false;
       if (data[i].amount >= conf.env.MIN_DONATION()) {
@@ -135,10 +136,10 @@ module.exports = {
               var comment = '';
               if (conf.env.ACCOUNT_NAME() === 'treeplanter') {
                 var sp = steem_api.getSteemPower(voter[0]).toFixed(2);
-                var trees = data[i].amount / 2;
+                var trees = ((data[i].amount * ci.sbd_to_dollar) / 2).toFixed(2);
                 title = 'Thanks for your donation';
                 comment = 'Good job! Thanks to @' + data[i].payer;
-                comment += ' you have planted ' + trees.toFixed(2) + ' ';
+                comment += ' you have planted ' + trees + ' ';
                 comment += 'tree to save Abongphen Highland ';
                 comment += 'Forest in Cameroon. Help me to plant 1,000,000 ';
                 comment += 'trees and share my Steem Power to the others. ';
@@ -260,7 +261,7 @@ module.exports = {
                   'url: ' + posts[i].permlink
                 );
               }
-              if (((sbd <= 0.002) && (steem <= 0.002)) && 
+              if (((sbd <= 0.002) && (steem <= 0.002)) &&
                 (donator_sbd > 0.002)) {
                 this.debug('SBD: ' + sbd);
                 this.debug('STEEM: ' + steem);
@@ -538,6 +539,12 @@ module.exports = {
       function(err,data) {callback(err,data);}
     );
   },
+  upsertStat: function(query,doc,callback) {
+    db.model('Information').update(
+      query,doc,{upsert: true,new: true},
+      function(err,data) {callback(err,data);}
+    );
+  },
   getTreesTotal: function(callback) {
     var stages = [
       {$match: {status: {$ne: 'refunded'}}},
@@ -607,7 +614,7 @@ module.exports = {
     if ((options.trees !== undefined) && (options.trees !== null)) {
       var group = {$group: {
         _id: {payer: '$payer'},
-        total: {$sum: {$divide: ['$amount',2]}},},};
+        total: {$sum: '$amount'},},};
       stages.push(group);
       stages.push({$sort: {total: -1}});
     }else {
@@ -654,21 +661,30 @@ module.exports = {
     );
   },
   generateTreeplanterReport: function(
-    total,count,donators,average,steempower,rate,period,trees,specific,report) {
+    total,count,donators,steempower,ci,period,trees,specific,report) {
     var when = this.getDate(new Date());
     var permlink = 'treeplanter-report-' + when;
     var title = 'Treeplanter report for ' + when;
     var tags = {tags: ['nature','charity','treeplanter','life','fundraising']};
 
+    // Calculate new total with current market changes
+    var total_trees = ((total * ci.sbd_to_dollar) / 2).toFixed(2);
+
+    // Calculate daily average
+    // Create function to calculate this.
+    var average = 29.3;
+
     // Magic to generate body
     var header = 'Rank | Username | Total \n---|---|---\n';
     var body = 'Hello all tree planters.\n';
-    body += 'We can plant ' + total + ' of trees thanks to you.\n\n';
+    body += 'We can plant ' + total_trees + ' of trees thanks to you.\n\n';
     body += 'Followers: ' + count + '\nNumber of tree planters: ' + donators;
-    body += '\nTrees planted: ' + total + '\n';
+    body += '\nTrees planted: ' + total_trees + '\n';
     body += 'Average amount of trees planted daily: ' + average + '\n';
-    body += 'STEEM POWER: ' + steempower + '\nDOLLAR/STEEM exchange rate: ';
-    body += rate + '\n\n';
+    body += 'STEEM POWER: ' + steempower;
+    body += '\nDOLLAR/STEEM exchange rate: ' + ci.steem_to_dollar;
+    body += '\nDOLLAR/SBD exchange rate: ' + ci.sbd_to_dollar;
+    body += '\n\n';
 
     var range = 'TODAY';
     if (period > 8) {
@@ -681,16 +697,18 @@ module.exports = {
     body += 'TOTAL RANKING OF ' + range + '\n';
     body += 'RANK  STEEMIAN  AMOUNT OF TREES PLANTED\n';
     body += header;
+    var daily_donation = 0;
     for (var i = 0; i < specific.length;i++) {
+      daily_donation += parseFloat(specific[i].total.toFixed(2));
       body += (i + 1) + ' | @' + specific[i]._id.payer +
-      ' | ' + specific[i].total.toFixed(2) + '\n';
+      ' | ' + ((specific[i].total * ci.sbd_to_dollar) / 2).toFixed(2) + '\n';
     }
 
     body += '\n\nTOTAL RANKING OF ALL TREE PLANTERS\n';
     body += header;
     for (var j = 0; j < trees.length;j++) {
       body += (j + 1) + ' | @' + trees[j]._id.payer +
-      ' | ' + trees[j].total.toFixed(2) + '\n';
+      ' | ' + ((trees[j].total * ci.sbd_to_dollar) / 2).toFixed(2) + '\n';
     }
 
     // Read file and add it to body
@@ -704,6 +722,26 @@ module.exports = {
       body,
       tags
     );
+
+    // Transfer 5% to developer
+    var developer_payment = (daily_donation * 0.05).toFixed(3);
+    wait.for(
+      steem_api.doTransfer,
+      conf.env.ACCOUNT_NAME(),
+      'raserrano',
+      developer_payment + ' SBD',
+      'Daily payment for development and management'
+    );
+    // Power up 50% of the amount
+    var powerup = (daily_donation * 0.5).toFixed(3);
+    // Create table to start tracking this
+    var stat = {};
+    stat.trees =  ((daily_donation * ci.sbd_to_dollar) / 2).toFixed(2);
+    stat.payment = developer_payment;
+    stat.powerup = powerup;
+
+    var result = wait.for(this.upsertStat,{'created': when},stat);
+    console.log(result);
   },
   generateGrowthReport: function(account) {
     var when = this.getDate(account.created);
