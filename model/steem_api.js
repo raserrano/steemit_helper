@@ -240,10 +240,12 @@ module.exports = {
       this.steem_getRewardFund_wrapper,
       'post'
       );
+
     ci.price_info = wait.for(
       this.steem_getCurrentMedianHistoryPrice_wrapper
     );
-
+    console.log('PRICE from median');
+    console.log(ci.price_info);
     ci.reward_balance = ci.rewardfund_info.reward_balance;
     ci.recent_claims = ci.rewardfund_info.recent_claims;
     ci.reward_pool = ci.reward_balance.replace(' STEEM', '')
@@ -255,17 +257,16 @@ module.exports = {
     ci.steem_per_vest =
       globalData.total_vesting_fund_steem.replace(' STEEM', '')
       / globalData.total_vesting_shares.replace(' VESTS', '');
-    request(
-      'https://api.coinmarketcap.com/v1/ticker/steem/',
-      function(err, response, body) {
-        if (err) {
-          ci.steem_to_dollar = 1;
-        } else {
-          var data = JSON.parse('{"data":' + body + '}');
-          ci.steem_to_dollar = data['data'][0]['price_usd'];
-        }
-      }
+    ci.steem_to_dollar = wait.for(
+      request,
+      'https://api.coinmarketcap.com/v1/ticker/steem/'
     );
+    ci.steem_to_dollar = JSON.parse(ci.steem_to_dollar.body)[0].price_usd;
+    ci.sbd_to_dollar = wait.for(
+      request,
+      'https://api.coinmarketcap.com/v1/ticker/steem-dollars/'
+    );
+    ci.sbd_to_dollar = JSON.parse(ci.sbd_to_dollar.body)[0].price_usd;    
     return ci;
   },
   getSteemPowerFromVest: function(globalData, vest) {
