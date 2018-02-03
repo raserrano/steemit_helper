@@ -97,9 +97,9 @@ module.exports = {
   },
   startVotingDonationsProcess: function(account,data) {
     var globalData = wait.for(
-      this.steem_getSteemGlobaleProperties_wrapper
+      steem_api.steem_getSteemGlobaleProperties_wrapper
     );
-    var ci = this.init_conversion(globalData);
+    var ci = steem_api.init_conversion(globalData);
     for (var i = 0;i < data.length;i++) {
       var voted_ok = false;
       if (data[i].amount >= conf.env.MIN_DONATION()) {

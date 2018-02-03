@@ -244,8 +244,6 @@ module.exports = {
     ci.price_info = wait.for(
       this.steem_getCurrentMedianHistoryPrice_wrapper
     );
-    console.log('PRICE from median');
-    console.log(ci.price_info);
     ci.reward_balance = ci.rewardfund_info.reward_balance;
     ci.recent_claims = ci.rewardfund_info.recent_claims;
     ci.reward_pool = ci.reward_balance.replace(' STEEM', '')
