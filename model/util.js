@@ -96,6 +96,9 @@ module.exports = {
     }
   },
   startVotingDonationsProcess: function(account,data) {
+    var globalData = wait.for(
+      this.steem_getSteemGlobaleProperties_wrapper
+    );
     var ci = this.init_conversion(globalData);
     for (var i = 0;i < data.length;i++) {
       var voted_ok = false;
