@@ -38,12 +38,13 @@ module.exports = {
           var query = {number: data[i][0]};
           var found = wait.for(this.getTransfer,query);
           var res = this.getContent([account],data[i]);
+          // bug here
           if (found.length > 0) {
-            if ((found[0].status !== 'refunded') || 
-              (found[0].status !== 'min amount') || 
-              (found[0].status !== 'due date') || 
-              (found[0].status !== 'processed')) {
-              wait.for(this.upsertTransfer,query,res);
+            var status_ok = (found[0].status !== 'refunded') ||
+            (found[0].status !== 'due date') ||
+            (found[0].status !== 'min amount');
+            if (status_ok) {
+              wait.for(this.upsertTransfer,query,found);
             }
           }else {
             wait.for(this.upsertTransfer,query,res);
@@ -129,8 +130,8 @@ module.exports = {
             if (conf.env.VOTE_ACTIVE()) {
               voted_ok = true;
               if (!data[i].voted) {
-                steem_api.votePost(data[i].author, data[i].url, weight);
-                wait.for(this.timeout_wrapper,5500);
+                //steem_api.votePost(data[i].author, data[i].url, weight);
+                //wait.for(this.timeout_wrapper,5500);
               }
             }else {
               this.debug(
@@ -169,8 +170,8 @@ module.exports = {
                 comment += 'I will be able to help more #minnows \n';
               }
               // Decide how to handle this with a form and mongodb document
-              steem_api.commentPost(data[i].author, data[i].url, title,comment);
-              wait.for(this.timeout_wrapper,22000);
+              //steem_api.commentPost(data[i].author, data[i].url, title,comment);
+              //wait.for(this.timeout_wrapper,22000);
             }else {
               this.debug(
                 'Commenting is not active, commenting: '
@@ -192,14 +193,6 @@ module.exports = {
           );
         }
       }else {
-        // Verify if it was a valid post and comment post/comment with *-*
-        //FIXME
-        // var title = 'Thanks for your donation';
-        // var comment = '![treeplantermessage_new.png](https://steemitimages.';
-        // comment += 'com/DQmZsdAUXGYBH38xY4smeMtHHEiEHxaEaQmGo2pJhMNdQfX/';
-        // comment += 'treeplantermessage_new.png)';
-        // steem_api.commentPost(data[i].author, data[i].url, title,comment);
-        // wait.for(this.timeout_wrapper,22000);
         wait.for(
           this.upsertTransfer,
           {_id: data[i]._id},
@@ -249,6 +242,17 @@ module.exports = {
           memo
         );
         wait.for(this.upsertTransfer,{_id: data[i]._id},{status: 'refunded'});
+      }else{
+        if(data[i].status === 'min amount'){
+          // Verify if it was a valid post and comment post/comment with *-*
+          var title = 'Thanks for your donation';
+          var comment = '![treeplantermessage_new.png](https://steemitimages.';
+          comment += 'com/DQmZsdAUXGYBH38xY4smeMtHHEiEHxaEaQmGo2pJhMNdQfX/';
+          comment += 'treeplantermessage_new.png)';
+          steem_api.commentPost(data[i].author, data[i].url, title,comment);
+          wait.for(this.timeout_wrapper,22000);
+          wait.for(this.upsertTransfer,{_id: data[i]._id},{status: 'refunded'});
+        }
       }
     }
   },
