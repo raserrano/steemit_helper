@@ -26,11 +26,15 @@ wait.launchFiber(function() {
       max
     );
     while(processed < max && processed < count.follower_count){
+      var user = wait.for(
+        steem_api.steem_getAccounts_wrapper,[followers[processed].follower]
+      );
+      var rep = utils.getReputation(user[0]);
       obj = {
         username:followers[processed].follower,
         tier:{level:0,vote:10,vote_count:2},
         active:true,
-        reputation:25,
+        reputation:rep,
       }
       wait.for(
         utils.upsertFollower,

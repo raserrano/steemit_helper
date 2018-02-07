@@ -39,8 +39,11 @@ module.exports = {
           var found = wait.for(this.getTransfer,query);
           var res = this.getContent([account],data[i]);
           if (found.length > 0) {
-            if (found[0].status !== 'refunded') {
-              wait.for(this.upsertTransfer,query,res);
+            var status_ok = (found[0].status !== 'refunded') ||
+            (found[0].status !== 'due date') ||
+            (found[0].status !== 'min amount');
+            if (status_ok) {
+              wait.for(this.upsertTransfer,query,found);
             }
           }else {
             wait.for(this.upsertTransfer,query,res);
@@ -137,25 +140,26 @@ module.exports = {
             if (conf.env.COMMENT_ACTIVE()) {
               var title = '';
               var comment = '';
+              var trees_total = wait.for(this.getTreesTotal);
               if (conf.env.ACCOUNT_NAME() === 'treeplanter') {
                 var sp = steem_api.getSteemPower(voter[0]).toFixed(2);
                 var trees = ((data[i].amount * ci.sbd_to_dollar) / 2).toFixed(2);
                 title = 'Thanks for your donation';
-                comment = 'Good job! Thanks to @' + data[i].payer;
-                comment += ' you have planted ' + trees + ' ';
-                comment += 'tree to save Abongphen Highland ';
-                comment += 'Forest in Cameroon. Help me to plant 1,000,000 ';
-                comment += 'trees and share my Steem Power to the others. ';
-                comment += 'Selfvoting is prohibited, but that should ';
-                comment += 'be the reason to spread the world to protect ';
-                comment += 'our precious environment. Check out profile of ';
-                comment += 'our conservation association @kedjom-keku ';
-                comment += 'and the founder/coordinator @martin.mikes to get ';
-                comment += 'more information about our conservation program. ';
-                comment += 'My current SP is ' + sp + '. Help me to plant ';
-                comment += 'more trees with your delegated SP. \n\n';
-                comment += 'Thanks a lot,\nyour @treeplanter \n';
-                comment += '[www.kedjom-keku.com](www.kedjom-keku.com)';
+                comment += '<center>';
+                comment += '<h3>You just planted ' + trees + ' tree(s)!</h3>\n'
+                comment += 'Thanks to @' + data[i].payer + ' \n';
+                comment += 'We have planted already ' + trees_total[0].total;
+                comment += ' trees\n out of 1,000,000\n'
+                comment += 'Let\'s save and restore Abongphen Highland';
+                comment += ' Forest\nin Cameroonian village Kedjom-Keku!\n';
+                comment += 'Plant trees with @treeplanter and get';
+                comment += ' paid for it!\nMy Steem Power = ' + sp + '\n';
+                comment += 'Thanks a lot!\n @martin.mikes';
+                comment += ' coordinator of @kedjom-keku\n';
+                comment += '![treeplantermessage_ok.png](https://';
+                comment += 'steemitimages.com/DQmdeFhTevmcmLvubxMMDoYBoNSa';
+                comment += 'z4ftt7PxktmLDmF2WGg/treeplantermessage_ok.png)';
+                comment += '</center>';
               }else {
                 title = 'Thanks for your donation';
                 comment = 'Congratulations @' + data[i].author + '!';
@@ -165,7 +169,12 @@ module.exports = {
                 comment += 'I will be able to help more #minnows \n';
               }
               // Decide how to handle this with a form and mongodb document
-              steem_api.commentPost(data[i].author, data[i].url, title,comment);
+              steem_api.commentPost(
+                data[i].author,
+                data[i].url,
+                title,
+                comment
+              );
               wait.for(this.timeout_wrapper,22000);
             }else {
               this.debug(
@@ -188,11 +197,14 @@ module.exports = {
           );
         }
       }else {
-        this.debug('Amount not enough, assuming donation');
         wait.for(
           this.upsertTransfer,
           {_id: data[i]._id},
-          {donation: data[i].amount,processed: true,status: 'min amount'}
+          {
+            donation: data[i].amount,
+            processed: true,
+            status: 'min amount',
+          }
         );
       }
     }
@@ -201,32 +213,72 @@ module.exports = {
     var memo = '';
     var send = '';
     for (var i = 0; i < data.length;i++) {
-      memo = 'I am sorry my SP was not enough to upvote the post you sent ';
-      memo += 'me in memo. Send me different (not so old) post. Thank you.';
-      if (conf.env.COMMENT_VOTE()) {
-        if (conf.env.SELF_VOTE()) {
-          conditions = data[i].status === 'due-date';
+      var result = wait.for(
+        steem_api.steem_getContent,
+        data[i].author,
+        data[i].url
+      );
+      var voted = steem_api.verifyAccountHasVoted(
+        [account],
+        result
+      );
+      if (voted) {
+        wait.for(
+          this.upsertTransfer,
+          {_id: data[i]._id},
+          {voted: true}
+        );
+      }else {
+        memo = 'I am sorry my SP was not enough to upvote the post you sent ';
+        memo += 'me in memo. Send me different (not so old) post. Thank you.';
+        if (conf.env.COMMENT_VOTE()) {
+          if (conf.env.SELF_VOTE()) {
+            conditions = data[i].status === 'due date';
+          }else {
+            memo = conf.env.REFUND_TEXT();
+            conditions = data[i].status === 'due date' ||
+              data[i].status === 'self-vote';
+          }
         }else {
-          memo = conf.env.REFUND_TEXT();
-          conditions = data[i].status === 'due-date' ||
+          conditions = data[i].status === 'due date' ||
+            data[i].status === 'comment' ||
             data[i].status === 'self-vote';
         }
-      }else {
-        conditions = data[i].status === 'due-date' ||
-          data[i].status === 'comment' ||
-          data[i].status === 'self-vote';
-      }
-      if (conditions) {
-        send = data[i].amount.toFixed(3) + ' ' + data[i].currency;
-        this.debug(send,account,data[i].payer,memo);
-        wait.for(
-          steem_api.doTransfer,
-          account,
-          data[i].payer,
-          send,
-          memo
-        );
-        wait.for(this.upsertTransfer,{_id: data[i]._id},{status: 'refunded'});
+        if (conditions) {
+          // Comment in post or comment that amount was refunded *-*
+          var title = 'Thanks for your donation';
+          var comment = '![treeplanternoplant_new.png]';
+          comment += '(https://steemitimages.com/DQmaCMGBXirzeFWCWD8gVadsJE1';
+          comment += 'PY1pvXTECAyjGAtF5KNg/treeplanternoplant_new.png)';
+          steem_api.commentPost(data[i].author, data[i].url, title,comment);
+          wait.for(this.timeout_wrapper,22000);
+          send = data[i].amount.toFixed(3) + ' ' + data[i].currency;
+          this.debug(send,account,data[i].payer,memo);
+          wait.for(
+            steem_api.doTransfer,
+            account,
+            data[i].payer,
+            send,
+            memo
+          );
+          wait.for(this.upsertTransfer,{_id: data[i]._id},{status: 'refunded'});
+        }else {
+          if (data[i].status === 'min amount') {
+            // Verify if it was a valid post and comment post/comment with *-*
+            var title = 'Thanks for your donation';
+            var comment = '![treeplantermessage_new.png]';
+            comment += '(https://steemitimages.';
+            comment += 'com/DQmZsdAUXGYBH38xY4smeMtHHEiEHxaEaQmGo2pJhMNdQfX/';
+            comment += 'treeplantermessage_new.png)';
+            steem_api.commentPost(data[i].author, data[i].url, title,comment);
+            wait.for(this.timeout_wrapper,22000);
+            wait.for(
+              this.upsertTransfer,
+              {_id: data[i]._id},
+              {status: 'refunded'}
+            );
+          }
+        }
       }
     }
   },
@@ -494,8 +546,6 @@ module.exports = {
           'url not valid',
           'content-not-found',
           'url-not-found',
-          'self-comment',
-          'self-vote',
           ],},
         number: {$gt: last_refunded},
       }
@@ -667,7 +717,7 @@ module.exports = {
     total,count,donators,steempower,ci,period,trees,specific,report) {
     var when = this.getDate(new Date());
     var permlink = 'treeplanter-report-' + when;
-    var title = 'Treeplanter report for ' + when;
+
     var tags = {tags: ['nature','charity','treeplanter','life','fundraising']};
 
     // Calculate new total with current market changes
@@ -700,9 +750,7 @@ module.exports = {
     body += 'TOTAL RANKING OF ' + range + '\n';
     body += 'RANK  STEEMIAN  AMOUNT OF TREES PLANTED\n';
     body += header;
-    var daily_donation = 0;
     for (var i = 0; i < specific.length;i++) {
-      daily_donation += parseFloat(specific[i].total.toFixed(2));
       body += (i + 1) + ' | @' + specific[i]._id.payer +
       ' | ' + ((specific[i].total * ci.sbd_to_dollar) / 2).toFixed(2) + '\n';
     }
@@ -717,6 +765,25 @@ module.exports = {
     // Read file and add it to body
     var contents = fs.readFileSync('./reports/treeplanter.md', 'utf8');
     body += '\n' + contents;
+
+
+    var sbd_steem = parseFloat(ci.steem_to_dollar) / parseFloat(ci.sbd_to_dollar);
+    // Period
+    var options_daily = {
+      period: 1,
+      voted: true,
+      rate: sbd_steem,
+      trees: true,
+    };
+    var report_payment = wait.for(this.getReport,options_daily);
+    var daily_donation = 0;
+    for (var i = 0; i < report_payment.length;i++) {
+      daily_donation += parseFloat(report_payment[i].total.toFixed(2));
+    }
+
+    var title = '@treeplanter funds raising & voting bot got ';
+    title += daily_donation + 'SBD today ' + when;
+    title += ' to save Abongphen Highland Forest in Cameroon. Thank you!';
 
     this.preparePost(
       conf.env.ACCOUNT_NAME(),
@@ -743,7 +810,7 @@ module.exports = {
     stat.payment = developer_payment;
     stat.powerup = powerup;
 
-    var result = wait.for(this.upsertStat,{'created': when},stat);
+    var result = wait.for(this.upsertStat,{created: when},stat);
     console.log(result);
   },
   generateGrowthReport: function(account) {

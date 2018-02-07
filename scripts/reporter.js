@@ -8,7 +8,6 @@ wait.launchFiber(function() {
   var voter = wait.for(
     steem_api.steem_getAccounts_wrapper,[conf.env.ACCOUNT_NAME()]
   );
-  console.log(voter);
   var followers = wait.for(
     steem_api.steem_getFollowersCount,
     conf.env.ACCOUNT_NAME()
@@ -18,7 +17,6 @@ wait.launchFiber(function() {
   );
   var ci = steem_api.init_conversion(globalData);
   var sbd_steem = parseFloat(ci.steem_to_dollar) / parseFloat(ci.sbd_to_dollar);
-  console.log(sbd_steem);
   var steempower = steem_api.getSteemPower(voter[0]);
   var report_date = new Date();
   var lastDayOfMonth = new Date(
