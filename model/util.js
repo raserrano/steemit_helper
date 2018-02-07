@@ -199,7 +199,7 @@ module.exports = {
         // comment += 'com/DQmZsdAUXGYBH38xY4smeMtHHEiEHxaEaQmGo2pJhMNdQfX/';
         // comment += 'treeplantermessage_new.png)';
         // steem_api.commentPost(data[i].author, data[i].url, title,comment);
-        wait.for(this.timeout_wrapper,22000);
+        // wait.for(this.timeout_wrapper,22000);
         wait.for(
           this.upsertTransfer,
           {_id: data[i]._id},
