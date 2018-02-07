@@ -207,6 +207,7 @@ module.exports = {
   startRefundingProcess: function(account,data,voter) {
     var memo = '';
     var send = '';
+    console.log(data);
     for (var i = 0; i < data.length;i++) {
       memo = 'I am sorry my SP was not enough to upvote the post you sent ';
       memo += 'me in memo. Send me different (not so old) post. Thank you.';
