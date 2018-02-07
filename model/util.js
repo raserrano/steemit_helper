@@ -39,7 +39,10 @@ module.exports = {
           var found = wait.for(this.getTransfer,query);
           var res = this.getContent([account],data[i]);
           if (found.length > 0) {
-            if (found[0].status !== 'refunded') {
+            if ((found[0].status !== 'refunded') || 
+              (found[0].status !== 'min amount') || 
+              (found[0].status !== 'due date') || 
+              (found[0].status !== 'processed')) {
               wait.for(this.upsertTransfer,query,res);
             }
           }else {
@@ -202,7 +205,6 @@ module.exports = {
           {
             donation: data[i].amount,
             processed: true,
-            voted: true,
             status: 'min amount'
           }
         );
