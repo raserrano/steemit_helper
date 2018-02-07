@@ -193,11 +193,12 @@ module.exports = {
         }
       }else {
         // Verify if it was a valid post and comment post/comment with *-*
-        var title = 'Thanks for your donation';
-        var comment = '![treeplantermessage_new.png](https://steemitimages.';
-        comment += 'com/DQmZsdAUXGYBH38xY4smeMtHHEiEHxaEaQmGo2pJhMNdQfX/';
-        comment += 'treeplantermessage_new.png)';
-        steem_api.commentPost(data[i].author, data[i].url, title,comment);
+        //FIXME
+        // var title = 'Thanks for your donation';
+        // var comment = '![treeplantermessage_new.png](https://steemitimages.';
+        // comment += 'com/DQmZsdAUXGYBH38xY4smeMtHHEiEHxaEaQmGo2pJhMNdQfX/';
+        // comment += 'treeplantermessage_new.png)';
+        // steem_api.commentPost(data[i].author, data[i].url, title,comment);
         wait.for(this.timeout_wrapper,22000);
         wait.for(
           this.upsertTransfer,
