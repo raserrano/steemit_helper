@@ -38,7 +38,6 @@ module.exports = {
           var query = {number: data[i][0]};
           var found = wait.for(this.getTransfer,query);
           var res = this.getContent([account],data[i]);
-          // bug here
           if (found.length > 0) {
             var status_ok = (found[0].status !== 'refunded') ||
             (found[0].status !== 'due date') ||
@@ -130,8 +129,8 @@ module.exports = {
             if (conf.env.VOTE_ACTIVE()) {
               voted_ok = true;
               if (!data[i].voted) {
-                //steem_api.votePost(data[i].author, data[i].url, weight);
-                //wait.for(this.timeout_wrapper,5500);
+                steem_api.votePost(data[i].author, data[i].url, weight);
+                wait.for(this.timeout_wrapper,5500);
               }
             }else {
               this.debug(
@@ -170,8 +169,8 @@ module.exports = {
                 comment += 'I will be able to help more #minnows \n';
               }
               // Decide how to handle this with a form and mongodb document
-              //steem_api.commentPost(data[i].author, data[i].url, title,comment);
-              //wait.for(this.timeout_wrapper,22000);
+              steem_api.commentPost(data[i].author, data[i].url, title,comment);
+              wait.for(this.timeout_wrapper,22000);
             }else {
               this.debug(
                 'Commenting is not active, commenting: '

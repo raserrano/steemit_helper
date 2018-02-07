@@ -51,7 +51,6 @@ wait.launchFiber(function() {
     last_voted += RECORDS_FETCH_LIMIT;
   }
   var queue = wait.for(utils.getQueue);
-  console.log(queue);
   console.log('Queue to vote: ' + queue.length);
   utils.startVotingDonationsProcess(
     conf.env.ACCOUNT_NAME(),
