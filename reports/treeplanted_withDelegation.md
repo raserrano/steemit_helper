@@ -10,6 +10,8 @@
 </ol>
 <center><h3>EACH DOLLAR (sent to Cameroon)<br/>=<br/>1 TREE PLANTED</h3></center>
 <h4>***PLANT A TREE AND GET PAID FOR IT. <br />IT WOULD BE NICE IF SEND IT AS FREE UP VOTE GIFT TO SOMEBODY!***</h4>
+<h3>Delegate SP to @treeplanter to help me to plant more trees</h3>
+How we should set up the investment program. Please could you help me with that to count some profitable model for us and steemians who will delegate the SP to us? Thanks. Before this is done remove this part (about delegation) from the report. 
 <h3>My rules</h3>
 <ol>
 <li>Each post/comment could be upvoted by me only once – if you send the same post/comment again, your contribution is going to be considered as donation without upvoting</li>
