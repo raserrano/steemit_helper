@@ -3,6 +3,7 @@ const
   conf = require('../config/dev'),
   db = require('./db'),
   fs = require('fs'),
+  sprintf = require('sprintf').sprintf,
   steem_api = require('./steem_api');
 
 module.exports = {
@@ -610,6 +611,16 @@ module.exports = {
       }
     );
   },
+  getTreesAverage: function(callback) {
+    var stages = [
+      {$group: {_id: 'trees',average: {$avg: '$trees'},},},
+      ];
+    db.model('Information').aggregate(stages).exec(
+      function(err,data) {
+        callback(err,data);
+      }
+    );
+  },
   getDonatorsTotal: function(callback) {
     db.model('Transfer').distinct('payer').exec(
       function(err,data) {
@@ -725,47 +736,10 @@ module.exports = {
 
     // Calculate daily average
     // Create function to calculate this.
-    var average = 29.3;
-
+    var average = wait.for(this.getTreesAverage);
+    average = average[0].average;
     // Magic to generate body
     var header = 'Rank | Username | Total \n---|---|---\n';
-    var body = 'Hello all tree planters.\n';
-    body += 'We can plant ' + total_trees + ' of trees thanks to you.\n\n';
-    body += 'Followers: ' + count + '\nNumber of tree planters: ' + donators;
-    body += '\nTrees planted: ' + total_trees + '\n';
-    body += 'Average amount of trees planted daily: ' + average + '\n';
-    body += 'STEEM POWER: ' + steempower;
-    body += '\nDOLLAR/STEEM exchange rate: ' + ci.steem_to_dollar;
-    body += '\nDOLLAR/SBD exchange rate: ' + ci.sbd_to_dollar;
-    body += '\n\n';
-
-    var range = 'TODAY';
-    if (period > 8) {
-      range = 'THIS MONTH';
-    }else {
-      if (period > 1) {
-        range = 'THIS WEEK';
-      }
-    }
-    body += 'TOTAL RANKING OF ' + range + '\n';
-    body += 'RANK  STEEMIAN  AMOUNT OF TREES PLANTED\n';
-    body += header;
-    for (var i = 0; i < specific.length;i++) {
-      body += (i + 1) + ' | @' + specific[i]._id.payer +
-      ' | ' + ((specific[i].total * ci.sbd_to_dollar) / 2).toFixed(2) + '\n';
-    }
-
-    body += '\n\nTOTAL RANKING OF ALL TREE PLANTERS\n';
-    body += header;
-    for (var j = 0; j < trees.length;j++) {
-      body += (j + 1) + ' | @' + trees[j]._id.payer +
-      ' | ' + ((trees[j].total * ci.sbd_to_dollar) / 2).toFixed(2) + '\n';
-    }
-
-    // Read file and add it to body
-    var contents = fs.readFileSync('./reports/treeplanter.md', 'utf8');
-    body += '\n' + contents;
-
 
     var sbd_steem = parseFloat(ci.steem_to_dollar) / parseFloat(ci.sbd_to_dollar);
     // Period
@@ -781,27 +755,15 @@ module.exports = {
       daily_donation += parseFloat(report_payment[i].total.toFixed(2));
     }
 
-    var title = '@treeplanter funds raising & voting bot got ';
-    title += daily_donation + 'SBD today ' + when;
-    title += ' to save Abongphen Highland Forest in Cameroon. Thank you!';
-
-    this.preparePost(
-      conf.env.ACCOUNT_NAME(),
-      permlink,
-      title,
-      body,
-      tags
-    );
-
     // Transfer 5% to developer
     var developer_payment = (daily_donation * 0.05).toFixed(3);
-    wait.for(
-      steem_api.doTransfer,
-      conf.env.ACCOUNT_NAME(),
-      'raserrano',
-      developer_payment + ' SBD',
-      'Daily payment for development and management'
-    );
+    // wait.for(
+    //   steem_api.doTransfer,
+    //   conf.env.ACCOUNT_NAME(),
+    //   'raserrano',
+    //   developer_payment + ' SBD',
+    //   'Daily payment for development and management'
+    // );
     // Power up 50% of the amount
     var powerup = (daily_donation * 0.5).toFixed(3);
     // Create table to start tracking this
@@ -811,7 +773,61 @@ module.exports = {
     stat.powerup = powerup;
 
     var result = wait.for(this.upsertStat,{created: when},stat);
-    console.log(result);
+
+    var contents_1 = fs.readFileSync('./reports/header.md', 'utf8');
+    var body = sprintf(
+      contents_1,
+      stat.trees,
+      total_trees,
+      'IMAGEN',
+      count,
+      donators,
+      total_trees,
+      average,
+      steempower,
+      ci.steem_to_dollar,
+      ci.sbd_to_dollar
+    );
+    body += "\n\n";
+
+    var range = 'TODAY';
+    if (period > 8) {
+      range = 'THIS MONTH';
+    }else {
+      if (period > 1) {
+        range = 'THIS WEEK';
+      }
+    }
+    body += '<h3>TOTAL RANKING OF ' + range + '</h3>\n';
+    body += 'RANK  STEEMIAN  AMOUNT OF TREES PLANTED\n';
+    body += header;
+    for (var i = 0; i < specific.length;i++) {
+      body += (i + 1) + ' | @' + specific[i]._id.payer +
+      ' | ' + ((specific[i].total * ci.sbd_to_dollar) / 2).toFixed(2) + '\n';
+    }
+
+    body += '\n\n<h3>TOTAL RANKING OF ALL TREE PLANTERS</h3>\n';
+    body += header;
+    for (var j = 0; j < trees.length;j++) {
+      body += (j + 1) + ' | @' + trees[j]._id.payer +
+      ' | ' + ((trees[j].total * ci.sbd_to_dollar) / 2).toFixed(2) + '\n';
+    }
+
+    // Read file and add it to body
+    var contents_2 = fs.readFileSync('./reports/treeplanterv2.md', 'utf8');
+    body += '\n' + contents_2;
+
+    var title = '@treeplanter funds raising & voting bot got ';
+    title += daily_donation.toFixed(2) + ' SBD today ' + when;
+    title += ' to save Abongphen Highland Forest in Cameroon. Thank you!';
+
+    this.preparePost(
+      conf.env.ACCOUNT_NAME(),
+      permlink,
+      title,
+      body,
+      tags
+    );
   },
   generateGrowthReport: function(account) {
     var when = this.getDate(account.created);
