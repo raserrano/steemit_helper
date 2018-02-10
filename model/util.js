@@ -664,7 +664,6 @@ module.exports = {
     if ((options.period !== undefined) && (options.period !== null)) {
       var cutoff = new Date();
       cutoff.setDate(cutoff.getDate() - options.period);
-      console.log(cutoff);
       stages.push(
         {$match: {processed_date: {$gt: cutoff}}}
       );
@@ -737,7 +736,7 @@ module.exports = {
     // Calculate daily average
     // Create function to calculate this.
     var average = wait.for(this.getTreesAverage);
-    average = average[0].average;
+    average = average[0].average.toFixed(2);
     // Magic to generate body
     var header = 'Rank | Username | Total \n---|---|---\n';
 
@@ -757,13 +756,13 @@ module.exports = {
 
     // Transfer 5% to developer
     var developer_payment = (daily_donation * 0.05).toFixed(3);
-    // wait.for(
-    //   steem_api.doTransfer,
-    //   conf.env.ACCOUNT_NAME(),
-    //   'raserrano',
-    //   developer_payment + ' SBD',
-    //   'Daily payment for development and management'
-    // );
+    wait.for(
+      steem_api.doTransfer,
+      conf.env.ACCOUNT_NAME(),
+      'raserrano',
+      developer_payment + ' SBD',
+      'Daily payment for development and management'
+    );
     // Power up 50% of the amount
     var powerup = (daily_donation * 0.5).toFixed(3);
     // Create table to start tracking this
@@ -774,12 +773,20 @@ module.exports = {
 
     var result = wait.for(this.upsertStat,{created: when},stat);
 
+    var pictures = JSON.parse(fs.readFileSync('./reports/pictures.json', 'utf8'));
+
+    // Random
+    var min = Math.ceil(0);
+    var max = Math.floor(pictures.pics.length);
+    var lucky = Math.floor(Math.random() * (max - min + 1)) + min;
+
+
     var contents_1 = fs.readFileSync('./reports/header.md', 'utf8');
     var body = sprintf(
       contents_1,
       stat.trees,
       total_trees,
-      'IMAGEN',
+      pictures.pics[lucky],
       count,
       donators,
       total_trees,
