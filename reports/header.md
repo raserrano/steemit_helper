@@ -1,4 +1,9 @@
-<center><h3>Hello tree planters!<br />Thanks to you, we can plant<br /></h3><h2>%s</h2><br /><h3>more trees today<br />In total </h3><h2>%s</h2> <h3>trees</h3><br /><span>since June 2017!</span></center>
+<center>
+  <h4>Hello tree planters!<br /> Thanks to you, we can plant </h4>
+  <h3>%s</h3><h4> more trees today. </h4>
+  <h4>In total  %s trees.</h4>
+  <h5> since June 2017!</h5>
+</center>
 
 ---
 

@@ -142,6 +142,9 @@ module.exports = {
               var title = '';
               var comment = '';
               var trees_total = wait.for(this.getTreesTotal);
+              trees_total = (
+                (trees_total[0].total * ci.sbd_to_dollar) / 2
+              ).toFixed(2);
               if (conf.env.ACCOUNT_NAME() === 'treeplanter') {
                 var sp = steem_api.getSteemPower(voter[0]).toFixed(2);
                 var trees = ((data[i].amount * ci.sbd_to_dollar) / 2).toFixed(2);
@@ -149,7 +152,7 @@ module.exports = {
                 comment += '<center>';
                 comment += '<h3>You just planted ' + trees + ' tree(s)!</h3>\n'
                 comment += 'Thanks to @' + data[i].payer + ' \n';
-                comment += '<h3>We have planted already ' + trees_total[0].total;
+                comment += '<h3>We have planted already ' + trees_total;
                 comment += ' trees\n out of 1,000,000<h3>\n'
                 comment += 'Let\'s save and restore Abongphen Highland';
                 comment += ' Forest\nin Cameroonian village Kedjom-Keku!\n';
