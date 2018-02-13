@@ -147,7 +147,7 @@ module.exports = {
               ).toFixed(2);
               if (conf.env.ACCOUNT_NAME() === 'treeplanter') {
                 var sp = steem_api.getSteemPower(voter[0]).toFixed(2);
-                var trees = ((amount_to_be_voted * ci.sbd_to_dollar) / 2).toFixed(2);
+                var trees = ((data[i].amount * ci.sbd_to_dollar) / 2).toFixed(2);
                 title = 'Thanks for your donation';
                 comment += '<center>';
                 comment += '<h3>You just planted ' + trees + ' tree(s)!</h3>\n'
