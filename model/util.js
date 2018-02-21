@@ -568,6 +568,13 @@ module.exports = {
       }
     );
   },
+  getLastInfo: function(callback) {
+    db.model('Information').find({}).limit(1).sort({created: -1}).exec(
+      function(err,data) {
+        callback(err,data);
+      }
+    );
+  },
   getTransfer: function(query,callback) {
     db.model('Transfer').find(query).exec(
       function(err,data) {
