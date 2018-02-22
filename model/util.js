@@ -335,14 +335,13 @@ module.exports = {
               }
               if (conf.env.COMMENT_ACTIVE()) {
                 comment = 'Welcome to steemit @' + posts[i].author +
-                '. Join #minnowsupportproject for more help. ' +
-                'Type in the comments of a post @OriginalWorks ' +
-                ' and it will help you verify that content is original.\n' +
-                'Transfer SBD to @treeplanter to plant trees and get an ' +
+                '. Join @minnowsupport project for more help. ' +
+                'Checkout @helpie and @qurator projects.\n' +
+                'Send SBD/STEEM to @treeplanter to plant trees and get an ' +
                 'get an upvote in exchange of your donation (Min 0.01 SDB) \n' +
                 'Upvote this comment to keep helping more new steemians \n' +
-                'Transfer SBD to @tuanis in exchange of an upvote and ' +
-                'support this project';
+                'Send SBD/STEEM to @tuanis in exchange of an upvote and ' +
+                'support this project, follow for random votes.';
 
                 steem_api.commentPost(
                   posts[i].author,
