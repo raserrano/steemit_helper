@@ -447,7 +447,7 @@ module.exports = {
               if (obj.payer !== obj.author) {
                 if ((result !== undefined) && (result !== null)) {
                   obj.created = result.created;
-                  if (this.dateDiff(obj.created) < (86400 * 6.5)) {
+                  if (this.dateDiff(obj.created) < (86400 * 6)) {
                     obj.voted = steem_api.verifyAccountHasVoted(
                       account,
                       result
