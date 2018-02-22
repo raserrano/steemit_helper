@@ -738,7 +738,7 @@ module.exports = {
     var when = this.getDate(new Date());
     var permlink = 'treeplanter-report-' + when;
 
-    var tags = {tags: ['nature','charity','treeplanter','life','fundraising']};
+    var tags = {tags: ['charity','fundraising','nature','life','treeplanter']};
 
     // Calculate new total with current market changes
     var total_trees = ((total * ci.sbd_to_dollar) / 2).toFixed(2);

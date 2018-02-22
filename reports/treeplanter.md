@@ -88,7 +88,7 @@ Thanks following steemians for delegated power  |SP delegated
 @kedjom-keku | 4741
 @ecoinstant | 205
 
-More opportunities how to help (If it could be organize better on the page it would be better)
+More opportunities how to help
 
 **Contribute to our transparent account [EUR]:**
 **IBAN: CZ8120100000002401262246**

@@ -29,7 +29,7 @@ Username | SP delegated
 @kedjom-keku | ~2370
 @ecoinstant | ~102
 
-More opportunities how to help (If it could be organize better on the page it would be better)
+More opportunities how to help
 
 <h4>Contribute to our transparent account [EUR]:</h4>
 - IBAN: CZ8120100000002401262246
