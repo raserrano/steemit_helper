@@ -6,7 +6,7 @@ const steem = require('steem'),
 var ci = new Object()
 
 //steem.api.setOptions({ url: 'https://rpc.buildteam.io/' })
-steem.api.setOptions({ url: 'https://api.steemit.com/' })
+steem.api.setOptions({ url: 'https://api.steemit.com/' });
 module.exports = {
   getTransfers: function(name, max, limit, callback) {
     steem.api.getAccountHistory(name,max,limit,function(err, result) {
@@ -17,13 +17,18 @@ module.exports = {
     var action = 'Voting ' + author + ' ' + permlink;
     action += ' with weight of ' + weight;
     console.log(action);
-    return wait.for(
-      steem.broadcast.vote,
-      conf.env.POSTING_KEY_PRV(),
-      conf.env.ACCOUNT_NAME(),
-      author,
-      permlink,
-      weight);
+    try{
+      return wait.for(
+        steem.broadcast.vote,
+        conf.env.POSTING_KEY_PRV(),
+        conf.env.ACCOUNT_NAME(),
+        author,
+        permlink,
+        weight
+      );
+    }catch(e){
+      console.log(e);
+    }
   },
   commentPost: function(author, permlink, title, comment) {
     console.log('Commenting post: ' + permlink);
@@ -32,50 +37,61 @@ module.exports = {
       permlink
     ).toLowerCase().replace('.','');
     console.log('Comment permlink: ' + comment_permlink);
-    return wait.for(
-      steem.broadcast.comment,
-      conf.env.POSTING_KEY_PRV(),
-      author,
-      permlink,
-      conf.env.ACCOUNT_NAME(),
-      comment_permlink,
-      title,
-      comment,
-      {}
-    );
+    try{
+      return wait.for(
+        steem.broadcast.comment,
+        conf.env.POSTING_KEY_PRV(),
+        author,
+        permlink,
+        conf.env.ACCOUNT_NAME(),
+        comment_permlink,
+        title,
+        comment,
+        {}
+      );
+    }catch (e){
+      console.log(e);
+    }
   },
   publishPost: function(author, permlink, tags, title, body) {
     var permlink = permlink.replace('.','');
     console.log('Publising post:' + permlink);
-    return wait.for(
-      steem.broadcast.comment,
-      conf.env.POSTING_KEY_PRV(),
-      '',
-      'report',
-      author,
-      permlink,
-      title,
-      body,
-      tags
-    );
+    try{
+      return wait.for(
+        steem.broadcast.comment,
+        conf.env.POSTING_KEY_PRV(),
+        '',
+        'report',
+        author,
+        permlink,
+        title,
+        body,
+        tags
+      );
+    }catch(e){
+      console.log(e);
+    }
   },
   publishPostOptions: function(author, permlink, percent, ext) {
     var maxAcceptedPayout = '1000000.000 SBD';
     var allowVotes = true;
     var allowCurationRewards = true;
     var extensions = ext;
-    return wait.for(
-      steem.broadcast.commentOptions,
-      conf.env.POSTING_KEY_PRV(),
-      author,
-      permlink,
-      maxAcceptedPayout,
-      percent,
-      allowVotes,
-      allowCurationRewards,
-      extensions
-
-    );
+    try{
+      return wait.for(
+        steem.broadcast.commentOptions,
+        conf.env.POSTING_KEY_PRV(),
+        author,
+        permlink,
+        maxAcceptedPayout,
+        percent,
+        allowVotes,
+        allowCurationRewards,
+        extensions
+      );
+    }catch(e){
+      console.log(e);
+    }
   },
   steem_getContent: function(author, post, callback) {
     steem.api.getContent(author, post,function(err,result) {
@@ -138,6 +154,17 @@ module.exports = {
           console.log(err);
         }
         callback(err, result);
+      }
+    );
+  },
+   steem_transferToVesting: function(from, to, amount){
+    steem.broadcast.transferToVesting(
+      conf.env.WIF(), 
+      from, 
+      to, 
+      amount, 
+      function(err, result) {
+        console.log(err, result);
       }
     );
   },
