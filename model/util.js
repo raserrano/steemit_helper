@@ -189,7 +189,12 @@ module.exports = {
             wait.for(
               this.upsertTransfer,
               {_id: data[i]._id},
-              {donation: data[i].donation,voted: voted_ok,processed: true}
+              {
+                donation: data[i].donation,
+                voted: voted_ok,
+                processed: true,
+                voted_date: new Date()
+              }
             );
           }else {
             console.log('Finishing donation process due to low voting power');
@@ -664,7 +669,7 @@ module.exports = {
         currency: '$currency',
         voted: '$voted',
         processed: '$processed',
-        processed_date: '$processed_date',
+        voted_date: '$voted_date',
         status: '$status',
         created: '$created',
       },
@@ -675,7 +680,7 @@ module.exports = {
       var cutoff = new Date();
       cutoff.setDate(cutoff.getDate() - options.period);
       stages.push(
-        {$match: {processed_date: {$gt: cutoff}}}
+        {$match: {voted_date: {$gt: cutoff}}}
       );
     }
     if ((options.voted !== undefined) && (options.voted !== null)) {
@@ -763,18 +768,24 @@ module.exports = {
     for (var i = 0; i < report_payment.length;i++) {
       daily_donation += parseFloat(report_payment[i].total.toFixed(2));
     }
+    if (daily_donation > 0) {
+      // Transfer 5% to developer
+      var developer_payment = (daily_donation * 0.05).toFixed(3);
+      console.log('Developer payment is: ' + developer_payment);
+      wait.for(
+        steem_api.doTransfer,
+        conf.env.ACCOUNT_NAME(),
+        'raserrano',
+        developer_payment + ' SBD',
+        'Daily payment for development and management'
+      );
+      // Power up 50% of the amount
+      var powerup = (daily_donation * 0.5).toFixed(3);
+    }else {
+      var powerup = 0;
+      var developer_payment = 0;
 
-    // Transfer 5% to developer
-    var developer_payment = (daily_donation * 0.05).toFixed(3);
-    wait.for(
-      steem_api.doTransfer,
-      conf.env.ACCOUNT_NAME(),
-      'raserrano',
-      developer_payment + ' SBD',
-      'Daily payment for development and management'
-    );
-    // Power up 50% of the amount
-    var powerup = (daily_donation * 0.5).toFixed(3);
+    }
     // Create table to start tracking this
     var stat = {};
     stat.trees =  ((daily_donation * ci.sbd_to_dollar) / 2).toFixed(2);
@@ -805,7 +816,7 @@ module.exports = {
       ci.steem_to_dollar,
       ci.sbd_to_dollar
     );
-    body += "\n\n";
+    body += '\n\n';
 
     var range = 'TODAY';
     if (period > 8) {
