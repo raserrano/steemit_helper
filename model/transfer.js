@@ -14,6 +14,7 @@ var transferSchema = new Schema({
   voted: { type: Boolean, required: false},
   processed: { type: Boolean, required: false},
   processed_date: { type: Date, required: false},
+  voted_date: { type: Date, required: false},
   status: { type: String, required: false},
   created: { type: Date, required: false},
 });

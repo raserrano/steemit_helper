@@ -185,7 +185,12 @@ module.exports = {
             wait.for(
               this.upsertTransfer,
               {_id: data[i]._id},
-              {donation: data[i].donation,voted: voted_ok,processed: true}
+              {
+                donation: data[i].donation,
+                voted: voted_ok,
+                processed: true,
+                voted_date: new Date()
+              }
             );
           }else {
             console.log('Finishing donation process due to low voting power');
@@ -649,7 +654,7 @@ module.exports = {
         currency: '$currency',
         voted: '$voted',
         processed: '$processed',
-        processed_date: '$processed_date',
+        voted_date: '$voted_date',
         status: '$status',
         created: '$created',
       },
@@ -661,7 +666,7 @@ module.exports = {
       cutoff.setDate(cutoff.getDate() - options.period);
       console.log(cutoff);
       stages.push(
-        {$match: {processed_date: {$gt: cutoff}}}
+        {$match: {voted_date: {$gt: cutoff}}}
       );
     }
     if ((options.voted !== undefined) && (options.voted !== null)) {
@@ -735,14 +740,68 @@ module.exports = {
 
     // Magic to generate body
     var header = 'Rank | Username | Total \n---|---|---\n';
-    var body = 'Hello all tree planters.\n';
-    body += 'We can plant ' + total_trees + ' of trees thanks to you.\n\n';
-    body += 'Followers: ' + count + '\nNumber of tree planters: ' + donators;
-    body += '\nTrees planted: ' + total_trees + '\n';
-    body += 'Average amount of trees planted daily: ' + average + '\n';
-    body += 'STEEM POWER: ' + steempower;
-    body += '\nDOLLAR/STEEM exchange rate: ' + ci.steem_to_dollar;
-    body += '\nDOLLAR/SBD exchange rate: ' + ci.sbd_to_dollar;
+
+    var sbd_steem = parseFloat(ci.steem_to_dollar) / parseFloat(ci.sbd_to_dollar);
+    // Period
+    var options_daily = {
+      period: 1,
+      voted: true,
+      rate: sbd_steem,
+      trees: true,
+    };
+    var report_payment = wait.for(this.getReport,options_daily);
+    var daily_donation = 0;
+    for (var i = 0; i < report_payment.length;i++) {
+      daily_donation += parseFloat(report_payment[i].total.toFixed(2));
+    }
+    if (daily_donation > 0) {
+      // Transfer 5% to developer
+      var developer_payment = (daily_donation * 0.05).toFixed(3);
+      console.log('Developer payment is: ' + developer_payment);
+      wait.for(
+        steem_api.doTransfer,
+        conf.env.ACCOUNT_NAME(),
+        'raserrano',
+        developer_payment + ' SBD',
+        'Daily payment for development and management'
+      );
+      // Power up 50% of the amount
+      var powerup = (daily_donation * 0.5).toFixed(3);
+    }else {
+      var powerup = 0;
+      var developer_payment = 0;
+
+    }
+    // Create table to start tracking this
+    var stat = {};
+    stat.trees =  ((daily_donation * ci.sbd_to_dollar) / 2).toFixed(2);
+    stat.payment = developer_payment;
+    stat.powerup = powerup;
+
+    var result = wait.for(this.upsertStat,{created: when},stat);
+
+    var pictures = JSON.parse(fs.readFileSync('./reports/pictures.json', 'utf8'));
+
+    // Random
+    var min = Math.ceil(0);
+    var max = Math.floor(pictures.pics.length);
+    var lucky = Math.floor(Math.random() * (max - min + 1)) + min;
+
+
+    var contents_1 = fs.readFileSync('./reports/header.md', 'utf8');
+    var body = sprintf(
+      contents_1,
+      stat.trees,
+      total_trees,
+      pictures.pics[lucky],
+      count,
+      donators,
+      total_trees,
+      average,
+      steempower,
+      ci.steem_to_dollar,
+      ci.sbd_to_dollar
+    );
     body += '\n\n';
 
     var range = 'TODAY';
