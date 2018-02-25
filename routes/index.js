@@ -76,7 +76,7 @@ router.get('/queue', function(req, res, next) {
     res.format({
       html: function() {
         res.render('index', {
-          title: 'Queue',
+          title: 'Queue ' + data.length,
           transfers: data,
           type: 'queue',
         });
