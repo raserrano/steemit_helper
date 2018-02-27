@@ -21,7 +21,7 @@ wait.launchFiber(function() {
     var voter = wait.for(
       steem_api.steem_getAccounts_wrapper,[conf.env.ACCOUNT_NAME()]
     );
-    var weight = steem_api.calculateVoteWeight(voter[0],0.03);
+    var weight = 500;
     utils.startVotingProcess(accounts_to[i],results_to,weight,voter[0]);
   }
   console.log('Finish voting');
