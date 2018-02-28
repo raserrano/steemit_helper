@@ -199,10 +199,34 @@ module.exports = {
       return value;
     },
     PAY_DEVELOPER: function() {
-      var value = false;
+      var value = 10;
       if ((process.env.POWERUP_POST !== undefined) &&
         (process.env.POWERUP_POST !== null)) {
-        value = JSON.parse(process.env.POWERUP_POST);
+        value = parseFloat(process.env.POWERUP_POST);
+      }
+      return value;
+    },
+    SUPPORT_ACCOUNT: function() {
+      var value = '';
+      if ((process.env.SUPPORT_ACCOUNT !== undefined) &&
+        (process.env.SUPPORT_ACCOUNT !== null)) {
+        value = process.env.SUPPORT_ACCOUNT;
+      }
+      return value;
+    },
+    SUPPORT_ACCOUNT_KEY: function() {
+      var value = '';
+      if ((process.env.SUPPORT_ACCOUNT_KEY !== undefined) &&
+        (process.env.SUPPORT_ACCOUNT_KEY !== null)) {
+        value = process.env.SUPPORT_ACCOUNT_KEY;
+      }
+      return value;
+    },
+    SLEEPING: function() {
+      var value = false;
+      if ((process.env.SUPPORT_ACCOUNT_KEY !== undefined) &&
+        (process.env.SUPPORT_ACCOUNT_KEY !== null)) {
+        value = JSON.parse(process.env.SUPPORT_ACCOUNT_KEY);
       }
       return value;
     },

@@ -153,7 +153,7 @@ module.exports = {
                 comment += '<h3>You just planted ' + trees + ' tree(s)!</h3>\n'
                 comment += 'Thanks to @' + data[i].payer + ' \n';
                 comment += '<h3>We have planted already ' + trees_total;
-                comment += ' trees\n out of 1,000,000<h3>\n'
+                comment += ' trees\n out of 1,000,000<h3>\n';
                 comment += 'Let\'s save and restore Abongphen Highland';
                 comment += ' Forest\nin Cameroonian village Kedjom-Keku!\n';
                 comment += 'Plant trees with @treeplanter and get';
@@ -767,9 +767,11 @@ module.exports = {
     for (var i = 0; i < report_payment.length;i++) {
       daily_donation += parseFloat(report_payment[i].total.toFixed(2));
     }
+    var developer_payment = 0;
+    var powerup = 0;
     if (daily_donation > 0) {
       // Transfer 5% to developer
-      var developer_payment = (daily_donation * 0.05).toFixed(3);
+      developer_payment = (daily_donation * 0.05).toFixed(3);
       console.log('Developer payment is: ' + developer_payment);
       wait.for(
         steem_api.doTransfer,
@@ -779,10 +781,10 @@ module.exports = {
         'Daily payment for development and management'
       );
       // Power up 50% of the amount
-      var powerup = (daily_donation * 0.5).toFixed(3);
+      powerup = (daily_donation * 0.5).toFixed(3);
     }else {
-      var powerup = 0;
-      var developer_payment = 0;
+      powerup = 0;
+      developer_payment = 0;
 
     }
     // Create table to start tracking this
