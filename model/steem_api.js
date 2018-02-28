@@ -30,7 +30,25 @@ module.exports = {
       console.log(e);
     }
   },
+  voteSupport: function(author, permlink, weight) {
+    var action = 'Voting ' + author + ' ' + permlink;
+    action += ' with weight of ' + weight;
+    console.log(action);
+    try{
+      return wait.for(
+        steem.broadcast.vote,
+        conf.env.SUPPORT_ACCOUNT_KEY(),
+        conf.env.SUPPORT_ACCOUNT(),
+        author,
+        permlink,
+        weight
+      );
+    }catch(e){
+      console.log(e);
+    }
+  },
   commentPost: function(author, permlink, title, comment) {
+    var result = '';
     console.log('Commenting post: ' + permlink);
     var comment_permlink = steem.formatter.commentPermlink(
       author,
@@ -38,7 +56,7 @@ module.exports = {
     ).toLowerCase().replace('.','');
     console.log('Comment permlink: ' + comment_permlink);
     try{
-      return wait.for(
+      result = wait.for(
         steem.broadcast.comment,
         conf.env.POSTING_KEY_PRV(),
         author,
@@ -49,9 +67,15 @@ module.exports = {
         comment,
         {}
       );
+      // Support account vote
+      if((conf.env.SUPPORT_ACCOUNT() !== null) || 
+      (conf.env.SUPPORT_ACCOUNT() !== "" )){
+        this.voteSupport(conf.env.ACCOUNT_NAME(), comment_permlink, 10000);
+      }
     }catch (e){
       console.log(e);
     }
+    return result;
   },
   publishPost: function(author, permlink, tags, title, body) {
     var permlink = permlink.replace('.','');
