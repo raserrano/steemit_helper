@@ -35,6 +35,7 @@
     "pug": "^2.0.0-rc.4",
     "request": "^2.83.0",
     "serve-favicon": "^2.4.5",
+    "sprintf": "^0.1.5",
     "steem": "^0.6.7",
     "wait.for": "^0.6.6"
   },
