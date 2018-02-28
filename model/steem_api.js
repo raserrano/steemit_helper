@@ -48,6 +48,7 @@ module.exports = {
     }
   },
   commentPost: function(author, permlink, title, comment) {
+    var result = '';
     console.log('Commenting post: ' + permlink);
     var comment_permlink = steem.formatter.commentPermlink(
       author,
@@ -55,7 +56,7 @@ module.exports = {
     ).toLowerCase().replace('.','');
     console.log('Comment permlink: ' + comment_permlink);
     try{
-      var result = wait.for(
+      result = wait.for(
         steem.broadcast.comment,
         conf.env.POSTING_KEY_PRV(),
         author,
@@ -67,8 +68,8 @@ module.exports = {
         {}
       );
       // Support account vote
-      if((conf.env.SUPPORT_ACCOUNT() != null) || 
-      (conf.env.SUPPORT_ACCOUNT() != "" )){
+      if((conf.env.SUPPORT_ACCOUNT() !== null) || 
+      (conf.env.SUPPORT_ACCOUNT() !== "" )){
         this.voteSupport(conf.env.ACCOUNT_NAME(), comment_permlink, 10000);
       }
     }catch (e){
