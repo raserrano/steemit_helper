@@ -1,6 +1,6 @@
 #### NEW manual how to plan trees with me.
 1. You, good lady or man, transfer between 0.01 and 0.5 STEEM/SBD to my wallet, with the link in memo of the post or comment you want to have upvoted by me (self-voting not allowed).
-2. I will upvote the post and attempt to add 100% value per vote per STEEM/SBD you send, so 0.01 STEEM/SBD donation = approx 0.02 STEEM/SBD worth of vote, up to 0.5 STEEM/SBD = 0.5 STEEM/SBD worth of vote.
+2. I will upvote the post and attempt to add 100% value per vote per STEEM/SBD you send, so 0.01 STEEM/SBD donation = approx 0.02 STEEM/SBD worth of vote, up to 0.5 STEEM/SBD = 1 STEEM/SBD worth of vote.
 
 #### I will share your donations.
 1. 50% of it is going directly to Cameroon to fund our conservation program to save Abongphen Highland Forest

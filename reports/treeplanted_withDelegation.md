@@ -1,7 +1,7 @@
 <h2>Manual how to plan trees with @treeplanter</h2>
 <ol>
 <li>You, good lady or man, transfer between 0.01 and 0.5 STEEM/SBD to my wallet, with the link in memo of the post or comment you want to have upvoted by me.</li>
-<li>I will upvote the post and attempt to add 100% value per vote per STEEM/SBD you send, so 0.01 STEEM/SBD donation = approx 0.02 STEEM/SBD worth of vote, up to 0.5 STEEM/SBD = 2 STEEM/SBD worth of vote.</li>
+<li>I will upvote the post and attempt to add 100% value per vote per STEEM/SBD you send, so 0.01 STEEM/SBD donation = approx 0.02 STEEM/SBD worth of vote, up to 0.5 STEEM/SBD = 1 STEEM/SBD worth of vote.</li>
 </ol>
 <h4>I will share your donations</h4>
 <ol>
