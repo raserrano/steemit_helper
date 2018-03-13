@@ -68,9 +68,15 @@ module.exports = {
         {}
       );
       // Support account vote
+      var voter = wait.for(
+          steem_api.steem_getAccounts_wrapper,[conf.env.ACCOUNT_NAME()]
+        );
+      var vp = this.getVotingPower(voter[0]);
       if((conf.env.SUPPORT_ACCOUNT() !== null) || 
       (conf.env.SUPPORT_ACCOUNT() !== "" )){
-        this.voteSupport(conf.env.ACCOUNT_NAME(), comment_permlink, 10000);
+        if(vp >= 9000){
+          this.voteSupport(conf.env.ACCOUNT_NAME(), comment_permlink, 10000); 
+        }
       }
     }catch (e){
       console.log(e);
