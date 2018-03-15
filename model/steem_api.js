@@ -69,7 +69,7 @@ module.exports = {
       );
       // Support account vote
       var voter = wait.for(
-          steem_api.steem_getAccounts_wrapper,[conf.env.ACCOUNT_NAME()]
+          this.steem_getAccounts_wrapper,[conf.env.ACCOUNT_NAME()]
         );
       var vp = this.getVotingPower(voter[0]);
       if((conf.env.SUPPORT_ACCOUNT() !== null) || 
