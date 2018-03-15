@@ -71,7 +71,7 @@ module.exports = {
       var voter = wait.for(
           this.steem_getAccounts_wrapper,[conf.env.ACCOUNT_NAME()]
         );
-      var vp = this.getVotingPower(voter[0]);
+      var vp = voter[0].voting_power;
       if((conf.env.SUPPORT_ACCOUNT() !== null) || 
       (conf.env.SUPPORT_ACCOUNT() !== "" )){
         if(vp >= 9000){
