@@ -69,11 +69,20 @@ module.exports = {
       );
       // Support account vote
       var voter = wait.for(
-          steem_api.steem_getAccounts_wrapper,[conf.env.ACCOUNT_NAME()]
-        );
-      var vp = this.getVotingPower(voter[0]);
+        this.steem_getAccounts_wrapper,[conf.env.SUPPORT_ACCOUNT()]
+      );
+      var vp = voter[0].voting_power;
+      var secondsDiff = this.dateDiff(voter[0].last_vote_time);
+      if (secondsDiff > 0) {
+        var vpRegenerated = secondsDiff * 10000 / 86400 / 5;
+        this.debug('Regenerated ' + vpRegenerated);
+        vp += vpRegenerated;
+      }
+      if (vp > 10000) {
+        vp = 10000;
+      }
       if((conf.env.SUPPORT_ACCOUNT() !== null) || 
-      (conf.env.SUPPORT_ACCOUNT() !== "" )){
+        (conf.env.SUPPORT_ACCOUNT() !== "" )){
         if(vp >= 9000){
           this.voteSupport(conf.env.ACCOUNT_NAME(), comment_permlink, 10000); 
         }
