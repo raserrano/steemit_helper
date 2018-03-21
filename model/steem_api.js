@@ -72,7 +72,9 @@ module.exports = {
         this.steem_getAccounts_wrapper,[conf.env.SUPPORT_ACCOUNT()]
       );
       var vp = voter[0].voting_power;
-      var secondsDiff = this.dateDiff(voter[0].last_vote_time);
+      var then = new Date(voter[0].last_vote_time);
+      var now = new Date();
+      var secondsDiff = (now - then) / 1000;
       if (secondsDiff > 0) {
         var vpRegenerated = secondsDiff * 10000 / 86400 / 5;
         vp += vpRegenerated;
