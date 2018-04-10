@@ -17,7 +17,7 @@ module.exports = {
     var action = 'Voting ' + author + ' ' + permlink;
     action += ' with weight of ' + weight;
     console.log(action);
-    try{
+    try {
       return wait.for(
         steem.broadcast.vote,
         conf.env.POSTING_KEY_PRV(),
@@ -26,7 +26,7 @@ module.exports = {
         permlink,
         weight
       );
-    }catch(e){
+    }catch (e) {
       console.log(e);
     }
   },
@@ -34,7 +34,7 @@ module.exports = {
     var action = 'Voting ' + author + ' ' + permlink;
     action += ' with weight of ' + weight;
     console.log(action);
-    try{
+    try {
       return wait.for(
         steem.broadcast.vote,
         conf.env.SUPPORT_ACCOUNT_KEY(),
@@ -43,7 +43,7 @@ module.exports = {
         permlink,
         weight
       );
-    }catch(e){
+    }catch (e) {
       console.log(e);
     }
   },
@@ -53,9 +53,9 @@ module.exports = {
     var comment_permlink = steem.formatter.commentPermlink(
       author,
       permlink
-    ).toLowerCase().replace('.','');
+    ).toLowerCase().replace(/\./g,'');
     console.log('Comment permlink: ' + comment_permlink);
-    try{
+    try {
       result = wait.for(
         steem.broadcast.comment,
         conf.env.POSTING_KEY_PRV(),
@@ -67,35 +67,37 @@ module.exports = {
         comment,
         {}
       );
-      // Support account vote
-      var voter = wait.for(
-        this.steem_getAccounts_wrapper,[conf.env.SUPPORT_ACCOUNT()]
-      );
-      var vp = voter[0].voting_power;
-      var secondsDiff = this.dateDiff(voter[0].last_vote_time);
-      if (secondsDiff > 0) {
-        var vpRegenerated = secondsDiff * 10000 / 86400 / 5;
-        this.debug('Regenerated ' + vpRegenerated);
-        vp += vpRegenerated;
-      }
-      if (vp > 10000) {
-        vp = 10000;
-      }
-      if((conf.env.SUPPORT_ACCOUNT() !== null) || 
-        (conf.env.SUPPORT_ACCOUNT() !== "" )){
-        if(vp >= 9000){
-          this.voteSupport(conf.env.ACCOUNT_NAME(), comment_permlink, 10000); 
+
+      if (conf.env.SUPPORT_ACCOUNT() !== '') {
+        // Support account vote
+        var voter = wait.for(
+          this.steem_getAccounts_wrapper,[conf.env.SUPPORT_ACCOUNT()]
+        );
+        var vp = voter[0].voting_power;
+        var then = new Date(voter[0].last_vote_time);
+        var now = new Date();
+        var secondsDiff = (now - then) / 1000;
+        if (secondsDiff > 0) {
+          var vpRegenerated = secondsDiff * 10000 / 86400 / 5;
+          vp += vpRegenerated;
+        }
+        if (vp > 10000) {
+          vp = 10000;
+        }
+        console.log('Support acc vp: ' + vp);
+        if (vp >= 9000) {
+          this.voteSupport(conf.env.ACCOUNT_NAME(), comment_permlink, 10000);
         }
       }
-    }catch (e){
+    }catch (e) {
       console.log(e);
     }
     return result;
   },
   publishPost: function(author, permlink, tags, title, body) {
-    var permlink = permlink.replace('.','');
+    var permlink = permlink.replace(/\./g,'');
     console.log('Publising post:' + permlink);
-    try{
+    try {
       return wait.for(
         steem.broadcast.comment,
         conf.env.POSTING_KEY_PRV(),
@@ -107,7 +109,7 @@ module.exports = {
         body,
         tags
       );
-    }catch(e){
+    }catch (e) {
       console.log(e);
     }
   },
@@ -116,7 +118,7 @@ module.exports = {
     var allowVotes = true;
     var allowCurationRewards = true;
     var extensions = ext;
-    try{
+    try {
       return wait.for(
         steem.broadcast.commentOptions,
         conf.env.POSTING_KEY_PRV(),
@@ -128,7 +130,7 @@ module.exports = {
         allowCurationRewards,
         extensions
       );
-    }catch(e){
+    }catch (e) {
       console.log(e);
     }
   },
@@ -189,19 +191,19 @@ module.exports = {
     steem.api.getDiscussionsByBlog(
       {tag: author, limit: amount},
       function(err, result) {
-        if(err){
+        if (err) {
           console.log(err);
         }
         callback(err, result);
       }
     );
   },
-   steem_transferToVesting: function(from, to, amount){
+  steem_transferToVesting: function(from, to, amount) {
     steem.broadcast.transferToVesting(
-      conf.env.WIF(), 
-      from, 
-      to, 
-      amount, 
+      conf.env.WIF(),
+      from,
+      to,
+      amount,
       function(err, result) {
         console.log(err, result);
       }
@@ -330,7 +332,7 @@ module.exports = {
       request,
       'https://api.coinmarketcap.com/v1/ticker/steem-dollars/'
     );
-    ci.sbd_to_dollar = JSON.parse(ci.sbd_to_dollar.body)[0].price_usd;    
+    ci.sbd_to_dollar = JSON.parse(ci.sbd_to_dollar.body)[0].price_usd;
     return ci;
   },
   getSteemPowerFromVest: function(globalData, vest) {
