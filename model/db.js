@@ -9,7 +9,7 @@ var db = mongoose.connect(
   config.database.conn(
     config.database.options
     ),
-  {useMongoClient: true}
+  {}
   );
 
 // CONNECTION EVENTS
