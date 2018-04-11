@@ -67,24 +67,24 @@ module.exports = {
         comment,
         {}
       );
-      // Support account vote
-      var voter = wait.for(
-        this.steem_getAccounts_wrapper,[conf.env.SUPPORT_ACCOUNT()]
-      );
-      var vp = voter[0].voting_power;
-      var then = new Date(voter[0].last_vote_time);
-      var now = new Date();
-      var secondsDiff = (now - then) / 1000;
-      if (secondsDiff > 0) {
-        var vpRegenerated = secondsDiff * 10000 / 86400 / 5;
-        vp += vpRegenerated;
-      }
-      if (vp > 10000) {
-        vp = 10000;
-      }
-      console.log('Support acc vp: ' + vp);
-      if ((conf.env.SUPPORT_ACCOUNT() !== null) ||
-        (conf.env.SUPPORT_ACCOUNT() !== '')) {
+
+      if (conf.env.SUPPORT_ACCOUNT() !== null) {
+        // Support account vote
+        var voter = wait.for(
+          this.steem_getAccounts_wrapper,[conf.env.SUPPORT_ACCOUNT()]
+        );
+        var vp = voter[0].voting_power;
+        var then = new Date(voter[0].last_vote_time);
+        var now = new Date();
+        var secondsDiff = (now - then) / 1000;
+        if (secondsDiff > 0) {
+          var vpRegenerated = secondsDiff * 10000 / 86400 / 5;
+          vp += vpRegenerated;
+        }
+        if (vp > 10000) {
+          vp = 10000;
+        }
+        console.log('Support acc vp: ' + vp);
         if (vp >= 9000) {
           this.voteSupport(conf.env.ACCOUNT_NAME(), comment_permlink, 10000);
         }
