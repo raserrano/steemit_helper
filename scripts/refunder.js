@@ -8,9 +8,15 @@ const
 wait.launchFiber(function() {
   var RECORDS_FETCH_LIMIT = 1000;
 
-  var accounts = wait.for(
-    steem_api.steem_getAccounts_wrapper,[conf.env.ACCOUNT_NAME()]
-  );
+  var accounts = "";
+  try{
+    accounts = wait.for(
+      steem_api.steem_getAccounts_wrapper,[conf.env.ACCOUNT_NAME()]
+    );
+  }catch(e){
+    console.log(e);
+    process.exit();
+  }
   // Get not voted posts from DB
   var last_refunded = wait.for(utils.getLastRefunded);
   if (last_refunded.length === 0) {
