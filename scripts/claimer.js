@@ -6,9 +6,15 @@ const
 
 // Voting for high bids
 wait.launchFiber(function() {
-  var voter = wait.for(
-    steem_api.steem_getAccounts_wrapper,[conf.env.ACCOUNT_NAME()]
-  );
+  var voter = "";
+  try{
+    voter = wait.for(
+      steem_api.steem_getAccounts_wrapper,[conf.env.ACCOUNT_NAME()]
+    );
+  }catch(e){
+    console.log(e);
+    process.exit();
+  }
   if (voter[0] !== undefined && voter[0] !== null) {
     var steem = voter[0].reward_steem_balance;
     var sbd = voter[0].reward_sbd_balance;

@@ -6,9 +6,15 @@ const
 
 // Voting for new users intro posts
 wait.launchFiber(function() {
-  var accounts = wait.for(
-    steem_api.steem_getAccounts_wrapper,[conf.env.ACCOUNT_NAME()]
-  );
+  var accounts = "";
+  try{
+    accounts = wait.for(
+      steem_api.steem_getAccounts_wrapper,[conf.env.ACCOUNT_NAME()]
+    );
+  }catch(e){
+    console.log(e);
+    process.exit();
+  }
   var weight = 500;
   var posts = wait.for(steem_api.steem_getPostsByTag,'introduceyourself',100);
   var report = utils.commentOnNewUserPost(posts,weight,accounts[0]);
