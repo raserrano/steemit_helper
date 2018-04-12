@@ -9,16 +9,24 @@ wait.launchFiber(function() {
   // capture SP, reputation, followers count
   // Calculate vote value
   var account = {};
-  var voter = wait.for(
-    steem_api.steem_getAccounts_wrapper,[conf.env.ACCOUNT_NAME()]
-  );
-  var followers = wait.for(
-    steem_api.steem_getFollowersCount,
-    conf.env.ACCOUNT_NAME()
-  );
-  var globalData = wait.for(
-    steem_api.steem_getSteemGlobaleProperties_wrapper
-  );
+  var voter = "";
+  var followers = "";
+  var globalData = "";
+  try{
+    voter = wait.for(
+      steem_api.steem_getAccounts_wrapper,[conf.env.ACCOUNT_NAME()]
+    );
+    followers = wait.for(
+      steem_api.steem_getFollowersCount,
+      conf.env.ACCOUNT_NAME()
+    );
+    globalData = wait.for(
+      steem_api.steem_getSteemGlobaleProperties_wrapper
+    );
+  }catch(e){
+    console.log(e);
+    process.exit();
+  }
   var ci = steem_api.init_conversion(globalData);
   var steempower = steem_api.getSteemPower(voter[0]);
   account.created = new Date();
