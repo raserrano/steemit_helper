@@ -53,7 +53,7 @@ module.exports = {
     var comment_permlink = steem.formatter.commentPermlink(
       author,
       permlink
-    ).toLowerCase().replace('.','');
+    ).toLowerCase().replace(/\./g,'');
     console.log('Comment permlink: ' + comment_permlink);
     try {
       result = wait.for(
@@ -68,7 +68,7 @@ module.exports = {
         {}
       );
 
-      if (conf.env.SUPPORT_ACCOUNT() !== null) {
+      if (conf.env.SUPPORT_ACCOUNT() !== '') {
         // Support account vote
         var voter = wait.for(
           this.steem_getAccounts_wrapper,[conf.env.SUPPORT_ACCOUNT()]
@@ -95,7 +95,7 @@ module.exports = {
     return result;
   },
   publishPost: function(author, permlink, tags, title, body) {
-    var permlink = permlink.replace('.','');
+    var permlink = permlink.replace(/\./g,'');
     console.log('Publising post:' + permlink);
     try {
       return wait.for(
