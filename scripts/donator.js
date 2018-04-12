@@ -7,10 +7,15 @@ const
 // Voting for donations
 wait.launchFiber(function() {
   var RECORDS_FETCH_LIMIT = 100;
-
-  var accounts = wait.for(
-    steem_api.steem_getAccounts_wrapper,[conf.env.ACCOUNT_NAME()]
-  );
+  var accounts = "";
+  try{
+    accounts = wait.for(
+      steem_api.steem_getAccounts_wrapper,[conf.env.ACCOUNT_NAME()]
+    );
+  }catch(e){
+    console.log(e);
+    process.exit();
+  }
 
   // Find last voted post number
   var last_voted = wait.for(utils.getLastTransfer);
@@ -24,12 +29,19 @@ wait.launchFiber(function() {
   }
   console.log('Last: ' + last_voted);
   // Get latest transfer
-  var max = wait.for(
-    steem_api.getTransfers,
-    conf.env.ACCOUNT_NAME(),
-    10000000,
-    1
-  );
+  var max = "";
+  try{
+    max = wait.for(
+      steem_api.getTransfers,
+      conf.env.ACCOUNT_NAME(),
+      10000000,
+      1
+    );
+  }catch(e){
+    console.log(e);
+    process.exit();
+  }
+
   if ((max !== undefined) && (max !== null)) {
     max = max[max.length - 1][0];
   }
