@@ -24,7 +24,7 @@ Thanks following steemians for delegated power  |SP delegated
 @martin.mikes | 10276
 @jean-gregoire | 10231
 @kedjom-keku | 4741
-@ecoinstant | 205
+@treebuilder | 205
 
 
 ### Have a nice day and...

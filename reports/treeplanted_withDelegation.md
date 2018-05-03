@@ -29,7 +29,7 @@ Username | SP delegated
 @martin.mikes | ~5138
 @jean-gregoire | ~5115
 @kedjom-keku | ~2370
-@ecoinstant | ~102
+@treebuilder | ~102
 
 More opportunities how to help (If it could be organize better on the page it would be better)
 
