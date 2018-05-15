@@ -18,21 +18,6 @@
 <li>I am going to keep my SP always high - meaning I will only vote every day to keep 80% of voting power. The amount of daily available votes depends on my current SP, see above.</li>
 <li>If my SP is exhausted you will be queued – your link will get my upvote immediately I am strong again. If the link will get expired before I will be able to upvote it you get refunded.</li>
 </ol>
-<h3>Our greatest supporters who allow us to plant more trees</h3>h3>
-<h4>Regular Upvoters</h4>
-The greatest tree planter is @czechglobalhost
-<center>![31516832_10160202308580702_3975039172145577984_n.jpg](https://steemitimages.com/DQmWrcmJeu2RUUkKtckwTAfCgLn78ornfFkSy2szFe4aguB/31516832_10160202308580702_3975039172145577984_n.jpg)</center>
-<h4>Current delegations</h4>
-Thanks following steemians for delegated power
-
-Username | SP delegated
----|---
-@itchykitten | ~5242
-@martin.mikes | ~5138
-@jean-gregoire | ~5115
-@kedjom-keku | ~2370
-@treebuilder | ~102
-
 
 More opportunities how to help
 
