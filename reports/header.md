@@ -5,6 +5,24 @@
   <h5> since June 2017!</h5>
 </center>
 
+<h3>Our greatest supporters who allow us to plant more trees</h3>h3>
+<h4>Regular Upvoters</h4>
+The greatest tree planter is @czechglobalhost
+<center>![31516832_10160202308580702_3975039172145577984_n.jpg](https://steemitimages.com/DQmWrcmJeu2RUUkKtckwTAfCgLn78ornfFkSy2szFe4aguB/31516832_10160202308580702_3975039172145577984_n.jpg)</center>
+<h4>SP delegators</h4>
+Thanks following steemians for delegated power
+
+Rank | Username | SP delegated | Numbers of trees planted daily 
+---|---|---|---
+1 | @itchykitten | ~5242 | 5
+2 | @martin.mikes | ~5138 | 5
+3 | @jean-gregoire | ~5115 | 4
+4 | @kedjom-keku | ~2370 | 2
+5 | @treebuilder | ~102 | 0.01
+
+<h3>Delegate SP to @treeplanter or regulary upvote our daily reports to help us to plant more trees and appear in this list of our greatest supporters. 
+Thanks a lot!</h3>h3>
+
 ---
 
 %s
