@@ -11,7 +11,7 @@
 
 ---
 
-<h3>Our greatest supporters who allow us to plant more trees</h3>h3>
+<h3>Our greatest supporters who allow us to plant more trees</h3>
 <h4>Regular Upvoters</h4>
 The greatest tree planter is @czechglobalhost
 <center>![31516832_10160202308580702_3975039172145577984_n.jpg](https://steemitimages.com/DQmWrcmJeu2RUUkKtckwTAfCgLn78ornfFkSy2szFe4aguB/31516832_10160202308580702_3975039172145577984_n.jpg)</center>
