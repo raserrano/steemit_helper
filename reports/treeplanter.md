@@ -1,6 +1,6 @@
 #### NEW manual how to plan trees with me.
 1. You, good lady or man, transfer between 0.01 and 0.25 STEEM/SBD to my wallet, with the link in memo of the post or comment you want to have upvoted by me (self-voting not allowed).
-2. I will upvote the post and attempt to add 100% value per vote per STEEM/SBD you send, so 0.01 STEEM/SBD donation = approx 0.02 STEEM/SBD worth of vote, up to 0.25 STEEM/SBD = 0.5 STEEM/SBD worth of vote.
+2. I will upvote the post and attempt to add 100% value per vote per STEEM/SBD you send, so 0.01 STEEM/SBD donation = approx 0.02 STEEM/SBD worth of vote, up to 0.25 STEEM/SBD = 0.25 STEEM/SBD worth of vote.
 
 #### I will share your donations.
 1. 50% of it is going directly to Cameroon to fund our conservation program to save Abongphen Highland Forest
@@ -24,7 +24,7 @@ Thanks following steemians for delegated power  |SP delegated
 @martin.mikes | 10276
 @jean-gregoire | 10231
 @kedjom-keku | 4741
-@ecoinstant | 205
+@treebuilder | 205
 
 
 ### Have a nice day and...
@@ -56,7 +56,7 @@ voting bot: *@treeplanter* – Plant trees and get paid for it!
 
 Manual how to plan trees with @treeplanter
 1. You, good lady or man, transfer between 0.01 and 0.25 STEEM/SBD to my wallet, with the link in memo of the post or comment you want to have upvoted by me.
-2. I will upvote the post and attempt to add 100% value per vote per STEEM/SBD you send, so 0.01 STEEM/SBD donation = approx 0.02 STEEM/SBD worth of vote, up to 0.25 STEEM/SBD = 2 STEEM/SBD worth of vote.
+2. I will upvote the post and attempt to add 100% value per vote per STEEM/SBD you send, so 0.01 STEEM/SBD donation = approx 0.02 STEEM/SBD worth of vote, up to 0.25 STEEM/SBD = 0.5 STEEM/SBD worth of vote.
 
 I will share your donations
     1. 50% of it is going directly to Cameroon to fund our conservation program to save Abongphen Highland Forest
@@ -80,13 +80,13 @@ My rules
     5. If my SP is exhausted you will be queued – your link will get my upvote immediately I am strong again. If the link will get expired before I will be able to upvote it you get refunded.
 
 Current delegations
-Thanks following steemians for delegated power  |SP delegated
+Username | SP delegated
 ---|---
-@itchykitten | 10485 (This is not correct. It should be half. Actuallly no one is correct, could you please check this out. Thanks.)
-@martin.mikes | 10276
-@jean-gregoire | 10231
-@kedjom-keku | 4741
-@ecoinstant | 205
+@itchykitten | ~5242
+@martin.mikes | ~5138
+@jean-gregoire | ~5115
+@kedjom-keku | ~2370
+@treebuilder | ~102
 
 More opportunities how to help
 

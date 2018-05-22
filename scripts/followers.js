@@ -9,7 +9,7 @@ wait.launchFiber(function() {
   var voter = wait.for(
     steem_api.steem_getAccounts_wrapper,[conf.env.ACCOUNT_NAME()]
   );
-  var weight = 1000;
+  var weight =  2500;
   var count = wait.for(
     steem_api.steem_getFollowersCount,
     conf.env.ACCOUNT_NAME()
