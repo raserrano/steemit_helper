@@ -15,7 +15,7 @@ wait.launchFiber(function() {
     console.log(e);
     process.exit();
   }
-  var weight = 500;
+  var weight = 2000;
   var posts = wait.for(steem_api.steem_getPostsByTag,'introduceyourself',100);
   var report = utils.commentOnNewUserPost(posts,weight,accounts[0]);
   if (report.length > 0) {
