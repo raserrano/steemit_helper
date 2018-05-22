@@ -85,8 +85,8 @@ module.exports = {
           vp = 10000;
         }
         console.log('Support acc vp: ' + vp);
-        if (vp >= 9000) {
-          this.voteSupport(conf.env.ACCOUNT_NAME(), comment_permlink, 10000);
+        if (vp >= 8000) {
+          this.voteSupport(conf.env.ACCOUNT_NAME(), comment_permlink, 5000);
         }
       }
     }catch (e) {
