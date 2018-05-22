@@ -19,11 +19,12 @@
 <li>If my SP is exhausted you will be queued – your link will get my upvote immediately I am strong again. If the link will get expired before I will be able to upvote it you get refunded.</li>
 </ol>
 
-More opportunities how to help
+<h3>More opportunities how to help</h3>
 
 <h4>Contribute to our transparent account [EUR]:</h4>
 - IBAN: CZ8120100000002401262246
 - BIC/SWIFT: FIOBCZPPXXX
+
 <h4>OR transparent account [$]:</h4>
 - IBAN: CZ9020100000002801262245
 - BIC/SWIFT: FIOBCZPPXXX**

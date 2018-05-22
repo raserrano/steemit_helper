@@ -28,8 +28,8 @@ Rank | Username | SP delegated | Numbers of trees planted daily
 4 | @kedjom-keku | ~2370 | 2
 5 | @treebuilder | ~102 | 0.01
 
-<h3>Delegate SP to @treeplanter or regulary upvote our daily reports to help us to plant more trees and appear in this list of our greatest supporters. 
-Thanks a lot!</h3>
+<center><h3>Delegate SP to @treeplanter or regulary upvote our daily reports to help us to plant more trees and appear in this list of our greatest supporters. 
+Thanks a lot!</h3><center>
 
 <center><h3>@treeplanter<br /></h3><small>fundraising voting bot</small><h2>PLANT TREES AND GET PAID FOR IT</h2>Let's plant <strong>1,000,000 trees</strong><small> to save and restore Abongphen Highland Forest in Cameroon</small></center>
 
