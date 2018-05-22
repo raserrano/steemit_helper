@@ -34,9 +34,9 @@ module.exports = {
   getTransfersToVote: function(account,data) {
     var i = 0;
     while (i < data.length) {
+      var query = {number: data[i][0]};
       if (data[i][1].op[0] == 'transfer') {
         if (data[i][1].op[1].to == account) {
-          var query = {number: data[i][0]};
           var found = wait.for(this.getTransfer,query);
           var res = this.getContent([account],data[i]);
           if (found.length > 0) {
@@ -115,7 +115,7 @@ module.exports = {
           this.debug('Donation is: ' + data[i].donation);
         }
         var voter = wait.for(
-          steem_api.steem_getAccounts_wrapper,[conf.env.ACCOUNT_NAME()]
+          steem_api.steem_getAccounts_wrapper,[account]
         );
         var vp = this.getVotingPower(voter[0]);
         var weight = steem_api.calculateVoteWeight(
@@ -127,64 +127,81 @@ module.exports = {
           if (vp >= (
             conf.env.MIN_VOTING_POWER() * conf.env.VOTE_POWER_1_PC()
             )) {
-            if (conf.env.VOTE_ACTIVE()) {
-              voted_ok = true;
-              if (!data[i].voted) {
-                steem_api.votePost(data[i].author, data[i].url, weight);
-                wait.for(this.timeout_wrapper,5500);
-              }
-            }else {
-              this.debug(
-                'Voting is not active, voting: ' + JSON.stringify(data[i])
-              );
-            }
-            if (conf.env.COMMENT_ACTIVE()) {
-              var title = '';
-              var comment = '';
-              var trees_total = wait.for(this.getTreesTotal);
-              trees_total = (
-                (trees_total[0].total * ci.sbd_to_dollar) / 2
-              ).toFixed(2);
-              if (conf.env.ACCOUNT_NAME() === 'treeplanter') {
-                var sp = steem_api.getSteemPower(voter[0]).toFixed(2);
-                var trees = ((data[i].amount * ci.sbd_to_dollar) / 2).toFixed(2);
-                title = 'Thanks for your donation';
-                comment += '<center>';
-                comment += '<h3>You just planted ' + trees + ' tree(s)!</h3>\n'
-                comment += 'Thanks to @' + data[i].payer + ' \n';
-                comment += '<h3>We have planted already ' + trees_total;
-                comment += ' trees\n out of 1,000,000<h3>\n';
-                comment += 'Let\'s save and restore Abongphen Highland';
-                comment += ' Forest\nin Cameroonian village Kedjom-Keku!\n';
-                comment += 'Plant trees with @treeplanter and get';
-                comment += ' paid for it!\nMy Steem Power = ' + sp + '\n';
-                comment += 'Thanks a lot!\n @martin.mikes';
-                comment += ' coordinator of @kedjom-keku\n';
-                comment += '![treeplantermessage_ok.png](https://';
-                comment += 'steemitimages.com/DQmdeFhTevmcmLvubxMMDoYBoNSa';
-                comment += 'z4ftt7PxktmLDmF2WGg/treeplantermessage_ok.png)';
-                comment += '</center>';
+            voted_ok = true;
+            var result = wait.for(
+              steem_api.steem_getContent,
+              data[i].author,
+              data[i].url
+            );
+            data[i].voted = steem_api.verifyAccountHasVoted(
+              [account],
+              result
+            );
+            data[i].status = 'processed';
+            data[i].processed = data[i].voted;
+            data[i].processed_date = new Date();
+            if (!data[i].voted) {
+              steem_api.votePost(data[i].author, data[i].url, weight);
+              wait.for(this.timeout_wrapper,5500);
+              if (conf.env.COMMENT_ACTIVE()) {
+                var title = '';
+                var comment = '';
+                var trees_total = wait.for(this.getTreesTotal);
+                trees_total = (
+                  (trees_total[0].total * ci.sbd_to_dollar) / 2
+                ).toFixed(2);
+                if (conf.env.ACCOUNT_NAME() === 'treeplanter') {
+                  var sp = steem_api.getSteemPower(voter[0]).toFixed(2);
+                  var trees = ((data[i].amount * ci.sbd_to_dollar) / 2).toFixed(2);
+                  title = 'Thanks for your donation';
+                  comment += '<center>';
+                  comment += '<h3>You just planted ' + trees + ' tree(s)!</h3>\n';
+                  comment += 'Thanks to @' + data[i].payer + ' \n';
+                  comment += '<h3>We have planted already ' + trees_total;
+                  comment += ' trees\n out of 1,000,000<h3>\n';
+                  comment += 'Let\'s save and restore Abongphen Highland';
+                  comment += ' Forest\nin Cameroonian village Kedjom-Keku!\n';
+                  comment += 'Plant trees with @treeplanter and get';
+                  comment += ' paid for it!\nMy Steem Power = ' + sp + '\n';
+                  comment += 'Thanks a lot!\n @martin.mikes';
+                  comment += ' coordinator of @kedjom-keku\n';
+                  comment += '![treeplantermessage_ok.png](https://';
+                  comment += 'steemitimages.com/DQmdeFhTevmcmLvubxMMDoYBoNSa';
+                  comment += 'z4ftt7PxktmLDmF2WGg/treeplantermessage_ok.png)';
+                  comment += '</center>';
+                }else {
+                  title = 'Thanks for your donation';
+                  comment = 'Congratulations @' + data[i].author + '!';
+                  comment += ' You have received a vote as ';
+                  comment += 'part of  @' + data[i].payer;
+                  comment += ' donation to this project.\n';
+                  comment += 'I will be able to help more #minnows \n';
+                }
+                // Decide how to handle this with a form and mongodb document
+                var comment_result = steem_api.commentPost(
+                  data[i].author,
+                  data[i].url,
+                  title,
+                  comment
+                );
+                var link = {
+                  author:comment_result.operations[0][1].author,
+                  url:comment_result.operations[0][1].permlink,
+                  created: new Date(),
+                };
+                if (conf.env.SUPPORT_ACCOUNT() !== '') {
+                  wait.for(utils.upsertLink,{
+                    author:comment_result.operations[0][1].author,
+                    url:comment_result.operations[0][1].permlink,
+                  },link);
+                }
+                wait.for(this.timeout_wrapper,17000);
               }else {
-                title = 'Thanks for your donation';
-                comment = 'Congratulations @' + data[i].author + '!';
-                comment += ' You have received a vote as ';
-                comment += 'part of  @' + data[i].payer;
-                comment += ' donation to this project.\n';
-                comment += 'I will be able to help more #minnows \n';
+                this.debug(
+                  'Commenting is not active, commenting: ' +
+                  JSON.stringify(data[i])
+                );
               }
-              // Decide how to handle this with a form and mongodb document
-              steem_api.commentPost(
-                data[i].author,
-                data[i].url,
-                title,
-                comment
-              );
-              wait.for(this.timeout_wrapper,22000);
-            }else {
-              this.debug(
-                'Commenting is not active, commenting: '
-                + JSON.stringify(data[i])
-              );
             }
             wait.for(
               this.upsertTransfer,
@@ -318,7 +335,6 @@ module.exports = {
               steem = parseFloat(steem[0]);
               if (conf.env.VOTE_ACTIVE()) {
                 steem_api.votePost(posts[i].author,posts[i].permlink,weight);
-                wait.for(this.timeout_wrapper,5100);
               }else {
                 this.debug(
                   'Voting is not active, voting: ' + posts[i].author +
@@ -352,19 +368,31 @@ module.exports = {
                 'Send SBD/STEEM to @tuanis in exchange of an upvote and ' +
                 'support this project, follow for random votes.';
 
-                steem_api.commentPost(
+                var comment_result = steem_api.commentPost(
                   posts[i].author,
                   posts[i].permlink,
                   title,
                   comment
                 );
-                wait.for(this.timeout_wrapper,22000);
+                var link = {
+                  author:comment_result.operations[0][1].author,
+                  url:comment_result.operations[0][1].permlink,
+                  created: new Date(),
+                };
+                if (conf.env.SUPPORT_ACCOUNT() !== '') {
+                  wait.for(utils.upsertLink,{
+                    author:comment_result.operations[0][1].author,
+                    url:comment_result.operations[0][1].permlink,
+                  },link);
+                }
+                wait.for(this.timeout_wrapper,17000);
               }else {
                 this.debug(
                   'Commenting is not active, commenting: ' + posts[i].author +
                   'url: ' + posts[i].permlink
                 );
                 this.debug('Comment: ' + comment);
+                wait.for(this.timeout_wrapper,5100);
               }
               report.push(posts[i]);
             }else {
@@ -455,7 +483,7 @@ module.exports = {
               if (obj.payer !== obj.author) {
                 if ((result !== undefined) && (result !== null)) {
                   obj.created = result.created;
-                  if (this.dateDiff(obj.created) < (86400 * 6)) {
+                  if (this.dateDiff(obj.created) < (86400 * 4.5)) {
                     obj.voted = steem_api.verifyAccountHasVoted(
                       account,
                       result
@@ -478,7 +506,7 @@ module.exports = {
             }else {
               if ((result !== undefined) && (result !== null)) {
                 obj.created = result.created;
-                if (this.dateDiff(obj.created) < (86400 * 6.5)) {
+                if (this.dateDiff(obj.created) < (86400 * 4.5)) {
                   obj.voted = steem_api.verifyAccountHasVoted(
                     account,
                     result
@@ -595,6 +623,15 @@ module.exports = {
       }
     );
   },
+  getLinks: function(callback) {
+    db.model('Link').find(
+      {}
+      ).exec(
+      function(err,data) {
+        callback(err,data);
+      }
+    );
+  },
   upsertTransfer: function(query,doc,callback) {
     db.model('Transfer').update(
       query,doc,{upsert: true,new: true},
@@ -609,6 +646,12 @@ module.exports = {
   },
   upsertStat: function(query,doc,callback) {
     db.model('Information').update(
+      query,doc,{upsert: true,new: true},
+      function(err,data) {callback(err,data);}
+    );
+  },
+  upsertLink: function(query,doc,callback) {
+    db.model('Link').update(
       query,doc,{upsert: true,new: true},
       function(err,data) {callback(err,data);}
     );
@@ -637,6 +680,19 @@ module.exports = {
   },
   getDonatorsTotal: function(callback) {
     db.model('Transfer').distinct('payer').exec(
+      function(err,data) {
+        callback(err,data);
+      }
+    );
+  },
+  cleanFollowers: function(callback) {
+    var date = new Date();
+    console.log(date);
+    date.setDate(date.getDate()-8);
+    console.log(date);
+    db.model('Link').remove(
+      {created:{$lt:date}}
+      ).exec(
       function(err,data) {
         callback(err,data);
       }

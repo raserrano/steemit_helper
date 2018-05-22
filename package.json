@@ -27,23 +27,23 @@
   "dependencies": {
     "body-parser": "^1.18.2",
     "cookie-parser": "^1.4.3",
-    "debug": "^2.6.9",
+    "debug": "^3.0.1",
     "express": "^4.16.2",
     "mongoose": "^4.13.10",
     "morgan": "^1.9.0",
-    "nyc": "^11.4.1",
+    "nyc": "^12.0.2",
     "pug": "^2.0.0-rc.4",
     "request": "^2.83.0",
     "serve-favicon": "^2.4.5",
     "sprintf": "^0.1.5",
-    "steem": "^0.6.7",
+    "steem": "^0.7.1",
     "wait.for": "^0.6.6"
   },
   "devDependencies": {
     "chai": "^4.1.2",
     "jscs": "^3.0.7",
-    "mocha": "^4.0.1",
+    "mocha": "^5.2.0",
     "nodemon": "^1.14.12",
-    "nyc": "^11.3.0"
+    "nyc": "^12.0.2"
   }
 }

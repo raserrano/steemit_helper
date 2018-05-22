@@ -4,9 +4,7 @@ const steem = require('steem'),
   conf = require('../config/dev');
 
 var ci = new Object()
-
-//steem.api.setOptions({ url: 'https://rpc.buildteam.io/' })
-steem.api.setOptions({ url: 'https://api.steemit.com/' });
+steem.api.setOptions({ url: conf.env.NODE() });
 module.exports = {
   getTransfers: function(name, max, limit, callback) {
     steem.api.getAccountHistory(name,max,limit,function(err, result) {
@@ -67,28 +65,6 @@ module.exports = {
         comment,
         {}
       );
-
-      if (conf.env.SUPPORT_ACCOUNT() !== '') {
-        // Support account vote
-        var voter = wait.for(
-          this.steem_getAccounts_wrapper,[conf.env.SUPPORT_ACCOUNT()]
-        );
-        var vp = voter[0].voting_power;
-        var then = new Date(voter[0].last_vote_time);
-        var now = new Date();
-        var secondsDiff = (now - then) / 1000;
-        if (secondsDiff > 0) {
-          var vpRegenerated = secondsDiff * 10000 / 86400 / 5;
-          vp += vpRegenerated;
-        }
-        if (vp > 10000) {
-          vp = 10000;
-        }
-        console.log('Support acc vp: ' + vp);
-        if (vp >= 9000) {
-          this.voteSupport(conf.env.ACCOUNT_NAME(), comment_permlink, 10000);
-        }
-      }
     }catch (e) {
       console.log(e);
     }

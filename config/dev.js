@@ -38,6 +38,14 @@ module.exports = {
       }
       return value;
     },
+    NODE: function() {
+      var value = 'https://api.steemit.com/';
+      if ((process.env.NODE !== undefined) &&
+        (process.env.NODE !== null)) {
+        value = process.env.NODE;
+      }
+      return value;
+    },
     ACCOUNT_NAME: function() {
       var value = '';
       if ((process.env.ACCOUNT_NAME !== undefined) &&
@@ -157,6 +165,14 @@ module.exports = {
         value = parseFloat(process.env.VOTE_MULTIPLIER);
       }
       return value;
+    },
+    WEIGHT: function() {
+      var value = 5;
+      if ((process.env.WEIGHT !== undefined) &&
+        (process.env.WEIGHT !== null)) {
+        value = parseFloat(process.env.WEIGHT);
+      }
+      return value*100;
     },
     LAST_VOTED: function() {
       var value;
