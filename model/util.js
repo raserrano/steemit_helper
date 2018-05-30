@@ -455,7 +455,7 @@ module.exports = {
               if (obj.payer !== obj.author) {
                 if ((result !== undefined) && (result !== null)) {
                   obj.created = result.created;
-                  if (this.dateDiff(obj.created) < (86400 * 6)) {
+                  if (this.dateDiff(obj.created) < (86400 * 4.5)) {
                     obj.voted = steem_api.verifyAccountHasVoted(
                       account,
                       result
@@ -478,7 +478,7 @@ module.exports = {
             }else {
               if ((result !== undefined) && (result !== null)) {
                 obj.created = result.created;
-                if (this.dateDiff(obj.created) < (86400 * 6.5)) {
+                if (this.dateDiff(obj.created) < (86400 * 4.5)) {
                   obj.voted = steem_api.verifyAccountHasVoted(
                     account,
                     result
