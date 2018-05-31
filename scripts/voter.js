@@ -27,8 +27,7 @@ wait.launchFiber(function() {
       console.log(e);
       break;
     }
-    var weight = 1000;
-    utils.startVotingProcess(accounts_to[i],results_to,weight,voter[0]);
+    utils.startVotingProcess(accounts_to[i],results_to,conf.env.WEIGHT(),voter[0]);
   }
   console.log('Finish voting');
   process.exit();
