@@ -158,6 +158,14 @@ module.exports = {
       }
       return value;
     },
+    WEIGTH: function() {
+      var value = 5;
+      if ((process.env.VOTE_MULTIPLIER !== undefined) &&
+        (process.env.VOTE_MULTIPLIER !== null)) {
+        value = parseFloat(process.env.VOTE_MULTIPLIER);
+      }
+      return value*100;
+    },
     LAST_VOTED: function() {
       var value;
       if ((process.env.LAST_VOTED !== undefined) &&
