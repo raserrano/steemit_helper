@@ -160,9 +160,9 @@ module.exports = {
     },
     WEIGHT: function() {
       var value = 5;
-      if ((process.env.VOTE_MULTIPLIER !== undefined) &&
-        (process.env.VOTE_MULTIPLIER !== null)) {
-        value = parseFloat(process.env.VOTE_MULTIPLIER);
+      if ((process.env.WEIGHT !== undefined) &&
+        (process.env.WEIGHT !== null)) {
+        value = parseFloat(process.env.WEIGHT);
       }
       return value*100;
     },
