@@ -34,9 +34,9 @@ module.exports = {
   getTransfersToVote: function(account,data) {
     var i = 0;
     while (i < data.length) {
+      var query = {number: data[i][0]};
       if (data[i][1].op[0] == 'transfer') {
         if (data[i][1].op[1].to == account) {
-          var query = {number: data[i][0]};
           var found = wait.for(this.getTransfer,query);
           var res = this.getContent([account],data[i]);
           if (found.length > 0) {
