@@ -115,7 +115,7 @@ module.exports = {
           this.debug('Donation is: ' + data[i].donation);
         }
         var voter = wait.for(
-          steem_api.steem_getAccounts_wrapper,[conf.env.ACCOUNT_NAME()]
+          steem_api.steem_getAccounts_wrapper,[account]
         );
         var vp = this.getVotingPower(voter[0]);
         var weight = steem_api.calculateVoteWeight(
@@ -135,7 +135,7 @@ module.exports = {
               data[i].url
             );
             data[i].voted = steem_api.verifyAccountHasVoted(
-              account,
+              [account]
               result
             );
             data[i].status = 'processed';
