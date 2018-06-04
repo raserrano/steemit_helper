@@ -9,24 +9,26 @@ wait.launchFiber(function() {
   var voter = wait.for(
     steem_api.steem_getAccounts_wrapper,[conf.env.ACCOUNT_NAME()]
   );
-  var weight =  2500;
+  var weight =  conf.env.WEIGHT();
   var count = wait.for(
     steem_api.steem_getFollowersCount,
     conf.env.ACCOUNT_NAME()
   );
+
+  console.log('Followers ' + count.follower_count);
   // Verify followers 
+  var batch = 100;
   var processed = 0;
   while(processed < count.follower_count){
-    var max = processed + 10;
+    max+=batch;
     var followers = wait.for(
       steem_api.steem_getFollowers,
       conf.env.ACCOUNT_NAME(),
       processed,
       'blog',
-      10
+      batch
     );
-    var current = 0;
-    while(processed < max && processed < count.follower_count){
+    for(var current = 0; current < followers.length; current++){
       var user = wait.for(
         steem_api.steem_getAccounts_wrapper,[followers[current].follower]
       );
@@ -42,8 +44,9 @@ wait.launchFiber(function() {
         {username:followers[current].follower},
         obj
       );
-      processed++;
     }
+    processed+=batch;
+    // console.log('From ' + processed + ' to ' + max);
   }
   // verify if follower has active posts
 
@@ -58,7 +61,6 @@ wait.launchFiber(function() {
   console.log(lucky);
   var votes = 0;
   var followers = wait.for(utils.getFollowers);
-
 
   for(var i = 0; i< lucky.length; i++){
     console.log('Processing '+followers[lucky[i]].username);
