@@ -34,9 +34,9 @@ module.exports = {
   getTransfersToVote: function(account,data) {
     var i = 0;
     while (i < data.length) {
+      var query = {number: data[i][0]};
       if (data[i][1].op[0] == 'transfer') {
         if (data[i][1].op[1].to == account) {
-          var query = {number: data[i][0]};
           var found = wait.for(this.getTransfer,query);
           var res = this.getContent([account],data[i]);
           if (found.length > 0) {
@@ -127,78 +127,73 @@ module.exports = {
           if (vp >= (
             conf.env.MIN_VOTING_POWER() * conf.env.VOTE_POWER_1_PC()
             )) {
-            if (conf.env.VOTE_ACTIVE()) {
-              voted_ok = true;
-              var result = wait.for(
-                steem_api.steem_getContent,
-                data[i].author,
-                data[i].url
-              );
-              data[i].voted = steem_api.verifyAccountHasVoted(
-                account,
-                result
-              );
-              data[i].status = 'processed';
-              data[i].processed = data[i].voted;
-              data[i].processed_date = new Date();
-              if (!data[i].voted) {
-                steem_api.votePost(data[i].author, data[i].url, weight);
-                wait.for(this.timeout_wrapper,5500);
-                if (conf.env.COMMENT_ACTIVE()) {
-                  var title = '';
-                  var comment = '';
-                  var trees_total = wait.for(this.getTreesTotal);
-                  trees_total = (
-                    (trees_total[0].total * ci.sbd_to_dollar) / 2
-                  ).toFixed(2);
-                  if (conf.env.ACCOUNT_NAME() === 'treeplanter') {
-                    var sp = steem_api.getSteemPower(voter[0]).toFixed(2);
-                    var trees = ((data[i].amount * ci.sbd_to_dollar) / 2).toFixed(2);
-                    title = 'Thanks for your donation';
-                    comment += '<center>';
-                    comment += '<h3>You just planted ' + trees + ' tree(s)!</h3>\n'
-                    comment += 'Thanks to @' + data[i].payer + ' \n';
-                    comment += '<h3>We have planted already ' + trees_total;
-                    comment += ' trees\n out of 1,000,000<h3>\n';
-                    comment += 'Let\'s save and restore Abongphen Highland';
-                    comment += ' Forest\nin Cameroonian village Kedjom-Keku!\n';
-                    comment += 'Plant trees with @treeplanter and get';
-                    comment += ' paid for it!\nMy Steem Power = ' + sp + '\n';
-                    comment += 'Thanks a lot!\n @martin.mikes';
-                    comment += ' coordinator of @kedjom-keku\n';
-                    comment += '![treeplantermessage_ok.png](https://';
-                    comment += 'steemitimages.com/DQmdeFhTevmcmLvubxMMDoYBoNSa';
-                    comment += 'z4ftt7PxktmLDmF2WGg/treeplantermessage_ok.png)';
-                    comment += '</center>';
-                  }else {
-                    title = 'Thanks for your donation';
-                    comment = 'Congratulations @' + data[i].author + '!';
-                    comment += ' You have received a vote as ';
-                    comment += 'part of  @' + data[i].payer;
-                    comment += ' donation to this project.\n';
-                    comment += 'I will be able to help more #minnows \n';
-                  }
-                  // Decide how to handle this with a form and mongodb document
-                  steem_api.commentPost(
-                    data[i].author,
-                    data[i].url,
-                    title,
-                    comment
-                  );
-                  wait.for(this.timeout_wrapper,17000);
+            voted_ok = true;
+            this.debug(JSON.stringify(data[i]));
+            var result = wait.for(
+              steem_api.steem_getContent,
+              data[i].author,
+              data[i].url
+            );
+            data[i].voted = steem_api.verifyAccountHasVoted(
+              account,
+              result
+            );
+            data[i].status = 'processed';
+            data[i].processed = data[i].voted;
+            data[i].processed_date = new Date();
+            this.debug(JSON.stringify(data[i]));
+            if (!data[i].voted) {
+              steem_api.votePost(data[i].author, data[i].url, weight);
+              wait.for(this.timeout_wrapper,5500);
+              if (conf.env.COMMENT_ACTIVE()) {
+                var title = '';
+                var comment = '';
+                var trees_total = wait.for(this.getTreesTotal);
+                trees_total = (
+                  (trees_total[0].total * ci.sbd_to_dollar) / 2
+                ).toFixed(2);
+                if (conf.env.ACCOUNT_NAME() === 'treeplanter') {
+                  var sp = steem_api.getSteemPower(voter[0]).toFixed(2);
+                  var trees = ((data[i].amount * ci.sbd_to_dollar) / 2).toFixed(2);
+                  title = 'Thanks for your donation';
+                  comment += '<center>';
+                  comment += '<h3>You just planted ' + trees + ' tree(s)!</h3>\n'
+                  comment += 'Thanks to @' + data[i].payer + ' \n';
+                  comment += '<h3>We have planted already ' + trees_total;
+                  comment += ' trees\n out of 1,000,000<h3>\n';
+                  comment += 'Let\'s save and restore Abongphen Highland';
+                  comment += ' Forest\nin Cameroonian village Kedjom-Keku!\n';
+                  comment += 'Plant trees with @treeplanter and get';
+                  comment += ' paid for it!\nMy Steem Power = ' + sp + '\n';
+                  comment += 'Thanks a lot!\n @martin.mikes';
+                  comment += ' coordinator of @kedjom-keku\n';
+                  comment += '![treeplantermessage_ok.png](https://';
+                  comment += 'steemitimages.com/DQmdeFhTevmcmLvubxMMDoYBoNSa';
+                  comment += 'z4ftt7PxktmLDmF2WGg/treeplantermessage_ok.png)';
+                  comment += '</center>';
                 }else {
-                  this.debug(
-                    'Commenting is not active, commenting: '
-                    + JSON.stringify(data[i])
-                  );
-                }                
-              }
-            }else {
-              this.debug(
-                'Voting is not active, voting: ' + JSON.stringify(data[i])
-              );
+                  title = 'Thanks for your donation';
+                  comment = 'Congratulations @' + data[i].author + '!';
+                  comment += ' You have received a vote as ';
+                  comment += 'part of  @' + data[i].payer;
+                  comment += ' donation to this project.\n';
+                  comment += 'I will be able to help more #minnows \n';
+                }
+                // Decide how to handle this with a form and mongodb document
+                steem_api.commentPost(
+                  data[i].author,
+                  data[i].url,
+                  title,
+                  comment
+                );
+                wait.for(this.timeout_wrapper,17000);
+              }else {
+                this.debug(
+                  'Commenting is not active, commenting: '
+                  + JSON.stringify(data[i])
+                );
+              }                
             }
-
             wait.for(
               this.upsertTransfer,
               {_id: data[i]._id},
