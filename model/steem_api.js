@@ -241,8 +241,8 @@ module.exports = {
         votes.push(result.active_votes[i].voter);
       }
       // Debug
-      // console.log('Votes: '+votes);
-      // console.log(account);
+      console.log('Votes: '+votes);
+      console.log(account);
       for (var j = 0;j < account.length;j++) {
         var match = '';
         if (account[j] instanceof Function) {
@@ -257,7 +257,7 @@ module.exports = {
       }
     }
     // Debug
-    // console.log('Found '+ match +' '+(pos !== 0));
+    console.log('Found '+ match +' '+(pos !== 0));
     return pos !== 0;
   },
   getSteemPower: function(account) {
