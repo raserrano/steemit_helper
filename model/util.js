@@ -129,6 +129,18 @@ module.exports = {
             )) {
             if (conf.env.VOTE_ACTIVE()) {
               voted_ok = true;
+              var result = wait.for(
+                steem_api.steem_getContent,
+                data[i].author,
+                data[i].url
+              );
+              data[i].voted = steem_api.verifyAccountHasVoted(
+                account,
+                result
+              );
+              data[i].status = 'processed';
+              data[i].processed = data[i].voted;
+              data[i].processed_date = new Date();
               if (!data[i].voted) {
                 steem_api.votePost(data[i].author, data[i].url, weight);
                 wait.for(this.timeout_wrapper,5500);
