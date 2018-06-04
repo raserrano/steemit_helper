@@ -135,7 +135,7 @@ module.exports = {
               data[i].url
             );
             data[i].voted = steem_api.verifyAccountHasVoted(
-              [account]
+              [account],
               result
             );
             data[i].status = 'processed';
