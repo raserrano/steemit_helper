@@ -115,7 +115,7 @@ module.exports = {
           this.debug('Donation is: ' + data[i].donation);
         }
         var voter = wait.for(
-          steem_api.steem_getAccounts_wrapper,[conf.env.ACCOUNT_NAME()]
+          steem_api.steem_getAccounts_wrapper,[account]
         );
         var vp = this.getVotingPower(voter[0]);
         var weight = steem_api.calculateVoteWeight(
@@ -128,20 +128,18 @@ module.exports = {
             conf.env.MIN_VOTING_POWER() * conf.env.VOTE_POWER_1_PC()
             )) {
             voted_ok = true;
-            this.debug(JSON.stringify(data[i]));
             var result = wait.for(
               steem_api.steem_getContent,
               data[i].author,
               data[i].url
             );
             data[i].voted = steem_api.verifyAccountHasVoted(
-              account,
+              [account],
               result
             );
             data[i].status = 'processed';
             data[i].processed = data[i].voted;
             data[i].processed_date = new Date();
-            this.debug(JSON.stringify(data[i]));
             if (!data[i].voted) {
               steem_api.votePost(data[i].author, data[i].url, weight);
               wait.for(this.timeout_wrapper,5500);
@@ -157,7 +155,7 @@ module.exports = {
                   var trees = ((data[i].amount * ci.sbd_to_dollar) / 2).toFixed(2);
                   title = 'Thanks for your donation';
                   comment += '<center>';
-                  comment += '<h3>You just planted ' + trees + ' tree(s)!</h3>\n'
+                  comment += '<h3>You just planted ' + trees + ' tree(s)!</h3>\n';
                   comment += 'Thanks to @' + data[i].payer + ' \n';
                   comment += '<h3>We have planted already ' + trees_total;
                   comment += ' trees\n out of 1,000,000<h3>\n';
@@ -189,10 +187,10 @@ module.exports = {
                 wait.for(this.timeout_wrapper,17000);
               }else {
                 this.debug(
-                  'Commenting is not active, commenting: '
-                  + JSON.stringify(data[i])
+                  'Commenting is not active, commenting: ' +
+                  JSON.stringify(data[i])
                 );
-              }                
+              }
             }
             wait.for(
               this.upsertTransfer,
