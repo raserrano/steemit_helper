@@ -53,7 +53,7 @@ wait.launchFiber(function() {
           active:true,
           created: date,
           reputation:rep,
-        }
+        };
         wait.for(
           utils.upsertFollower,
           {username:followers[current].follower},
