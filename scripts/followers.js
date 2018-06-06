@@ -83,13 +83,16 @@ wait.launchFiber(function() {
             );
             if(!voted){
               steem_api.votePost(posts[j].author, posts[j].permlink, weight);
-              wait.for(utils.timeout_wrapper,5500);
               var title = 'Thanks for your donation';
               var comment = 'Congratulations @' + posts[j].author + '!';
                 comment += ' You have received a vote as ';
                 comment += 'a way to thank you for supporting my program.';
               // Decide how to handle this with a form and mongodb document
-              steem_api.commentPost(posts[j].author, posts[j].permlink, title,comment);
+              var comment_result = steem_api.commentPost(posts[j].author, posts[j].permlink, title,comment);
+              utils.debug(JSON.stringify(comment_result));
+              if (conf.env.SUPPORT_ACCOUNT() !== '') {
+                wait.for(utils.upsertLink,query,res);
+              }
               wait.for(utils.timeout_wrapper,22000);
               votes++;
               break;
