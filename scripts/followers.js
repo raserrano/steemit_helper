@@ -16,7 +16,13 @@ wait.launchFiber(function() {
     conf.env.ACCOUNT_NAME()
   );
   var followers_db = wait.for(utils.getFollowers);
-  if (date.getDay() === 0 || (count.follower_count !== followers_db.length))) {
+  // Clean followers who unfollowed
+  if(count.follower_count !== followers_db.length){
+    wait.for(utils.cleanFollowers);
+  }
+  var followers_clean = wait.for(utils.getFollowers);
+  if (date.getDay() === 0 || (count.follower_count !== followers_db.length)) {
+
     console.log('Followers ' + count.follower_count);
     // Verify followers
     var batch = 100;
@@ -113,7 +119,10 @@ wait.launchFiber(function() {
                 created: new Date(),
               }
               if (conf.env.SUPPORT_ACCOUNT() !== '') {
-                wait.for(utils.upsertLink,{},link);
+                wait.for(utils.upsertLink,{
+                  author:comment_result.operations[0][1].author,
+                  url:comment_result.operations[0][1].permlink,
+                },link);
               }
               wait.for(utils.timeout_wrapper,22000);
               votes++;

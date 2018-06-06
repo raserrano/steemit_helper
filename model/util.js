@@ -679,6 +679,19 @@ module.exports = {
       }
     );
   },
+  cleanFollowers: function(callback) {
+    var date = new Date();
+    console.log(date);
+    date.setDate(date.getDate()-8);
+    console.log(date);
+    db.model('Link').remove(
+      {created:{$lt:date}}
+      ).exec(
+      function(err,data) {
+        callback(err,data);
+      }
+    );
+  },
   getReport: function(options,callback) {
 
     var stages = new Array();
