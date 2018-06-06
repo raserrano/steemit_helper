@@ -15,8 +15,8 @@ wait.launchFiber(function() {
     steem_api.steem_getFollowersCount,
     conf.env.ACCOUNT_NAME()
   );
-
-  if (date.getDay() === 0) {
+  var followers_db = wait.for(utils.getFollowers);
+  if (date.getDay() === 0 || (count.follower_count !== followers_db.length))) {
     console.log('Followers ' + count.follower_count);
     // Verify followers
     var batch = 100;
@@ -78,14 +78,14 @@ wait.launchFiber(function() {
   }
   console.log(lucky);
   var votes = 0;
-  var followers = wait.for(utils.getFollowers);
+  var followers_db = wait.for(utils.getFollowers);
 
   for(var i = 0; i< lucky.length; i++){
-    console.log('Processing '+followers[lucky[i]].username);
-    var posts = wait.for(steem_api.steem_getPostsByAuthor,followers[lucky[i]].username,20);
+    console.log('Processing '+followers_db[lucky[i]].username);
+    var posts = wait.for(steem_api.steem_getPostsByAuthor,followers_db[lucky[i]].username,20);
     if(posts.length > 0){
       for(var j=0; j< posts.length;j++){
-        if(followers[lucky[i]].username == posts[j].author){
+        if(followers_db[lucky[i]].username == posts[j].author){
           // Valid posts
           if(utils.dateDiff(posts[j].created) < (86400 * 5)){
             console.log('Found something to vote to');
@@ -126,7 +126,7 @@ wait.launchFiber(function() {
         }
       }
     }else{
-      console.log('No posts for '+followers[i].username);
+      console.log('No posts for '+followers_db[i].username);
     }
   }
   console.log('Finish voting followers program');

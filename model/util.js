@@ -365,12 +365,20 @@ module.exports = {
                 'Send SBD/STEEM to @tuanis in exchange of an upvote and ' +
                 'support this project, follow for random votes.';
 
-                steem_api.commentPost(
-                  posts[i].author,
-                  posts[i].permlink,
+                var comment_result = steem_api.commentPost(
+                  data[i].author,
+                  data[i].permlink,
                   title,
                   comment
                 );
+                var link = {
+                  author:comment_result.operations[0][1].author,
+                  url:comment_result.operations[0][1].permlink,
+                  created: new Date(),
+                }
+                if (conf.env.SUPPORT_ACCOUNT() !== '') {
+                  wait.for(this.upsertLink,{},link);
+                }
                 wait.for(this.timeout_wrapper,17000);
               }else {
                 this.debug(
