@@ -188,7 +188,7 @@ module.exports = {
                   author:comment_result.operations[0][1].author,
                   url:comment_result.operations[0][1].permlink,
                   created: new Date(),
-                }
+                };
                 if (conf.env.SUPPORT_ACCOUNT() !== '') {
                   wait.for(this.upsertLink,{},link);
                 }
@@ -375,7 +375,7 @@ module.exports = {
                   author:comment_result.operations[0][1].author,
                   url:comment_result.operations[0][1].permlink,
                   created: new Date(),
-                }
+                };
                 if (conf.env.SUPPORT_ACCOUNT() !== '') {
                   wait.for(this.upsertLink,{},link);
                 }
@@ -386,7 +386,7 @@ module.exports = {
                   'url: ' + posts[i].permlink
                 );
                 this.debug('Comment: ' + comment);
-                wait.for(this.timeout_wrapper,5100)
+                wait.for(this.timeout_wrapper,5100);
               }
               report.push(posts[i]);
             }else {
