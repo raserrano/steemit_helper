@@ -6,6 +6,7 @@ const
 
 wait.launchFiber(function() {
   var account = {};
+  var date = new Date();
   var voter = wait.for(
     steem_api.steem_getAccounts_wrapper,[conf.env.ACCOUNT_NAME()]
   );
@@ -15,38 +16,53 @@ wait.launchFiber(function() {
     conf.env.ACCOUNT_NAME()
   );
 
-  console.log('Followers ' + count.follower_count);
-  // Verify followers 
-  var batch = 100;
-  var processed = 0;
-  while(processed < count.follower_count){
-    max+=batch;
-    var followers = wait.for(
-      steem_api.steem_getFollowers,
-      conf.env.ACCOUNT_NAME(),
-      processed,
-      'blog',
-      batch
-    );
-    for(var current = 0; current < followers.length; current++){
-      var user = wait.for(
-        steem_api.steem_getAccounts_wrapper,[followers[current].follower]
-      );
-      var rep = utils.getReputation(user[0]);
-      obj = {
-        username:followers[current].follower,
-        tier:{level:0,vote:10,vote_count:2},
-        active:true,
-        reputation:rep,
+  if (date.getDay() === 0) {
+    console.log('Followers ' + count.follower_count);
+    // Verify followers
+    var batch = 100;
+    var processed = '';
+    var followers = [];
+    var i = 0;
+    while(i < count.follower_count){
+      try{
+        followers = wait.for(
+          steem_api.steem_getFollowers,
+          conf.env.ACCOUNT_NAME(),
+          processed,
+          'blog',
+          batch
+        );
+      }catch(e){
+        console.log(e);
       }
-      wait.for(
-        utils.upsertFollower,
-        {username:followers[current].follower},
-        obj
-      );
+      // console.log(followers.length);
+      for(var current = 0; current < followers.length; current++){
+        var user = {};
+        try{
+          user = wait.for(
+            steem_api.steem_getAccounts_wrapper,[followers[current].follower]
+          );
+        }catch(e){
+          console.log(e);
+        }
+        // console.log(followers[current])
+        var rep = utils.getReputation(user[0]);
+        obj = {
+          username:followers[current].follower,
+          tier:{level:0,vote:10,vote_count:2},
+          active:true,
+          created: date,
+          reputation:rep,
+        };
+        wait.for(
+          utils.upsertFollower,
+          {username:followers[current].follower},
+          obj
+        );
+        processed = followers[current].follower;
+        i++;
+      }
     }
-    processed+=batch;
-    // console.log('From ' + processed + ' to ' + max);
   }
   // verify if follower has active posts
 
@@ -69,7 +85,7 @@ wait.launchFiber(function() {
       for(var j=0; j< posts.length;j++){
         if(followers[lucky[i]].username == posts[j].author){
           // Valid posts
-          if(utils.dateDiff(posts[j].created) < (86400 * 6.5)){
+          if(utils.dateDiff(posts[j].created) < (86400 * 5)){
             console.log('Found something to vote to');
             // Not voted yet
             var result = wait.for(
