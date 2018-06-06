@@ -178,12 +178,20 @@ module.exports = {
                   comment += 'I will be able to help more #minnows \n';
                 }
                 // Decide how to handle this with a form and mongodb document
-                steem_api.commentPost(
+                var comment_result = steem_api.commentPost(
                   data[i].author,
                   data[i].url,
                   title,
                   comment
                 );
+                var link = {
+                  author:comment_result.operations[0][1].author,
+                  url:comment_result.operations[0][1].permlink,
+                  created: new Date(),
+                };
+                if (conf.env.SUPPORT_ACCOUNT() !== '') {
+                  wait.for(this.upsertLink,{},link);
+                }
                 wait.for(this.timeout_wrapper,17000);
               }else {
                 this.debug(
@@ -324,7 +332,6 @@ module.exports = {
               steem = parseFloat(steem[0]);
               if (conf.env.VOTE_ACTIVE()) {
                 steem_api.votePost(posts[i].author,posts[i].permlink,weight);
-                wait.for(this.timeout_wrapper,5100);
               }else {
                 this.debug(
                   'Voting is not active, voting: ' + posts[i].author +
@@ -358,19 +365,28 @@ module.exports = {
                 'Send SBD/STEEM to @tuanis in exchange of an upvote and ' +
                 'support this project, follow for random votes.';
 
-                steem_api.commentPost(
-                  posts[i].author,
-                  posts[i].permlink,
+                var comment_result = steem_api.commentPost(
+                  data[i].author,
+                  data[i].permlink,
                   title,
                   comment
                 );
-                wait.for(this.timeout_wrapper,22000);
+                var link = {
+                  author:comment_result.operations[0][1].author,
+                  url:comment_result.operations[0][1].permlink,
+                  created: new Date(),
+                };
+                if (conf.env.SUPPORT_ACCOUNT() !== '') {
+                  wait.for(this.upsertLink,{},link);
+                }
+                wait.for(this.timeout_wrapper,17000);
               }else {
                 this.debug(
                   'Commenting is not active, commenting: ' + posts[i].author +
                   'url: ' + posts[i].permlink
                 );
                 this.debug('Comment: ' + comment);
+                wait.for(this.timeout_wrapper,5100);
               }
               report.push(posts[i]);
             }else {
@@ -601,6 +617,15 @@ module.exports = {
       }
     );
   },
+  getLinks: function(callback) {
+    db.model('Link').find(
+      {}
+      ).exec(
+      function(err,data) {
+        callback(err,data);
+      }
+    );
+  },
   upsertTransfer: function(query,doc,callback) {
     db.model('Transfer').update(
       query,doc,{upsert: true,new: true},
@@ -615,6 +640,12 @@ module.exports = {
   },
   upsertStat: function(query,doc,callback) {
     db.model('Information').update(
+      query,doc,{upsert: true,new: true},
+      function(err,data) {callback(err,data);}
+    );
+  },
+  upsertLink: function(query,doc,callback) {
+    db.model('Link').update(
       query,doc,{upsert: true,new: true},
       function(err,data) {callback(err,data);}
     );
@@ -643,6 +674,19 @@ module.exports = {
   },
   getDonatorsTotal: function(callback) {
     db.model('Transfer').distinct('payer').exec(
+      function(err,data) {
+        callback(err,data);
+      }
+    );
+  },
+  cleanFollowers: function(callback) {
+    var date = new Date();
+    console.log(date);
+    date.setDate(date.getDate()-8);
+    console.log(date);
+    db.model('Link').remove(
+      {created:{$lt:date}}
+      ).exec(
       function(err,data) {
         callback(err,data);
       }
