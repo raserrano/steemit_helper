@@ -46,19 +46,21 @@ wait.launchFiber(function() {
           console.log(e);
         }
         // console.log(followers[current])
-        var rep = utils.getReputation(user[0]);
-        obj = {
-          username:followers[current].follower,
-          tier:{level:0,vote:10,vote_count:2},
-          active:true,
-          created: date,
-          reputation:rep,
-        };
-        wait.for(
-          utils.upsertFollower,
-          {username:followers[current].follower},
-          obj
-        );
+        if(user[0] !== undefined){
+          var rep = utils.getReputation(user[0]);
+          obj = {
+            username:followers[current].follower,
+            tier:{level:0,vote:10,vote_count:2},
+            active:true,
+            created: date,
+            reputation:rep,
+          };
+          wait.for(
+            utils.upsertFollower,
+            {username:followers[current].follower},
+            obj
+          );          
+        }
         processed = followers[current].follower;
         i++;
       }
@@ -99,15 +101,19 @@ wait.launchFiber(function() {
             );
             if(!voted){
               steem_api.votePost(posts[j].author, posts[j].permlink, weight);
-              var title = 'Thanks for your donation';
+              var title = 'Free upvote!';
               var comment = 'Congratulations @' + posts[j].author + '!';
                 comment += ' You have received a vote as ';
                 comment += 'a way to thank you for supporting my program.';
               // Decide how to handle this with a form and mongodb document
               var comment_result = steem_api.commentPost(posts[j].author, posts[j].permlink, title,comment);
-              utils.debug(JSON.stringify(comment_result));
+              var link = {
+                author:comment_result.operations[0][1].author,
+                url:comment_result.operations[0][1].permlink,
+                created: new Date(),
+              }
               if (conf.env.SUPPORT_ACCOUNT() !== '') {
-                wait.for(utils.upsertLink,query,res);
+                wait.for(utils.upsertLink,{},link);
               }
               wait.for(utils.timeout_wrapper,22000);
               votes++;
@@ -123,6 +129,6 @@ wait.launchFiber(function() {
       console.log('No posts for '+followers[i].username);
     }
   }
-  console.log('Finish report');
+  console.log('Finish voting followers program');
   process.exit();
 });

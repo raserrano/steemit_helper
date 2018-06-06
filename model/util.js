@@ -184,9 +184,13 @@ module.exports = {
                   title,
                   comment
                 );
-                this.debug(JSON.stringify(comment_result));
+                var link = {
+                  author:comment_result.operations[0][1].author,
+                  url:comment_result.operations[0][1].permlink,
+                  created: new Date(),
+                }
                 if (conf.env.SUPPORT_ACCOUNT() !== '') {
-                  wait.for(this.upsertLink,query,res);
+                  wait.for(this.upsertLink,{},link);
                 }
                 wait.for(this.timeout_wrapper,17000);
               }else {
@@ -598,6 +602,15 @@ module.exports = {
   },
   getFollowers: function(callback) {
     db.model('Follower').find(
+      {}
+      ).exec(
+      function(err,data) {
+        callback(err,data);
+      }
+    );
+  },
+  getLinks: function(callback) {
+    db.model('Link').find(
       {}
       ).exec(
       function(err,data) {
