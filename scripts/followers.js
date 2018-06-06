@@ -117,7 +117,7 @@ wait.launchFiber(function() {
                 author:comment_result.operations[0][1].author,
                 url:comment_result.operations[0][1].permlink,
                 created: new Date(),
-              }
+              };
               if (conf.env.SUPPORT_ACCOUNT() !== '') {
                 wait.for(utils.upsertLink,{
                   author:comment_result.operations[0][1].author,

@@ -4,8 +4,7 @@ const steem = require('steem'),
   conf = require('../config/dev');
 
 var ci = new Object()
-
-steem.api.setOptions({ url: conf.env.NODE() })
+steem.api.setOptions({ url: conf.env.NODE() });
 module.exports = {
   getTransfers: function(name, max, limit, callback) {
     steem.api.getAccountHistory(name,max,limit,function(err, result) {
