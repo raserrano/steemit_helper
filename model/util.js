@@ -190,7 +190,10 @@ module.exports = {
                   created: new Date(),
                 };
                 if (conf.env.SUPPORT_ACCOUNT() !== '') {
-                  wait.for(this.upsertLink,{},link);
+                  wait.for(utils.upsertLink,{
+                    author:comment_result.operations[0][1].author,
+                    url:comment_result.operations[0][1].permlink,
+                  },link);
                 }
                 wait.for(this.timeout_wrapper,17000);
               }else {
@@ -366,8 +369,8 @@ module.exports = {
                 'support this project, follow for random votes.';
 
                 var comment_result = steem_api.commentPost(
-                  data[i].author,
-                  data[i].permlink,
+                  posts[i].author,
+                  posts[i].permlink,
                   title,
                   comment
                 );
@@ -377,7 +380,10 @@ module.exports = {
                   created: new Date(),
                 };
                 if (conf.env.SUPPORT_ACCOUNT() !== '') {
-                  wait.for(this.upsertLink,{},link);
+                  wait.for(utils.upsertLink,{
+                    author:comment_result.operations[0][1].author,
+                    url:comment_result.operations[0][1].permlink,
+                  },link);
                 }
                 wait.for(this.timeout_wrapper,17000);
               }else {
