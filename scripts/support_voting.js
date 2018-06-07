@@ -14,7 +14,7 @@ wait.launchFiber(function() {
       steem_api.steem_getAccounts_wrapper,[conf.env.SUPPORT_ACCOUNT()]
   	);
   	var vp = utils.getVotingPower(voter[0]);
-  	if (vp >= 7000) {
+  	if (vp >= 9800) {
 	  	if(utils.dateDiff(links[i].created)>1800){
 	  		steem_api.voteSupport(links[i].author, links[i].url, weight);
         wait.for(utils.deleteLink,{_id:links[i]._id});
