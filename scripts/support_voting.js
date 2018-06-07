@@ -14,14 +14,17 @@ wait.launchFiber(function() {
       steem_api.steem_getAccounts_wrapper,[conf.env.SUPPORT_ACCOUNT()]
   	);
   	var vp = utils.getVotingPower(voter[0]);
-  	if (vp >= 7500) {
-	  	if(utils.dateDiff(links[i].created)<1200){
-	  		steem_api.voteSupport(links[i].author, links[i].permlink, weight);
+  	if (vp >= 7000) {
+	  	if(utils.dateDiff(links[i].created)>1800){
+	  		steem_api.voteSupport(links[i].author, links[i].url, weight);
+        wait.for(utils.deleteLink,{_id:links[i]._id});
+        wait.for(utils.timeout_wrapper,5100);
 	  	}
   	}else{
+      console.log('VP too low to vote: '+vp);
       break;
     }
   }
-  console.log('Finish voting donations');
+  console.log('Finish voting links');
   process.exit();
 });
