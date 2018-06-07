@@ -692,6 +692,14 @@ module.exports = {
       }
     );
   },
+  deleteLink: function(query,callback) {
+    console.log('Deleting link');
+    db.model('Link').remove(query).exec(
+      function(err,data) {
+        callback(err,data);
+      }
+    );
+  },
   getReport: function(options,callback) {
 
     var stages = new Array();
