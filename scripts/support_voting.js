@@ -15,10 +15,15 @@ wait.launchFiber(function() {
   	);
   	var vp = utils.getVotingPower(voter[0]);
   	if (vp >= 9800) {
-	  	if(utils.dateDiff(links[i].created)>1800){
-	  		steem_api.voteSupport(links[i].author, links[i].url, weight);
-        wait.for(utils.deleteLink,{_id:links[i]._id});
-        wait.for(utils.timeout_wrapper,5100);
+      var diff = utils.dateDiff(links[i].created);
+      if(diff>1800){
+        if (diff < (86400 * 6)) {
+	  		 steem_api.voteSupport(links[i].author, links[i].url, weight);
+          wait.for(utils.deleteLink,{_id:links[i]._id});
+          wait.for(utils.timeout_wrapper,5100);
+        }else{
+          wait.for(utils.deleteLink,{_id:links[i]._id});
+        }
 	  	}
   	}else{
       console.log('VP too low to vote: '+vp);
