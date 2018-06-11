@@ -238,6 +238,7 @@ module.exports = {
   startRefundingProcess: function(account,data,voter) {
     var memo = '';
     var send = '';
+    var refunded_urls = [];
     for (var i = 0; i < data.length;i++) {
       var result = wait.for(
         steem_api.steem_getContent,
@@ -270,41 +271,56 @@ module.exports = {
             data[i].status === 'comment' ||
             data[i].status === 'self-vote';
         }
-        if (conditions) {
-          // Comment in post or comment that amount was refunded *-*
-          var title = 'Thanks for your donation';
-          var comment = '![treeplanternoplant_new.png]';
-          comment += '(https://steemitimages.com/DQmaCMGBXirzeFWCWD8gVadsJE1';
-          comment += 'PY1pvXTECAyjGAtF5KNg/treeplanternoplant_new.png)';
-          steem_api.commentPost(data[i].author, data[i].url, title,comment);
-          wait.for(this.timeout_wrapper,22000);
-          send = data[i].amount.toFixed(3) + ' ' + data[i].currency;
-          this.debug(send,account,data[i].payer,memo);
-          wait.for(
-            steem_api.doTransfer,
-            account,
-            data[i].payer,
-            send,
-            memo
-          );
-          wait.for(this.upsertTransfer,{_id: data[i]._id},{status: 'refunded'});
-        }else {
-          if (data[i].status === 'min amount') {
-            // Verify if it was a valid post and comment post/comment with *-*
+        if(refunded_urls.includes(data[i].memo)){
+          data[i].status = 'refunded';
+        }else{
+          if (conditions) {
+            // Comment in post or comment that amount was refunded *-*
             var title = 'Thanks for your donation';
-            var comment = '![treeplantermessage_new.png]';
-            comment += '(https://steemitimages.';
-            comment += 'com/DQmZsdAUXGYBH38xY4smeMtHHEiEHxaEaQmGo2pJhMNdQfX/';
-            comment += 'treeplantermessage_new.png)';
+            var comment = '![treeplanternoplant_new.png]';
+            comment += '(https://steemitimages.com/DQmaCMGBXirzeFWCWD8gVadsJE1';
+            comment += 'PY1pvXTECAyjGAtF5KNg/treeplanternoplant_new.png)';
             steem_api.commentPost(data[i].author, data[i].url, title,comment);
             wait.for(this.timeout_wrapper,22000);
+            send = data[i].amount.toFixed(3) + ' ' + data[i].currency;
+            this.debug(send,account,data[i].payer,memo);
+            wait.for(
+              steem_api.doTransfer,
+              account,
+              data[i].payer,
+              send,
+              memo
+            );
             wait.for(
               this.upsertTransfer,
               {_id: data[i]._id},
               {status: 'refunded'}
             );
-          }
+            refunded_urls.push(data[i].memo);
+          }else {
+            if (data[i].status === 'min amount') {
+              // Verify if it was a valid post and comment post/comment with
+              var title = 'Thanks for your donation';
+              var comment = '![treeplantermessage_new.png]';
+              comment += '(https://steemitimages.';
+              comment += 'com/DQmZsdAUXGYBH38xY4smeMtHHEiEHxaEaQmGo2pJhMNdQfX/';
+              comment += 'treeplantermessage_new.png)';
+              steem_api.commentPost(data[i].author, data[i].url, title,comment);
+              wait.for(this.timeout_wrapper,22000);
+              wait.for(
+                this.upsertTransfer,
+                {_id: data[i]._id},
+                {status: 'refunded'}
+              );
+              refunded_urls.push(data[i].memo);
+            }
+          }          
         }
+        wait.for(
+          this.upsertTransfer,
+          {memo: data[i].memo},
+          {status: 'refunded'}
+        );
       }
     }
   },
