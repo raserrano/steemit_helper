@@ -592,6 +592,7 @@ module.exports = {
       {
         voted: false,
         processed: true,
+        author: {$ne: null},
         status: {
           $in: [
           'due date',
