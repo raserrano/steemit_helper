@@ -759,6 +759,7 @@ module.exports = {
         currency: '$currency',
         voted: '$voted',
         processed: '$processed',
+        processed_date: '$processed_date',
         voted_date: '$voted_date',
         status: '$status',
         created: '$created',
