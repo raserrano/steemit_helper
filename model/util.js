@@ -406,7 +406,7 @@ module.exports = {
                   created: new Date(),
                 };
                 if (conf.env.SUPPORT_ACCOUNT() !== '') {
-                  wait.for(utils.upsertLink,{
+                  wait.for(this.upsertLink,{
                     author:comment_result.operations[0][1].author,
                     url:comment_result.operations[0][1].permlink,
                   },link);
@@ -950,6 +950,32 @@ module.exports = {
       tags
     );
   },
+  generateStatusReport: function(status,queue){
+    var when = this.getDate(new Date());
+    var permlink = 'treeplanter-status-' + when;
+
+    var tags = {tags: ['treeplanter','status','report','bot']};
+    // Read file and add it to body
+    //var contents_2 = fs.readFileSync('./reports/treeplanterv2.md', 'utf8');
+    
+    //body += '\n' + contents_2;
+
+    var title = '@treeplanter status for ' + when;
+    var body = " The waiting time for the last 10 donations was"
+    var response_time = 0;
+    for(var i=0;i<status.length;i++){
+      response_time+=this.dateDiff(status[i].processed_date,status[i].voted_date);
+    }
+    var avg_response = parseFloat(response_time)/10;
+
+    // this.preparePost(
+    //   conf.env.ACCOUNT_NAME(),
+    //   permlink,
+    //   title,
+    //   body,
+    //   tags
+    // );
+  },
   generateGrowthReport: function(account) {
     var when = this.getDate(account.created);
     var permlink = account.username + '-growth-' + when;
@@ -1045,9 +1071,8 @@ module.exports = {
     rep += 25;
     return rep.toFixed(3);
   },
-  dateDiff: function(when) {
+  dateDiff: function(when, now=new Date()) {
     var then = new Date(when);
-    var now = new Date();
     return (now - then) / 1000;
   },
   getDate: function(when) {
