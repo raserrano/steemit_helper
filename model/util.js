@@ -959,26 +959,53 @@ module.exports = {
     var permlink = 'treeplanter-status-' + when;
 
     var tags = {tags: ['treeplanter','status','report','bot']};
-    // Read file and add it to body
-    //var contents_2 = fs.readFileSync('./reports/treeplanterv2.md', 'utf8');
-    
-    //body += '\n' + contents_2;
 
-    var title = '@treeplanter status for ' + when;
-    var body = " The waiting time for the last 10 donations was"
+    var title = '@treeplanter status report ' + when;
     var response_time = 0;
     for(var i=0;i<status.length;i++){
       response_time+=this.dateDiff(status[i].processed_date,status[i].voted_date);
     }
-    var avg_response = parseFloat(response_time)/10;
+    var avg_response = parseFloat(response_time)/50;
     console.log(avg_response);
-    // this.preparePost(
-    //   conf.env.ACCOUNT_NAME(),
-    //   permlink,
-    //   title,
-    //   body,
-    //   tags
-    // );
+    var duration = 'The average duration for the last donations was ';
+    var days = parseInt(avg_response/(60*60*24));
+    var hours = parseInt(avg_response/(60*60));
+    var minutes = parseInt(avg_response/(60));
+    if(days>1){
+      duration+= days + ' day(s) ';
+      hours-=days*24;
+      if(hours>1){
+        duration+='and ' + hours +' hour(s) ';
+        minutes-=hours*60;
+      }else{
+        duration+='and ' + minutes + ' minute(s).';
+      }
+    }else{
+      if(hours>1){
+        duration+='and #{hours} hour(s) ';
+        minutes-=hours*60;
+      }else{
+        duration+='and #{minutes} minute(s).';
+      }
+    }
+    // Read file and add it to body
+    var contents_1 = fs.readFileSync('./reports/status.md', 'utf8');
+    var body = sprintf(
+      contents_1,
+      conf.env.MAX_DONATION(),
+      conf.env.MIN_DONATION(),
+      conf.env.VOTE_MULTIPLIER(),
+      duration,
+      queue.length
+    );
+    
+    this.preparePost(
+      conf.env.ACCOUNT_NAME(),
+      permlink,
+      title,
+      body,
+      tags
+    );
   },
   generateGrowthReport: function(account) {
     var when = this.getDate(account.created);

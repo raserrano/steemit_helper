@@ -20,7 +20,7 @@ wait.launchFiber(function() {
   // Status
   var options_status = {
     voted: true,
-    limit: 10
+    limit: 50
   };
   var report_status = wait.for(utils.getReport,options_status);
 
@@ -28,7 +28,7 @@ wait.launchFiber(function() {
   var options_queue = {
     voted: false,
   };
-  var report_queue = wait.for(utils.getReport,options_status);
+  var report_queue = wait.for(utils.getReport,options_queue);
 
   console.log(JSON.stringify(report_status));
   console.log(JSON.stringify(report_queue));
