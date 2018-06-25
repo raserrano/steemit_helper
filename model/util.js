@@ -255,6 +255,11 @@ module.exports = {
           {_id: data[i]._id},
           {voted: true}
         );
+        wait.for(
+          this.upsertTransfer,
+          {url: data[i].url},
+          {voted: true}
+        );
       }else {
         memo = 'I am sorry my SP was not enough to upvote the post you sent ';
         memo += 'me in memo. Send me different (not so old) post. Thank you.';
@@ -319,6 +324,11 @@ module.exports = {
         wait.for(
           this.upsertTransfer,
           {memo: data[i].memo},
+          {status: 'refunded'}
+        );
+        wait.for(
+          this.upsertTransfer,
+          {url: data[i].url},
           {status: 'refunded'}
         );
       }
@@ -592,6 +602,7 @@ module.exports = {
       {
         voted: false,
         processed: true,
+        author: {$ne: null},
         status: {
           $in: [
           'due date',
@@ -748,6 +759,7 @@ module.exports = {
         currency: '$currency',
         voted: '$voted',
         processed: '$processed',
+        processed_date: '$processed_date',
         voted_date: '$voted_date',
         status: '$status',
         created: '$created',

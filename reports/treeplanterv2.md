@@ -18,6 +18,8 @@
 <li>I am going to keep my SP always high - meaning I will only vote every day to keep 80% of voting power. The amount of daily available votes depends on my current SP, see above.</li>
 <li>If my SP is exhausted you will be queued – your link will get my upvote immediately I am strong again. If the link will get expired before I will be able to upvote it you get refunded.</li>
 </ol>
+If you have any trouble or you are concern about a donation contact @treeassistant for help.
+
 
 <h3>More opportunities how to help</h3>
 
