@@ -1,12 +1,12 @@
 <h2>Manual how to plan trees with @treeplanter</h2>
 <ol>
-<li>You, good lady or man, transfer between 0.01 and 0.25 STEEM/SBD to my wallet, with the link in memo of the post or comment you want to have upvoted by me.</li>
-<li>I will upvote the post and attempt to add 100% value per vote per STEEM/SBD you send, so 0.01 STEEM/SBD donation = approx 0.02 STEEM/SBD worth of vote, up to 0.25 STEEM/SBD = 0.5 STEEM/SBD worth of vote.</li>
+<li>You, good lady or man, transfer between 0.01 and 0.1 STEEM/SBD to my wallet, with the link in memo of the post or comment you want to have upvoted by me.</li>
+<li>I will upvote the post and attempt to add 100% value per vote per STEEM/SBD you send, so 0.01 STEEM/SBD donation = approx 0.02 STEEM/SBD worth of vote, up to 0.1 STEEM/SBD = 0.2 STEEM/SBD worth of vote.</li>
 </ol>
 <h4>I will share your donations</h4>
 <ol>
 <li>50% of it is going directly to Cameroon to fund our conservation program to save Abongphen Highland Forest</li>
-<li>50% will help me to grow and get more STEEM POWER to share more happiness and money on Steemit to you Steemians. e.g. If you send me 0.25 STEEM/SBD I will divide it and use half (0.5) for tree planting and the second half to power me up.</li>
+<li>50% will help me to grow and get more STEEM POWER to share more happiness and money on Steemit to you Steemians. e.g. If you send me 0.1 STEEM/SBD I will divide it and use half (0.5) for tree planting and the second half to power me up.</li>
 </ol>
 <center><h3>EACH DOLLAR (sent to Cameroon)<br/>=<br/>1 TREE PLANTED</h3></center>
 <h4>***PLANT A TREE AND GET PAID FOR IT. <br />IT WOULD BE NICE IF SEND IT AS FREE UP VOTE GIFT TO SOMEBODY!***</h4>
@@ -14,7 +14,7 @@
 <ol>
 <li>Each post/comment could be upvoted by me only once – if you send the same post/comment again, your contribution is going to be considered as donation without upvoting</li>
 <li>If you transfer less than 0.01 STEEM/SBD, I will just thank you for your donation – no upvoting</li>
-<li>If you transfer more than 0.25 STEEM/SBD, I will upvote the post as the donation is 0.25 STEEM/SBD, the rest is just a donation – thank you for it.</li>
+<li>If you transfer more than 0.1 STEEM/SBD, I will upvote the post as the donation is 0.1 STEEM/SBD, the rest is just a donation – thank you for it.</li>
 <li>I am going to keep my SP always high - meaning I will only vote every day to keep 80% of voting power. The amount of daily available votes depends on my current SP, see above.</li>
 <li>If my SP is exhausted you will be queued – your link will get my upvote immediately I am strong again. If the link will get expired before I will be able to upvote it you get refunded.</li>
 </ol>
