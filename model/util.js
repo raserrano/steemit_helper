@@ -120,8 +120,12 @@ module.exports = {
         var vp = this.getVotingPower(voter[0]);
         var weight = steem_api.calculateVoteWeight(
           voter[0],
+          vp,
           (amount_to_be_voted * conf.env.VOTE_MULTIPLIER())
         );
+        console.log('Voting power: '+vp);
+        console.log('To vote: '+amount_to_be_voted);
+        console.log('Weight: '+weight);
         if (conf.env.VOTE_ACTIVE()) {
           this.debug('VP is :' + vp);
           if (vp >= (
@@ -967,7 +971,7 @@ module.exports = {
       response_time+=this.dateDiff(status[i].processed_date,status[i].voted_date);
     }
     var avg_response = parseFloat(response_time)/10;
-
+    console.log(avg_response);
     // this.preparePost(
     //   conf.env.ACCOUNT_NAME(),
     //   permlink,
