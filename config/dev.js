@@ -159,7 +159,7 @@ module.exports = {
       return value;
     },
     VOTE_MULTIPLIER: function() {
-      var value = 1.5;
+      var value = 2;
       if ((process.env.VOTE_MULTIPLIER !== undefined) &&
         (process.env.VOTE_MULTIPLIER !== null)) {
         value = parseFloat(process.env.VOTE_MULTIPLIER);
@@ -216,9 +216,9 @@ module.exports = {
     },
     PAY_DEVELOPER: function() {
       var value = 10;
-      if ((process.env.POWERUP_POST !== undefined) &&
-        (process.env.POWERUP_POST !== null)) {
-        value = parseFloat(process.env.POWERUP_POST);
+      if ((process.env.PAY_DEVELOPER !== undefined) &&
+        (process.env.PAY_DEVELOPER !== null)) {
+        value = parseFloat(process.env.PAY_DEVELOPER);
       }
       return value;
     },
