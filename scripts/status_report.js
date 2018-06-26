@@ -30,11 +30,9 @@ wait.launchFiber(function() {
   };
   var report_queue = wait.for(utils.getReport,options_queue);
 
-  console.log(JSON.stringify(report_status));
-  console.log(JSON.stringify(report_queue));
   utils.generateStatusReport(
     report_status,
-    options_queue
+    report_queue
   );
 
   console.log('Finish status report');
