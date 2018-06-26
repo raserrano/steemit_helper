@@ -123,9 +123,6 @@ module.exports = {
           vp,
           (amount_to_be_voted * conf.env.VOTE_MULTIPLIER())
         );
-        console.log('Voting power: '+vp);
-        console.log('To vote: '+amount_to_be_voted);
-        console.log('Weight: '+weight);
         if (conf.env.VOTE_ACTIVE()) {
           this.debug('VP is :' + vp);
           if (vp >= (
@@ -335,6 +332,33 @@ module.exports = {
           {url: data[i].url},
           {status: 'refunded'}
         );
+      }
+    }
+  },
+  startRefundingProcessSpecial: function(account,data,voter) {
+    var memo = '';
+    var send = '';
+    var refunded_urls = [];
+    memo = 'Refunding because vote was not performed correctly. Sorry for the inconvenience ';
+    for (var i = 0; i < data.length;i++) {
+      if(refunded_urls.includes(data[i].memo)){
+        data[i].status = 'refunded';
+      }else{
+        send = data[i].amount.toFixed(3) + ' ' + data[i].currency;
+        this.debug(send,account,data[i].payer,memo);
+        wait.for(
+          steem_api.doTransfer,
+          account,
+          data[i].payer,
+          send,
+          memo
+        );
+        wait.for(
+          this.upsertTransfer,
+          {_id: data[i]._id},
+          {status: 'refunded'}
+        );
+        refunded_urls.push(data[i].memo);
       }
     }
   },
@@ -605,6 +629,27 @@ module.exports = {
     db.model('Transfer').find(
       {
         voted: false,
+        processed: true,
+        author: {$ne: null},
+        status: {
+          $in: [
+          'due date',
+          'url not valid',
+          'content-not-found',
+          'url-not-found',
+          ],},
+        number: {$gt: last_refunded},
+      }
+    ).sort({number: 1}).exec(
+      function(err,data) {
+        callback(err,data);
+      }
+    );
+  },
+  getRefundsSpecial: function(last_refunded,callback) {
+    db.model('Transfer').find(
+      {
+        voted: true,
         processed: true,
         author: {$ne: null},
         status: {
