@@ -18,12 +18,12 @@ wait.launchFiber(function() {
     process.exit();
   }
   // Get not voted posts from DB
-  var last_refunded = wait.for(utils.getLastRefunded);
-  if (last_refunded.length === 0) {
-    last_refunded = conf.env.LAST_REFUNDED();
-  }else {
-    last_refunded = last_refunded[0].number;
-  }
+  var last_refunded = conf.env.LAST_REFUNDED();//wait.for(utils.getLastRefunded);
+  // if (last_refunded.length === 0) {
+  //   last_refunded = conf.env.LAST_REFUNDED();
+  // }else {
+  //   last_refunded = last_refunded[0].number;
+  // }
   console.log('Last refunded: ' + last_refunded);
   if (conf.env.REFUNDS_ACTIVE()) {
     var refunds = wait.for(utils.getRefunds,last_refunded);
