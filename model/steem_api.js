@@ -257,20 +257,13 @@ module.exports = {
     );
     var ci = this.init_conversion(globalData);
     var steempower = this.getSteemPower(account);
-    console.log(steempower);
     var sp_scaled_vests = steempower / ci.steem_per_vest;
-
-    var up = target_value * 52;
-    var down = sp_scaled_vests * 100 * ci.reward_pool * ci.sbd_per_steem;
-    var oneval = up / down;
-
-    var votingpower = (oneval / (100 * (100 * vp) / conf.env.VOTE_POWER_1_PC())) * 100;
-
-    console.log('Vote weight is: ' + votingpower);
-    if (votingpower > 100) {
-      votingpower = 100;
+    var f = target_value/(sp_scaled_vests*100*ci.reward_pool*ci.sbd_per_steem);
+    var votingpower = parseInt((((f*50)-49) / vp)*10000);
+    if (votingpower > 10000) {
+      votingpower = 10000;
     }
-    return parseInt(votingpower * conf.env.VOTE_POWER_1_PC());
+    return votingpower;
   },
   init_conversion: function(globalData, callback) {
     var ci = new Object();
