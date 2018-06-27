@@ -251,26 +251,19 @@ module.exports = {
     console.log('Total vests: ' + totalVests);
     return this.getSteemPowerFromVest(globalData,totalVests);
   },
-  calculateVoteWeight: function(account, target_value) {
+  calculateVoteWeight: function(account, vp, target_value) {
     var globalData = wait.for(
       this.steem_getSteemGlobaleProperties_wrapper
     );
     var ci = this.init_conversion(globalData);
     var steempower = this.getSteemPower(account);
     var sp_scaled_vests = steempower / ci.steem_per_vest;
-
-    var voteweight = 100;
-    var up = target_value * 52;
-    var down = sp_scaled_vests * 100 * ci.reward_pool * ci.sbd_per_steem;
-    var oneval = up / down;
-
-    var votingpower = (oneval / (100 * (100 * voteweight)
-      / conf.env.VOTE_POWER_1_PC())) * 100;
-    console.log('Vote weight is: ' + votingpower);
-    if (votingpower > 100) {
-      votingpower = 100;
+    var f = target_value/(sp_scaled_vests*100*ci.reward_pool*ci.sbd_per_steem);
+    var votingpower = parseInt((((f*50)-49) / vp)*10000);
+    if (votingpower > 10000) {
+      votingpower = 10000;
     }
-    return parseInt(votingpower * conf.env.VOTE_POWER_1_PC());
+    return votingpower;
   },
   init_conversion: function(globalData, callback) {
     var ci = new Object();

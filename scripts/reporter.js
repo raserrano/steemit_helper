@@ -3,7 +3,7 @@ const
   utils = require('../model/util'),
   steem_api = require('../model/steem_api'),
   conf = require('../config/dev');
-// Generates a report for the not voted posts of account
+// Generates a report for the voted posts of account
 wait.launchFiber(function() {
   var voter = "";
   var followers = "";
