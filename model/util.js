@@ -3,7 +3,7 @@ const
   conf = require('../config/dev'),
   db = require('./db'),
   fs = require('fs'),
-  sprintf = require('sprintf').sprintf,
+  sprintf = require('sprintf-js').sprintf,
   steem_api = require('./steem_api');
 
 module.exports = {
@@ -985,7 +985,13 @@ module.exports = {
 
     // Read file and add it to body
     var contents_2 = fs.readFileSync('./reports/treeplanterv2.md', 'utf8');
-    body += '\n' + contents_2;
+    var data = {
+      minimum: conf.env.MIN_DONATION(),
+      maximum: conf.env.MAX_DONATION(),
+      min_voted: (conf.env.MIN_DONATION()*conf.env.VOTE_MULTIPLIER()),
+      max_voted: (conf.env.MAX_DONATION()*conf.env.VOTE_MULTIPLIER()),
+    };
+    body += sprintf(contents_2 , data);
 
     var title = '@treeplanter funds raising & voting bot got ';
     title += daily_donation.toFixed(2) + ' SBD today ' + when;
@@ -1011,7 +1017,6 @@ module.exports = {
       response_time+=this.dateDiff(status[i].processed_date,status[i].voted_date);
     }
     var avg_response = parseFloat(response_time)/50;
-    console.log(avg_response);
     var duration = 'The average duration for the last donations was ';
     var days = parseInt(avg_response/(60*60*24));
     var hours = parseInt(avg_response/(60*60));
@@ -1023,14 +1028,19 @@ module.exports = {
         duration+='and ' + hours +' hour(s) ';
         minutes-=hours*60;
       }else{
+
         duration+='and ' + minutes + ' minute(s).';
       }
     }else{
       if(hours>1){
-        duration+='and #{hours} hour(s) ';
+        duration+='and ' + hours +' hour(s) ';
         minutes-=hours*60;
       }else{
-        duration+='and #{minutes} minute(s).';
+        if(hours === 0){
+          duration+=minutes + ' minute(s).';          
+        }else{
+          duration+='and ' + minutes + ' minute(s).';          
+        }
       }
     }
     // Read file and add it to body
@@ -1043,7 +1053,17 @@ module.exports = {
       duration,
       queue.length
     );
-    
+
+    // Read file and add it to body
+    var contents_2 = fs.readFileSync('./reports/treeplanterv2.md', 'utf8');
+    var data = {
+      minimum: conf.env.MIN_DONATION(),
+      maximum: conf.env.MAX_DONATION(),
+      min_voted: (conf.env.MIN_DONATION()*conf.env.VOTE_MULTIPLIER()),
+      max_voted: (conf.env.MAX_DONATION()*conf.env.VOTE_MULTIPLIER()),
+    };
+    body += sprintf(contents_2 , data);
+
     this.preparePost(
       conf.env.ACCOUNT_NAME(),
       permlink,

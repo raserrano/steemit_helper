@@ -1,21 +1,21 @@
 <h2>Manual how to plan trees with @treeplanter</h2>
 <ol>
-<li>You, good lady or man, transfer between 0.01 and 0.25 STEEM/SBD to my wallet, with the link in memo of the post or comment you want to have upvoted by me.</li>
-<li>I will upvote the post and attempt to add 100% value per vote per STEEM/SBD you send, so 0.01 STEEM/SBD donation = approx 0.016 STEEM/SBD worth of vote, up to 0.25 STEEM/SBD = 0.4 STEEM/SBD worth of vote.</li>
+<li>You, good lady or man, transfer between %(minimum)s and %(maximum)s STEEM/SBD to my wallet, with the link in memo of the post or comment you want to have upvoted by me.</li>
+<li>I will upvote the post and attempt to add 100&#37; value per vote per STEEM/SBD you send, so %(minimum)s STEEM/SBD donation = approx %(min_voted)s STEEM/SBD worth of vote, up to %(maximum)s STEEM/SBD = %(max_voted)s STEEM/SBD worth of vote.</li>
 </ol>
 <h4>I will share your donations</h4>
 <ol>
-<li>50% of it is going directly to Cameroon to fund our conservation program to save Abongphen Highland Forest</li>
-<li>50% will help me to grow and get more STEEM POWER to share more happiness and money on Steemit to you Steemians. e.g. If you send me 0.1 STEEM/SBD I will divide it and use half (0.5) for tree planting and the second half to power me up.</li>
+<li>50&#37; of it is going directly to Cameroon to fund our conservation program to save Abongphen Highland Forest</li>
+<li>50&#37; will help me to grow and get more STEEM POWER to share more happiness and money on Steemit to you Steemians. e.g. If you send me 0.1 STEEM/SBD I will divide it and use half (0.5) for tree planting and the second half to power me up.</li>
 </ol>
 <center><h3>EACH DOLLAR (sent to Cameroon)<br/>=<br/>1 TREE PLANTED</h3></center>
 <h4>***PLANT A TREE AND GET PAID FOR IT. <br />IT WOULD BE NICE IF SEND IT AS FREE UP VOTE GIFT TO SOMEBODY!***</h4>
 <h3>My rules</h3>
 <ol>
 <li>Each post/comment could be upvoted by me only once – if you send the same post/comment again, your contribution is going to be considered as donation without upvoting</li>
-<li>If you transfer less than 0.01 STEEM/SBD, I will just thank you for your donation – no upvoting</li>
-<li>If you transfer more than 0.25 STEEM/SBD, I will upvote the post as the donation is 0.25 STEEM/SBD, the rest is just a donation – thank you for it.</li>
-<li>I am going to keep my SP always high - meaning I will only vote every day to keep 80% of voting power. The amount of daily available votes depends on my current SP, see above.</li>
+<li>If you transfer less than %(minimum)s STEEM/SBD, I will just thank you for your donation – no upvoting</li>
+<li>If you transfer more than %(maximum)s STEEM/SBD, I will upvote the post as the donation is %(maximum)s STEEM/SBD, the rest is just a donation – thank you for it.</li>
+<li>I am going to keep my SP always high - meaning I will only vote every day to keep 80&#37; of voting power. The amount of daily available votes depends on my current SP, see above.</li>
 <li>If my SP is exhausted you will be queued – your link will get my upvote immediately I am strong again. If the link will get expired before I will be able to upvote it you get refunded.</li>
 </ol>
 If you have any trouble or you are concern about a donation contact @treeassistant for help.
@@ -47,7 +47,7 @@ STEEM wallet: www.steemit.com/@treeplanter </center>
 <center> **Plant trees with our voting bot @treeplanter!**</center> 
 <center> ![KK-icon-plant-tree-Green-outline.png](https://steemitimages.com/DQmcNsUbep88DodSR2hr6NT4speakfuxGE84NfzNSRHpW2p/KK-icon-plant-tree-Green-outline.png) </center>
 <h3>Check or website: [www.kedjom-keku.com](http://kedjom-keku.com/en/) to get more information about our conservation program in Cameroon. </h3>
-<center>![20048_285846264217_3092790_n (5).jpg](https://steemitimages.com/DQmZrR8t6tDJL7bJntJ3eQZpU8Gqxnm3jmm9QhxtaoVQWnr/20048_285846264217_3092790_n%20(5).jpg)</center>
+<center>![kedjom-keku.jpg](https://cdn.steemitimages.com/DQmPn6FQagmENdbFiHUTLpYfaBDehgA9b9zVHKvPzJkfGTo/kedjom-keku.jpg)</center>
 <h3>STEEM helps us to save Abongphen Highland Forest</h3>
 We have already cashed out 1,815$ which allowed us to pay 5 of our local employees in Cameroon for two months (NOV-DEC 2017) who takes care about our tree nursery, bee hives, farm, livestock and organizes workshops for indigienous people.  We still have 0,3 BTC pending in our wallet which was changed from STEEM. Our wish is to make agreement with our workers to pay them in cryptos as STEEM, BTC or SolarCoin.  
 
