@@ -5,13 +5,13 @@ const
   conf = require('../config/dev');
 // Daily stats
 wait.launchFiber(function() {
-  var voter = "";
-  var globalData = "";
-  try{
+  var voter = '';
+  var globalData = '';
+  try {
     voter = wait.for(
       steem_api.steem_getAccounts_wrapper,[conf.env.ACCOUNT_NAME()]
     );
-  }catch(e){
+  }catch (e) {
     console.log(e);
     process.exit();
   }
@@ -20,7 +20,7 @@ wait.launchFiber(function() {
   // Status
   var options_status = {
     voted: true,
-    limit: 50
+    limit: 50,
   };
   var report_status = wait.for(utils.getReport,options_status);
 

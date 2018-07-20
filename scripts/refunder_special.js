@@ -8,17 +8,17 @@ const
 wait.launchFiber(function() {
   var RECORDS_FETCH_LIMIT = 1000;
 
-  var accounts = "";
-  try{
+  var accounts = '';
+  try {
     accounts = wait.for(
       steem_api.steem_getAccounts_wrapper,[conf.env.ACCOUNT_NAME()]
     );
-  }catch(e){
+  }catch (e) {
     console.log(e);
     process.exit();
   }
   // Get not voted posts from DB
-  var last_refunded = conf.env.LAST_REFUNDED();//wait.for(utils.getLastRefunded);
+  var last_refunded = conf.env.LAST_REFUNDED();//Wait.for(utils.getLastRefunded);
 
   console.log('Last refunded: ' + last_refunded);
   if (conf.env.REFUNDS_ACTIVE()) {

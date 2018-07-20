@@ -6,12 +6,12 @@ const
 
 // Voting for high bids
 wait.launchFiber(function() {
-  var voter = "";
-  try{
+  var voter = '';
+  try {
     voter = wait.for(
       steem_api.steem_getAccounts_wrapper,[conf.env.ACCOUNT_NAME()]
     );
-  }catch(e){
+  }catch (e) {
     console.log(e);
     process.exit();
   }

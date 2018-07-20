@@ -9,10 +9,10 @@ wait.launchFiber(function() {
   // capture SP, reputation, followers count
   // Calculate vote value
   var account = {};
-  var voter = "";
-  var followers = "";
-  var globalData = "";
-  try{
+  var voter = '';
+  var followers = '';
+  var globalData = '';
+  try {
     voter = wait.for(
       steem_api.steem_getAccounts_wrapper,[conf.env.ACCOUNT_NAME()]
     );
@@ -23,7 +23,7 @@ wait.launchFiber(function() {
     globalData = wait.for(
       steem_api.steem_getSteemGlobaleProperties_wrapper
     );
-  }catch(e){
+  }catch (e) {
     console.log(e);
     process.exit();
   }
