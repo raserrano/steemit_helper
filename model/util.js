@@ -1021,18 +1021,17 @@ module.exports = {
     var days = parseInt(avg_response / (60 * 60 * 24));
     var hours = parseInt(avg_response / (60 * 60));
     var minutes = parseInt(avg_response / (60));
-    if (days > 1) {
+    if (days > 0) {
       duration += days + ' day(s) ';
       hours -= days * 24;
-      if (hours > 1) {
+      if (hours > 0) {
         duration += 'and ' + hours + ' hour(s) ';
         minutes -= hours * 60;
       }else {
-
         duration += 'and ' + minutes + ' minute(s).';
       }
     }else {
-      if (hours > 1) {
+      if (hours > 0) {
         if (days === 0) {
           duration += hours + ' hour(s) ';
           minutes -= hours * 60;
@@ -1114,33 +1113,23 @@ module.exports = {
   },
   preparePost: function(author, permlink, title, body, tags) {
     if (conf.env.REPORT_ACTIVE()) {
-      var voter = wait.for(
-        steem_api.publishPost,
-        author,
-        permlink,
-        tags,
-        title,
-        body
-      );
       var percentage = 10000;
       if (conf.env.POWERUP_POST()) {
         percentage = 0;
       }
-      var extensions =
-        [[0,{beneficiaries: [{account: 'raserrano', weight: 1000 }],},],];
-      // {account: 'raserrano', weight: 1000 },
-      // if(conf.env.BENEFICIARIES() !== null){
-      //   var list = conf.env.BENEFICIARIES();
-      //   extensions =
-      //     [[0,{beneficiaries:list,},],];
-      // }
-      // console.log(extensions);
-      var options = wait.for(
-        steem_api.publishPostOptions,
+      var ext = [[0,{beneficiaries:
+        [{account: 'raserrano', weight: 1000 }],
+      },],];
+
+      var result = wait.for(
+        steem_api.publishPostOptionsAsync,
         author,
         permlink,
+        tags,
+        title,
+        body,
         percentage,
-        extensions
+        ext
       );
     }else {
       this.debug('Debug is active not posting but body is:');

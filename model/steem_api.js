@@ -110,6 +110,37 @@ module.exports = {
       console.log(e);
     }
   },
+  publishPostOptionsAsync: function(author, permlink, tags, title, bodyText, percent, ext){
+    var  operations = [
+      ['comment',
+        {
+          parent_author: '',
+          parent_permlink: 'report',
+          author: author,
+          permlink,
+          title: title,
+          body: bodyText,
+          json_metadata : JSON.stringify(tags)
+        }
+      ],
+      ['comment_options',
+        {
+          author: author,
+          permlink,
+          max_accepted_payout: '1000000.000 SBD',
+          percent_steem_dollars: percent,
+          allow_votes: true,
+          allow_curation_rewards: true,
+          extensions: ext
+        }
+      ]
+    ];
+    return wait.for(
+      steem.broadcast.sendAsync,
+      { operations, extensions: [] },
+      { posting: conf.env.POSTING_KEY_PRV() }
+    );
+  },
   steem_getContent: function(author, post, callback) {
     steem.api.getContent(author, post,function(err,result) {
       callback(err, result);
