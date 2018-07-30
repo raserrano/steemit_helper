@@ -13,12 +13,12 @@ wait.launchFiber(function() {
 
   var last_info = wait.for(utils.getLastInfo);
   console.log(last_info);
-  
+
   wait.for(
     steem_api.steem_transferToVesting,
     [conf.env.ACCOUNT_NAME()],
     [conf.env.ACCOUNT_NAME()],
-    "50.000 STEEM"
+    '50.000 STEEM'
   );
   console.log('Finish powerup');
   process.exit();

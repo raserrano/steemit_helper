@@ -8,12 +8,12 @@ const
 wait.launchFiber(function() {
   var RECORDS_FETCH_LIMIT = 1000;
 
-  var accounts = "";
-  try{
+  var accounts = '';
+  try {
     accounts = wait.for(
       steem_api.steem_getAccounts_wrapper,[conf.env.ACCOUNT_NAME()]
     );
-  }catch(e){
+  }catch (e) {
     console.log(e);
     process.exit();
   }

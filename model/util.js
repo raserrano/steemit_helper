@@ -3,7 +3,7 @@ const
   conf = require('../config/dev'),
   db = require('./db'),
   fs = require('fs'),
-  sprintf = require('sprintf').sprintf,
+  sprintf = require('sprintf-js').sprintf,
   steem_api = require('./steem_api');
 
 module.exports = {
@@ -186,14 +186,14 @@ module.exports = {
                   comment
                 );
                 var link = {
-                  author:comment_result.operations[0][1].author,
-                  url:comment_result.operations[0][1].permlink,
+                  author: comment_result.operations[0][1].author,
+                  url: comment_result.operations[0][1].permlink,
                   created: new Date(),
                 };
                 if (conf.env.SUPPORT_ACCOUNT() !== '') {
                   wait.for(this.upsertLink,{
-                    author:comment_result.operations[0][1].author,
-                    url:comment_result.operations[0][1].permlink,
+                    author: comment_result.operations[0][1].author,
+                    url: comment_result.operations[0][1].permlink,
                   },link);
                 }
                 wait.for(this.timeout_wrapper,17000);
@@ -211,7 +211,7 @@ module.exports = {
                 donation: data[i].donation,
                 voted: voted_ok,
                 processed: true,
-                voted_date: new Date()
+                voted_date: new Date(),
               }
             );
           }else {
@@ -277,9 +277,9 @@ module.exports = {
             data[i].status === 'comment' ||
             data[i].status === 'self-vote';
         }
-        if(refunded_urls.includes(data[i].memo)){
+        if (refunded_urls.includes(data[i].memo)) {
           data[i].status = 'refunded';
-        }else{
+        }else {
           if (conditions) {
             // Comment in post or comment that amount was refunded *-*
             var title = 'Thanks for your donation';
@@ -320,7 +320,7 @@ module.exports = {
               );
               refunded_urls.push(data[i].memo);
             }
-          }          
+          }
         }
         wait.for(
           this.upsertTransfer,
@@ -341,9 +341,9 @@ module.exports = {
     var refunded_urls = [];
     memo = 'Refunding because vote was not performed correctly. Sorry for the inconvenience ';
     for (var i = 0; i < data.length;i++) {
-      if(refunded_urls.includes(data[i].memo)){
+      if (refunded_urls.includes(data[i].memo)) {
         data[i].status = 'refunded';
-      }else{
+      }else {
         send = data[i].amount.toFixed(3) + ' ' + data[i].currency;
         this.debug(send,account,data[i].payer,memo);
         wait.for(
@@ -429,14 +429,14 @@ module.exports = {
                   comment
                 );
                 var link = {
-                  author:comment_result.operations[0][1].author,
-                  url:comment_result.operations[0][1].permlink,
+                  author: comment_result.operations[0][1].author,
+                  url: comment_result.operations[0][1].permlink,
                   created: new Date(),
                 };
                 if (conf.env.SUPPORT_ACCOUNT() !== '') {
                   wait.for(this.upsertLink,{
-                    author:comment_result.operations[0][1].author,
-                    url:comment_result.operations[0][1].permlink,
+                    author: comment_result.operations[0][1].author,
+                    url: comment_result.operations[0][1].permlink,
                   },link);
                 }
                 wait.for(this.timeout_wrapper,17000);
@@ -764,10 +764,10 @@ module.exports = {
   cleanFollowers: function(callback) {
     var date = new Date();
     console.log(date);
-    date.setDate(date.getDate()-8);
+    date.setDate(date.getDate() - 8);
     console.log(date);
     db.model('Link').remove(
-      {created:{$lt:date}}
+      {created: {$lt: date}}
       ).exec(
       function(err,data) {
         callback(err,data);
@@ -985,7 +985,13 @@ module.exports = {
 
     // Read file and add it to body
     var contents_2 = fs.readFileSync('./reports/treeplanterv2.md', 'utf8');
-    body += '\n' + contents_2;
+    var data = {
+      minimum: conf.env.MIN_DONATION(),
+      maximum: conf.env.MAX_DONATION(),
+      min_voted: (conf.env.MIN_DONATION() * conf.env.VOTE_MULTIPLIER()),
+      max_voted: (conf.env.MAX_DONATION() * conf.env.VOTE_MULTIPLIER()),
+    };
+    body += sprintf(contents_2 , data);
 
     var title = '@treeplanter funds raising & voting bot got ';
     title += daily_donation.toFixed(2) + ' SBD today ' + when;
@@ -999,7 +1005,7 @@ module.exports = {
       tags
     );
   },
-  generateStatusReport: function(status,queue){
+  generateStatusReport: function(status,queue) {
     var when = this.getDate(new Date());
     var permlink = 'treeplanter-status-' + when;
 
@@ -1007,30 +1013,38 @@ module.exports = {
 
     var title = '@treeplanter status report ' + when;
     var response_time = 0;
-    for(var i=0;i<status.length;i++){
-      response_time+=this.dateDiff(status[i].processed_date,status[i].voted_date);
+    for (var i = 0;i < status.length;i++) {
+      response_time += this.dateDiff(status[i].processed_date,status[i].voted_date);
     }
-    var avg_response = parseFloat(response_time)/50;
-    console.log(avg_response);
+    var avg_response = parseFloat(response_time) / 50;
     var duration = 'The average duration for the last donations was ';
-    var days = parseInt(avg_response/(60*60*24));
-    var hours = parseInt(avg_response/(60*60));
-    var minutes = parseInt(avg_response/(60));
-    if(days>1){
-      duration+= days + ' day(s) ';
-      hours-=days*24;
-      if(hours>1){
-        duration+='and ' + hours +' hour(s) ';
-        minutes-=hours*60;
-      }else{
-        duration+='and ' + minutes + ' minute(s).';
+    var days = parseInt(avg_response / (60 * 60 * 24));
+    var hours = parseInt(avg_response / (60 * 60));
+    var minutes = parseInt(avg_response / (60));
+    if (days > 0) {
+      duration += days + ' day(s) ';
+      hours -= days * 24;
+      if (hours > 0) {
+        duration += 'and ' + hours + ' hour(s) ';
+        minutes -= hours * 60;
+      }else {
+        duration += 'and ' + minutes + ' minute(s).';
       }
-    }else{
-      if(hours>1){
-        duration+='and #{hours} hour(s) ';
-        minutes-=hours*60;
-      }else{
-        duration+='and #{minutes} minute(s).';
+    }else {
+      if (hours > 0) {
+        if (days === 0) {
+          duration += hours + ' hour(s) ';
+          minutes -= hours * 60;
+        }else {
+          duration += 'and ' + hours + ' hour(s) ';
+          minutes -= hours * 60;
+        }
+      }else {
+        if (hours === 0) {
+          duration += minutes + ' minute(s).';
+        }else {
+          duration += 'and ' + minutes + ' minute(s).';
+        }
       }
     }
     // Read file and add it to body
@@ -1043,7 +1057,17 @@ module.exports = {
       duration,
       queue.length
     );
-    
+
+    // Read file and add it to body
+    var contents_2 = fs.readFileSync('./reports/treeplanterv2.md', 'utf8');
+    var data = {
+      minimum: conf.env.MIN_DONATION(),
+      maximum: conf.env.MAX_DONATION(),
+      min_voted: (conf.env.MIN_DONATION() * conf.env.VOTE_MULTIPLIER()),
+      max_voted: (conf.env.MAX_DONATION() * conf.env.VOTE_MULTIPLIER()),
+    };
+    body += sprintf(contents_2 , data);
+
     this.preparePost(
       conf.env.ACCOUNT_NAME(),
       permlink,
@@ -1089,33 +1113,23 @@ module.exports = {
   },
   preparePost: function(author, permlink, title, body, tags) {
     if (conf.env.REPORT_ACTIVE()) {
-      var voter = wait.for(
-        steem_api.publishPost,
-        author,
-        permlink,
-        tags,
-        title,
-        body
-      );
       var percentage = 10000;
       if (conf.env.POWERUP_POST()) {
         percentage = 0;
       }
-      var extensions =
-        [[0,{beneficiaries: [{account: 'raserrano', weight: 1000 }],},],];
-      // {account: 'raserrano', weight: 1000 },
-      // if(conf.env.BENEFICIARIES() !== null){
-      //   var list = conf.env.BENEFICIARIES();
-      //   extensions =
-      //     [[0,{beneficiaries:list,},],];
-      // }
-      // console.log(extensions);
-      var options = wait.for(
-        steem_api.publishPostOptions,
+      var ext = [[0,{beneficiaries:
+        [{account: 'raserrano', weight: 1000 }],
+      },],];
+
+      var result = wait.for(
+        steem_api.publishPostOptionsAsync,
         author,
         permlink,
+        tags,
+        title,
+        body,
         percentage,
-        extensions
+        ext
       );
     }else {
       this.debug('Debug is active not posting but body is:');

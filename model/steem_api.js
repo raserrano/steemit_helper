@@ -110,6 +110,37 @@ module.exports = {
       console.log(e);
     }
   },
+  publishPostOptionsAsync: function(author, permlink, tags, title, bodyText, percent, ext){
+    var  operations = [
+      ['comment',
+        {
+          parent_author: '',
+          parent_permlink: 'report',
+          author: author,
+          permlink,
+          title: title,
+          body: bodyText,
+          json_metadata : JSON.stringify(tags)
+        }
+      ],
+      ['comment_options',
+        {
+          author: author,
+          permlink,
+          max_accepted_payout: '1000000.000 SBD',
+          percent_steem_dollars: percent,
+          allow_votes: true,
+          allow_curation_rewards: true,
+          extensions: ext
+        }
+      ]
+    ];
+    return wait.for(
+      steem.broadcast.sendAsync,
+      { operations, extensions: [] },
+      { posting: conf.env.POSTING_KEY_PRV() }
+    );
+  },
   steem_getContent: function(author, post, callback) {
     steem.api.getContent(author, post,function(err,result) {
       callback(err, result);
@@ -258,8 +289,8 @@ module.exports = {
     var ci = this.init_conversion(globalData);
     var steempower = this.getSteemPower(account);
     var sp_scaled_vests = steempower / ci.steem_per_vest;
-    var f = target_value/(sp_scaled_vests*100*ci.reward_pool*ci.sbd_per_steem);
-    var votingpower = parseInt((((f*50)-49) / vp)*10000);
+    var f = target_value / (sp_scaled_vests * 100 * ci.reward_pool * ci.sbd_per_steem);
+    var votingpower = parseInt((((f * 50) - 49) / vp) * 10000);
     if (votingpower > 10000) {
       votingpower = 10000;
     }

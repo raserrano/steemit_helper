@@ -172,7 +172,7 @@ module.exports = {
         (process.env.WEIGHT !== null)) {
         value = parseFloat(process.env.WEIGHT);
       }
-      return value*100;
+      return value * 100;
     },
     LAST_VOTED: function() {
       var value;
