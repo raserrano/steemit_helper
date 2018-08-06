@@ -9,24 +9,25 @@ wait.launchFiber(function() {
   var accounts = wait.for(
     steem_api.steem_getAccounts_wrapper,[conf.env.ACCOUNT_NAME()]
   );
-  var weight = steem_api.calculateVoteWeight(accounts[0],0.01);
+  var vp = utils.getVotingPower(accounts[0]);
+  var weight = steem_api.calculateVoteWeight(accounts[0],vp,0.01);
 
 
-steem.api.getTrendingTags(afterTag, limit, function(err, result) {
-  console.log(err, result);
-});
+  steem.api.getTrendingTags(afterTag, limit, function(err, result) {
+    console.log(err, result);
+  });
 
 
-steem.api.getDiscussionsByTrending(query, function(err, result) {
-  console.log(err, result);
-});
+  steem.api.getDiscussionsByTrending(query, function(err, result) {
+    console.log(err, result);
+  });
 
 
 
 
-steem.api.getDiscussionsByCreated(query, function(err, result) {
-  console.log(err, result);
-});
+  steem.api.getDiscussionsByCreated(query, function(err, result) {
+    console.log(err, result);
+  });
 
 
 

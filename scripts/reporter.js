@@ -3,12 +3,12 @@ const
   utils = require('../model/util'),
   steem_api = require('../model/steem_api'),
   conf = require('../config/dev');
-// Generates a report for the not voted posts of account
+// Generates a report for the voted posts of account
 wait.launchFiber(function() {
-  var voter = "";
-  var followers = "";
-  var globalData = "";
-  try{
+  var voter = '';
+  var followers = '';
+  var globalData = '';
+  try {
     voter = wait.for(
       steem_api.steem_getAccounts_wrapper,[conf.env.ACCOUNT_NAME()]
     );
@@ -19,7 +19,7 @@ wait.launchFiber(function() {
     globalData = wait.for(
       steem_api.steem_getSteemGlobaleProperties_wrapper
     );
-  }catch(e){
+  }catch (e) {
     console.log(e);
     process.exit();
   }
