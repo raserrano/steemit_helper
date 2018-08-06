@@ -49,11 +49,10 @@ STEEM wallet: www.steemit.com/@treeplanter </center>
 <h3>Check or website: [www.kedjom-keku.com](http://kedjom-keku.com/en/) to get more information about our conservation program in Cameroon. </h3>
 <center>![kedjom-keku.jpg](https://cdn.steemitimages.com/DQmPn6FQagmENdbFiHUTLpYfaBDehgA9b9zVHKvPzJkfGTo/kedjom-keku.jpg)</center>
 <h3>STEEM helps us to save Abongphen Highland Forest</h3>
-We have already cashed out 1,815$ which allowed us to pay 5 of our local employees in Cameroon for two months (NOV-DEC 2017) who takes care about our tree nursery, bee hives, farm, livestock and organizes workshops for indigienous people.  We still have 0,3 BTC pending in our wallet which was changed from STEEM. Our wish is to make agreement with our workers to pay them in cryptos as STEEM, BTC or SolarCoin.  
 
 Nice day,
 #### @martin.mikes
 Co-founder and coordinator of *@kedjom-keku* association
 email: *martin.mikes@kedjom-keku.com*
-web: *www.kedjom-keku.com*
+web: *[www.kedjom-keku.com](www.kedjom-keku.com)*
 <center><h2>Thanks a lot!</h2></center><h4>Read, upvote and resteem other active articles of me @martin.mikes, NGO @kedjom-keku or voting bot @treeplanter - all revenue is going to be spend for natural conservation.</h4><h3>Follow us: @kedjom-keku, @martin.mikes, @treeplanter!</h3>

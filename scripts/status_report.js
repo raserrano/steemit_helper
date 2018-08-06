@@ -23,12 +23,7 @@ wait.launchFiber(function() {
     limit: 50,
   };
   var report_status = wait.for(utils.getReport,options_status);
-
-  // Not voted
-  var options_queue = {
-    voted: false,
-  };
-  var report_queue = wait.for(utils.getReport,options_queue);
+  var report_queue = wait.for(utils.getQueue);
 
   utils.generateStatusReport(
     report_status,
