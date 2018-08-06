@@ -116,16 +116,11 @@ STEEM wallet: www.steemit.com/@treeplanter </center>
  ## Check or website: [www.kedjom-keku.com](http://kedjom-keku.com/en/) to get more information about our conservation program in Cameroon. </h2>
 <center> ![20048_285846264217_3092790_n (5).jpg](https://steemitimages.com/DQmZrR8t6tDJL7bJntJ3eQZpU8Gqxnm3jmm9QhxtaoVQWnr/20048_285846264217_3092790_n%20(5).jpg) </center>
 
-STEEM helps us to save Abongphen Highland Forest
-We have already cashed out 1,815$ which allowed us to pay 5 of our local employees in Cameroon for two months (NOV-DEC 2017) who takes care about our tree nursery, bee hives, farm, livestock and organizes workshops for indigienous people.  We still have 0,3 BTC pending in our wallet which was changed from STEEM. Our wish is to make agreement with our workers to pay them in cryptos as STEEM, BTC or SolarCoin.  
+<h3>STEEM helps us to save Abongphen Highland Forest</h3>
 
 Nice day,
 #### @martin.mikes
 Co-founder and coordinator of *@kedjom-keku* association
 email: *martin.mikes@kedjom-keku.com*
-web: *www.kedjom-keku.com*
-# Thanks a lot!
-
-### Read, upvote and resteem other active articles of me @martin.mikes, NGO @kedjom-keku or voting bot @treeplanter - all revenue is going to be spend for natural conservation.
-
-# Follow us: @kedjom-keku, @martin.mikes, @treeplanter!
+web: *[www.kedjom-keku.com](www.kedjom-keku.com)*
+<center><h2>Thanks a lot!</h2></center><h4>Read, upvote and resteem other active articles of me @martin.mikes, NGO @kedjom-keku or voting bot @treeplanter - all revenue is going to be spend for natural conservation.</h4><h3>Follow us: @kedjom-keku, @martin.mikes, @treeplanter!</h3>
