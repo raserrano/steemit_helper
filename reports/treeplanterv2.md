@@ -38,5 +38,5 @@ Nice day,
 #### @martin.mikes
 Co-founder and coordinator of *@kedjom-keku* association
 email: *martin.mikes@kedjom-keku.com*
-web: *www.kedjom-keku.com*
+web: *[www.kedjom-keku.com](www.kedjom-keku.com)*
 <center><h2>Thanks a lot!</h2></center><h4>Read, upvote and resteem other active articles of me @martin.mikes, NGO @kedjom-keku or voting bot @treeplanter - all revenue is going to be spend for natural conservation.</h4><h3>Follow us: @kedjom-keku, @martin.mikes, @treeplanter!</h3>
