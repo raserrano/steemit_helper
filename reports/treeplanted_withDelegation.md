@@ -27,42 +27,31 @@ The greatest tree planter is @czechglobalhost
 <h4>Current delegations</h4>
 Thanks following steemians for delegated power
 
-Username | SP delegated
----|---
-@itchykitten | ~5242
-@martin.mikes | ~5138
-@jean-gregoire | ~5115
-@kedjom-keku | ~2370
-@treebuilder | ~102
+Rank | Username | SP delegated | Numbers of trees planted daily
+---|---|---|---
+1 | @itchykitten | ~5242 | 2
+2 | @martin.mikes | ~5138 | 2
+3 | @jean-gregoire | ~5115 | 2
+4 | @kedjom-keku | ~2370 | 1
+5 | @sc-steemit | ~152 | 0.02
+6 | @acedawnmusic | ~104 | 0.015
+7 | @treebuilder | ~102 | 0.015
+8 | @dylanhobalart | ~20 | 0.001
+9 | @scottcbusiness | ~10 | 0.001
 
-More opportunities how to help (If it could be organize better on the page it would be better)
+<center><h5>More opportunities how to help</h5></center>
+<h6>Contribute to our transparent accounts</h6>
+||||
+---|---|---
+EUR  | IBAN: CZ8120100000002401262246 | BIC/SWIFT: FIOBCZPPXXX
+USD  | IBAN: CZ9020100000002801262245 | BIC/SWIFT: FIOBCZPPXXX**
+![btclogomaly.png](https://steemitimages.com/50x50/https://cdn.steemitimages.com/DQmWKA9hSXh7KcaGBFDB73Pscmz7KVq1a8qhN4Vi8v5deHt/btclogomaly.png) | <center>![BTCwalletKK.png](https://steemitimages.com/50x50/https://cdn.steemitimages.com/DQmaPdF6UoA1iia2UCZbD431MreusJwXAAHd546mA2Srkpp/BTCwalletKK.png)</center> | 1GVCsYsf2LzvyqDUYhXPjQbb2KtW6dDDH
+![slrlogomale.png](https://steemitimages.com/50x50/https://cdn.steemitimages.com/DQmR6qswF9U5QEQKtDcz9GgonmZRXB8M2W4X3mGdCgZHAb3/slrlogomale.png) | <center>![SLRwalletKK.png](https://steemitimages.com/50x50/https://cdn.steemitimages.com/DQmb1EzcKSuLTGs27sRfJpcJVs2zFF5qF1Yh9msCjepeDSc/SLRwalletKK.png)</center> | 8LsW14JHnbvpq6RefqASJMgySN6K8SgAiG </center> 
+![steemlogomale.png](https://steemitimages.com/50x50/https://cdn.steemitimages.com/DQmPBTSoFeabenhqLDu3oYa2sxZCpCGn6dQPvaqBuwZSdyA/steemlogomale.png) | <center>@treeplanter</center> | <center>@kedjom-keku</center>
 
-<h4>Contribute to our transparent account [EUR]:</h4>
-- IBAN: CZ8120100000002401262246
-- BIC/SWIFT: FIOBCZPPXXX
-<h4>OR transparent account [$]:</h4>
-- IBAN: CZ9020100000002801262245
-- BIC/SWIFT: FIOBCZPPXXX**
 
-<center>![btclogomaly.png](https://steemitimages.com/DQmWKA9hSXh7KcaGBFDB73Pscmz7KVq1a8qhN4Vi8v5deHt/btclogomaly.png)
-![BTCwalletKK.png](https://steemitimages.com/DQmaPdF6UoA1iia2UCZbD431MreusJwXAAHd546mA2Srkpp/BTCwalletKK.png)
-BTC wallet: 1GVCsYsf2LzvyqDUYhXPjQbb2KtW6dDDH  </center>
-
-<center>
-![slrlogomale.png](https://steemitimages.com/DQmR6qswF9U5QEQKtDcz9GgonmZRXB8M2W4X3mGdCgZHAb3/slrlogomale.png)
-![SLRwalletKK.png](https://steemitimages.com/DQmb1EzcKSuLTGs27sRfJpcJVs2zFF5qF1Yh9msCjepeDSc/SLRwalletKK.png)
-SolarCoin wallet: 8LsW14JHnbvpq6RefqASJMgySN6K8SgAiG </center> 
-
-<center>
-![steemlogomale.png](https://steemitimages.com/DQmPBTSoFeabenhqLDu3oYa2sxZCpCGn6dQPvaqBuwZSdyA/steemlogomale.png)
-STEEM wallet: www.steemit.com/@treeplanter </center>
-
-<center> **Plant trees with our voting bot @treeplanter!**</center> 
-<center> ![KK-icon-plant-tree-Green-outline.png](https://steemitimages.com/DQmcNsUbep88DodSR2hr6NT4speakfuxGE84NfzNSRHpW2p/KK-icon-plant-tree-Green-outline.png) </center>
-<h3>Check or website: [www.kedjom-keku.com](http://kedjom-keku.com/en/) to get more information about our conservation program in Cameroon. </h3>
-<center>![20048_285846264217_3092790_n (5).jpg](https://steemitimages.com/DQmZrR8t6tDJL7bJntJ3eQZpU8Gqxnm3jmm9QhxtaoVQWnr/20048_285846264217_3092790_n%20(5).jpg)</center>
-<h3>STEEM helps us to save Abongphen Highland Forest</h3>
-We have already cashed out 1,815$ which allowed us to pay 5 of our local employees in Cameroon for two months (NOV-DEC 2017) who takes care about our tree nursery, bee hives, farm, livestock and organizes workshops for indigienous people.  We still have 0,3 BTC pending in our wallet which was changed from STEEM. Our wish is to make agreement with our workers to pay them in cryptos as STEEM, BTC or SolarCoin.  
+![KK-icon-plant-tree-Green-outline.png](https://steemitimages.com/50x50/https://cdn.steemitimages.com/DQmcNsUbep88DodSR2hr6NT4speakfuxGE84NfzNSRHpW2p/KK-icon-plant-tree-Green-outline.png) **Plant trees with our voting bot @treeplanter!**
+![kedjom-keku.jpg](https://cdn.steemitimages.com/50x50/https://cdn.steemitimages.com/DQmPn6FQagmENdbFiHUTLpYfaBDehgA9b9zVHKvPzJkfGTo/kedjom-keku.jpg) **Check or website: [www.kedjom-keku.com](http://kedjom-keku.com/en/) to get more information about our conservation program in Cameroon.**
 
 Nice day,
 #### @martin.mikes

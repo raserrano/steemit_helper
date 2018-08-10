@@ -413,15 +413,11 @@ module.exports = {
                 posts[i].fee = 0;
               }
               if (conf.env.COMMENT_ACTIVE()) {
-                comment = 'Welcome to steemit @' + posts[i].author +
-                '. Join @minnowsupport project for more help. ' +
-                'Checkout @helpie and @qurator projects.\n' +
-                'Send SBD/STEEM to @treeplanter to plant trees and get an ' +
-                'get an upvote in exchange of your donation (Min 0.01 SDB) \n' +
-                'Upvote this comment to keep helping more new steemians \n' +
-                'Send SBD/STEEM to @tuanis in exchange of an upvote and ' +
-                'support this project, follow for random votes.';
-
+                var coment = fs.readFileSync('./reports/comment.md', 'utf8');
+                var data = {
+                  user: posts[i].author,
+                };
+                comment = sprintf(coment , data);
                 var comment_result = steem_api.commentPost(
                   posts[i].author,
                   posts[i].permlink,
