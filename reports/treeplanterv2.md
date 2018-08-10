@@ -20,35 +20,19 @@
 </ol>
 If you have any trouble or you are concern about a donation contact @treeassistant for help.
 
+<center><h5>More opportunities how to help</h5></center>
+<h6>Contribute to our transparent accounts</h6>
+||||
+---|---|---
+EUR  | IBAN: CZ8120100000002401262246 | BIC/SWIFT: FIOBCZPPXXX
+USD  | IBAN: CZ9020100000002801262245 | BIC/SWIFT: FIOBCZPPXXX**
+![btclogomaly.png](https://steemitimages.com/50x50/https://cdn.steemitimages.com/DQmWKA9hSXh7KcaGBFDB73Pscmz7KVq1a8qhN4Vi8v5deHt/btclogomaly.png) | <center>![BTCwalletKK.png](https://steemitimages.com/50x50/https://cdn.steemitimages.com/DQmaPdF6UoA1iia2UCZbD431MreusJwXAAHd546mA2Srkpp/BTCwalletKK.png)</center> | 1GVCsYsf2LzvyqDUYhXPjQbb2KtW6dDDH
+![slrlogomale.png](https://steemitimages.com/50x50/https://cdn.steemitimages.com/DQmR6qswF9U5QEQKtDcz9GgonmZRXB8M2W4X3mGdCgZHAb3/slrlogomale.png) | <center>![SLRwalletKK.png](https://steemitimages.com/50x50/https://cdn.steemitimages.com/DQmb1EzcKSuLTGs27sRfJpcJVs2zFF5qF1Yh9msCjepeDSc/SLRwalletKK.png)</center> | 8LsW14JHnbvpq6RefqASJMgySN6K8SgAiG </center> 
+![steemlogomale.png](https://steemitimages.com/50x50/https://cdn.steemitimages.com/DQmPBTSoFeabenhqLDu3oYa2sxZCpCGn6dQPvaqBuwZSdyA/steemlogomale.png) | <center>@treeplanter</center> | <center>@kedjom-keku</center>
 
-<h3>More opportunities how to help</h3>
 
-<h4>Contribute to our transparent account [EUR]:</h4>
-- IBAN: CZ8120100000002401262246
-- BIC/SWIFT: FIOBCZPPXXX
-
-<h4>OR transparent account [$]:</h4>
-- IBAN: CZ9020100000002801262245
-- BIC/SWIFT: FIOBCZPPXXX**
-
-<center>![btclogomaly.png](https://steemitimages.com/DQmWKA9hSXh7KcaGBFDB73Pscmz7KVq1a8qhN4Vi8v5deHt/btclogomaly.png)
-![BTCwalletKK.png](https://steemitimages.com/DQmaPdF6UoA1iia2UCZbD431MreusJwXAAHd546mA2Srkpp/BTCwalletKK.png)
-BTC wallet: 1GVCsYsf2LzvyqDUYhXPjQbb2KtW6dDDH  </center>
-
-<center>
-![slrlogomale.png](https://steemitimages.com/DQmR6qswF9U5QEQKtDcz9GgonmZRXB8M2W4X3mGdCgZHAb3/slrlogomale.png)
-![SLRwalletKK.png](https://steemitimages.com/DQmb1EzcKSuLTGs27sRfJpcJVs2zFF5qF1Yh9msCjepeDSc/SLRwalletKK.png)
-SolarCoin wallet: 8LsW14JHnbvpq6RefqASJMgySN6K8SgAiG </center> 
-
-<center>
-![steemlogomale.png](https://steemitimages.com/DQmPBTSoFeabenhqLDu3oYa2sxZCpCGn6dQPvaqBuwZSdyA/steemlogomale.png)
-STEEM wallet: www.steemit.com/@treeplanter </center>
-
-<center> **Plant trees with our voting bot @treeplanter!**</center> 
-<center> ![KK-icon-plant-tree-Green-outline.png](https://steemitimages.com/DQmcNsUbep88DodSR2hr6NT4speakfuxGE84NfzNSRHpW2p/KK-icon-plant-tree-Green-outline.png) </center>
-<h3>Check or website: [www.kedjom-keku.com](http://kedjom-keku.com/en/) to get more information about our conservation program in Cameroon. </h3>
-<center>![kedjom-keku.jpg](https://cdn.steemitimages.com/DQmPn6FQagmENdbFiHUTLpYfaBDehgA9b9zVHKvPzJkfGTo/kedjom-keku.jpg)</center>
-<h3>STEEM helps us to save Abongphen Highland Forest</h3>
+![KK-icon-plant-tree-Green-outline.png](https://steemitimages.com/50x50/https://cdn.steemitimages.com/DQmcNsUbep88DodSR2hr6NT4speakfuxGE84NfzNSRHpW2p/KK-icon-plant-tree-Green-outline.png) **Plant trees with our voting bot @treeplanter!**
+![kedjom-keku.jpg](https://cdn.steemitimages.com/50x50/https://cdn.steemitimages.com/DQmPn6FQagmENdbFiHUTLpYfaBDehgA9b9zVHKvPzJkfGTo/kedjom-keku.jpg) **Check or website: [www.kedjom-keku.com](http://kedjom-keku.com/en/) to get more information about our conservation program in Cameroon.**
 
 Nice day,
 #### @martin.mikes
