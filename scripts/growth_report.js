@@ -31,7 +31,6 @@ wait.launchFiber(function() {
   var steempower = steem_api.getSteemPower(voter[0]);
   account.created = new Date();
 
-
   // Saving the data
   account.username = conf.env.ACCOUNT_NAME();
   account.followers = followers.follower_count;
@@ -54,6 +53,20 @@ wait.launchFiber(function() {
   if (account.created.getDay() === 1) {
     utils.generateGrowthReport(
       account
+    );
+  }
+  if (account.created.getDay() === 4) {
+    // Status
+    var options_status = {
+      voted: true,
+      limit: 50,
+    };
+    var report_status = wait.for(utils.getReport,options_status);
+    var report_queue = wait.for(utils.getQueue);
+
+    utils.generateStatusReport(
+      report_status,
+      report_queue
     );
   }
   console.log('Finish report');

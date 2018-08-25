@@ -863,8 +863,10 @@ module.exports = {
     body += '\n\n## Total sent in fees: ' + total.toFixed(3) + ' ##';
     body += '\n\nMake sure to visit their profile and welcome them as well.\n';
     body += 'Long live Steemit, the social revolution platform.';
-    var msp  = '[![pal-sig-anim-trans](https://i.imgur.com/sBkPplQ.gif)]';
-    msp += '(https://discord.gg/GUuCXgY)';
+
+    var contents_3 = fs.readFileSync('./reports/tuanis.md', 'utf8');
+    body += contents_3;
+
     body += '\n---\n <center>' + msp + '</center>';
     this.preparePost(
       conf.env.ACCOUNT_NAME(),
@@ -989,6 +991,9 @@ module.exports = {
     };
     body += sprintf(contents_2 , data);
 
+    var contents_3 = fs.readFileSync('./reports/raserrano.md', 'utf8');
+    body += contents_3;
+
     var title = '@treeplanter funds raising & voting bot got ';
     title += daily_donation.toFixed(2) + ' SBD today ' + when;
     title += ' to save Abongphen Highland Forest in Cameroon. Thank you!';
@@ -1047,11 +1052,13 @@ module.exports = {
     var contents_1 = fs.readFileSync('./reports/status.md', 'utf8');
     var body = sprintf(
       contents_1,
+      'Hello treeplanters!',
       conf.env.MAX_DONATION(),
       conf.env.MIN_DONATION(),
       conf.env.VOTE_MULTIPLIER(),
       duration,
-      queue.length
+      queue.length,
+      '[Check the queue here](https://treeplanterv2.herokuapp.com/queue)'
     );
 
     // Read file and add it to body
@@ -1063,6 +1070,75 @@ module.exports = {
       max_voted: (conf.env.MAX_DONATION() * conf.env.VOTE_MULTIPLIER()),
     };
     body += sprintf(contents_2 , data);
+
+    var contents_3 = fs.readFileSync('./reports/raserrano.md', 'utf8');
+    body += contents_3;
+
+    this.preparePost(
+      conf.env.ACCOUNT_NAME(),
+      permlink,
+      title,
+      body,
+      tags
+    );
+  },
+  generateStatusReportTuanis: function(status,queue) {
+    var when = this.getDate(new Date());
+    var permlink = 'tuanis-status-' + when;
+
+    var tags = {tags: ['helpmejoin', 'status', 'report', 'bot']};
+
+    var title = '@tuanis status report ' + when;
+    var response_time = 0;
+    for (var i = 0;i < status.length;i++) {
+      response_time += this.dateDiff(status[i].processed_date,status[i].voted_date);
+    }
+    var avg_response = parseFloat(response_time) / 50;
+    var duration = 'The average duration for the last donations was ';
+    var days = parseInt(avg_response / (60 * 60 * 24));
+    var hours = parseInt(avg_response / (60 * 60));
+    var minutes = parseInt(avg_response / (60));
+    if (days > 0) {
+      duration += days + ' day(s) ';
+      hours -= days * 24;
+      if (hours > 0) {
+        duration += 'and ' + hours + ' hour(s) ';
+        minutes -= hours * 60;
+      }else {
+        duration += 'and ' + minutes + ' minute(s).';
+      }
+    }else {
+      if (hours > 0) {
+        if (days === 0) {
+          duration += hours + ' hour(s) ';
+          minutes -= hours * 60;
+        }else {
+          duration += 'and ' + hours + ' hour(s) ';
+          minutes -= hours * 60;
+        }
+      }else {
+        if (hours === 0) {
+          duration += minutes + ' minute(s).';
+        }else {
+          duration += 'and ' + minutes + ' minute(s).';
+        }
+      }
+    }
+    // Read file and add it to body
+    var contents_1 = fs.readFileSync('./reports/status.md', 'utf8');
+    var body = sprintf(
+      contents_1,
+      'Hello minnows!',
+      conf.env.MAX_DONATION(),
+      conf.env.MIN_DONATION(),
+      conf.env.VOTE_MULTIPLIER(),
+      duration,
+      queue.length,
+      ''
+    );
+
+    var contents_3 = fs.readFileSync('./reports/tuanis.md', 'utf8');
+    body += contents_3;
 
     this.preparePost(
       conf.env.ACCOUNT_NAME(),
@@ -1077,8 +1153,13 @@ module.exports = {
     var permlink = account.username + '-growth-' + when;
     var title = 'Growth report for ' + when;
     var body = '<h3>Growth Report</h3>\n With your help I have grown and ';
-    var image_url =  'https://steemitimages.com/';
-    image_url += 'DQmUdo4Ngm8JgDqRL4FndKksi7HzgbGMkFXwNpbYACWMQVu/tuanis.jpeg';
+
+    var pictures = JSON.parse(fs.readFileSync('./reports/tuanis_pics.json', 'utf8'));
+
+    // Random
+    var min = Math.ceil(0);
+    var max = Math.floor(pictures.pics.length);
+    var lucky = Math.floor(Math.random() * (max - min + 1)) + min;
 
     body += 'I am able to help more minnows. Thanks for your support.\n ';
     body += '\n';
@@ -1087,16 +1168,22 @@ module.exports = {
     body += '- **Vote value:** ' + account.vote + '\n';
     body += '- **Steem power:** ' + account.sp + '\n';
     body += '\n\n';
-    body += '![tuanis.jpeg](' + image_url + ') \n\n';
+    body += pictures.pic[lucky];
+    body += '\n\n';
     body += 'Upvote this report to keep supporting this project. \n\n';
     body += '--- \n';
     body += 'You can also support this project by sending a transfer and a ';
-    body += 'post or comment URL in the memo field. **Minimum is 0.01 SBD** ';
-    body += 'I will upvote it to a value of 1.5 times your donation. \n';
-    body += '**Max upvote value to 0.03 SBD**, you can always send more  ';
+    body += 'post or comment URL in the memo field. **Minimum is ';
+    body += conf.env.MIN_DONATION()+' SBD/STEEM** ';
+    body += 'I will upvote it to a value of ';
+    body += conf.env.VOTE_MULTIPLIER()+' times your donation. \n';
+    body += '**Max upvote value to ';
+    body += conf.env.MAX_DONATION()+' SBD/STEEM**, you can always send more  ';
     body += 'but it will be consider a donation.';
-    var msp  = '[![pal-sig-anim-trans](https://i.imgur.com/sBkPplQ.gif)]';
-    msp += '(https://discord.gg/GUuCXgY)';
+
+    var contents_3 = fs.readFileSync('./reports/tuanis.md', 'utf8');
+    body += contents_3;
+
     body += '\n---\n <center>' + msp + '</center>';
     var tags = {tags: ['helpmejoin','minnowsupportproject','minnows']};
     this.preparePost(
