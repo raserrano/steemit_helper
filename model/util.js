@@ -867,7 +867,6 @@ module.exports = {
     var contents_3 = fs.readFileSync('./reports/tuanis.md', 'utf8');
     body += contents_3;
 
-    body += '\n---\n <center>' + msp + '</center>';
     this.preparePost(
       conf.env.ACCOUNT_NAME(),
       permlink,
