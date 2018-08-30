@@ -64,7 +64,7 @@ wait.launchFiber(function() {
     var report_status = wait.for(utils.getReport,options_status);
     var report_queue = wait.for(utils.getQueue);
 
-    utils.generateStatusReport(
+    utils.generateStatusReportTuanis(
       report_status,
       report_queue
     );

@@ -7,5 +7,4 @@ Support this project by upvoting this report.
 
 ---
 
-
 <center>[![pal-sig-anim-trans](https://i.imgur.com/sBkPplQ.gif)](https://discord.gg/GUuCXgY)</center>
