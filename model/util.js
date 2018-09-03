@@ -118,10 +118,16 @@ module.exports = {
           steem_api.steem_getAccounts_wrapper,[account]
         );
         var vp = this.getVotingPower(voter[0]);
+
+        var vote_multiplier = conf.env.VOTE_MULTIPLIER();
+        if(data[i].payer === data[i].author){
+          vote_multiplier = conf.env.SELF_VOTE_MULTIPLIER();
+        }
+
         var weight = steem_api.calculateVoteWeight(
           voter[0],
           vp,
-          (amount_to_be_voted * conf.env.VOTE_MULTIPLIER())
+          (amount_to_be_voted * vote_multiplier)
         );
         if (conf.env.VOTE_ACTIVE()) {
           this.debug('VP is :' + vp);
@@ -942,8 +948,14 @@ module.exports = {
 
 
     var contents_1 = fs.readFileSync('./reports/header.md', 'utf8');
+    body += contents_1;
+    var contents_2 = fs.readFileSync('./reports/delegation.md', 'utf8');
+    body += contents_2;
+    var contents_3 = fs.readFileSync('./reports/treeplanter_stats.md', 'utf8');
+    body += contents_3;
+
     var body = sprintf(
-      contents_1,
+      body,
       stat.trees,
       total_trees,
       pictures.pics[lucky],
@@ -979,19 +991,19 @@ module.exports = {
       body += (j + 1) + ' | @' + trees[j]._id.payer +
       ' | ' + ((trees[j].total * ci.sbd_to_dollar) / 2).toFixed(2) + '\n';
     }
-
     // Read file and add it to body
-    var contents_2 = fs.readFileSync('./reports/treeplanterv2.md', 'utf8');
+    var contents_4 = fs.readFileSync('./reports/treeplanter_manual.md', 'utf8');
     var data = {
       minimum: conf.env.MIN_DONATION(),
       maximum: conf.env.MAX_DONATION(),
       min_voted: (conf.env.MIN_DONATION() * conf.env.VOTE_MULTIPLIER()),
       max_voted: (conf.env.MAX_DONATION() * conf.env.VOTE_MULTIPLIER()),
     };
-    body += sprintf(contents_2 , data);
+    delegation_block = sprintf(contents_4 , data);
+    body += delegation_block;
 
-    var contents_3 = fs.readFileSync('./reports/raserrano.md', 'utf8');
-    body += contents_3;
+    var contents_5 = fs.readFileSync('./reports/raserrano.md', 'utf8');
+    body += contents_5;
 
     var title = '@treeplanter funds raising & voting bot got ';
     title += daily_donation.toFixed(2) + ' SBD today ' + when;
@@ -1061,7 +1073,7 @@ module.exports = {
     );
 
     // Read file and add it to body
-    var contents_2 = fs.readFileSync('./reports/treeplanterv2.md', 'utf8');
+    var contents_2 = fs.readFileSync('./reports/treeplanter_manual.md', 'utf8');
     var data = {
       minimum: conf.env.MIN_DONATION(),
       maximum: conf.env.MAX_DONATION(),
@@ -1070,8 +1082,11 @@ module.exports = {
     };
     body += sprintf(contents_2 , data);
 
-    var contents_3 = fs.readFileSync('./reports/raserrano.md', 'utf8');
+    var contents_3 = fs.readFileSync('./reports/delegation.md', 'utf8');
     body += contents_3;
+
+    var contents_4 = fs.readFileSync('./reports/raserrano.md', 'utf8');
+    body += contents_4;
 
     this.preparePost(
       conf.env.ACCOUNT_NAME(),

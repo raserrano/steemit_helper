@@ -1,24 +1,25 @@
-<h2>Manual how to plan trees with @treeplanter</h2>
+<center><img src="https://steemitimages.com/DQmcNsUbep88DodSR2hr6NT4speakfuxGE84NfzNSRHpW2p/KK-icon-plant-tree-Green-outline.png" alt="KK-icon-plant-tree-Green-outline.png"></center>
+<h2>How to plant trees with @treeplanter</h2>
 <ol>
-<li>You, good lady or man, transfer between %(minimum)s and %(maximum)s STEEM/SBD to my wallet, with the link in memo of the post or comment you want to have upvoted by me.</li>
-<li>I will upvote the post and attempt to add 100&#37; value per vote per STEEM/SBD you send, so %(minimum)s STEEM/SBD donation = approx %(min_voted)s STEEM/SBD worth of vote, up to %(maximum)s STEEM/SBD = %(max_voted)s STEEM/SBD worth of vote.</li>
+<li>Transfer between %(minimum)s and %(maximum)s STEEM/SBD to my wallet, with the link in memo of the post or comment you want to have upvoted by me.</li>
+<li>I will upvote the post and attempt to add 100&#37; value per vote per STEEM/SBD you send, so %(minimum)s STEEM/SBD donation = approx %(min_voted)s STEEM/SBD worth of vote, up to %(maximum)s STEEM/SBD = %(max_voted)s STEEM/SBD worth of vote - in case of non-self votes. If you want to be self-voted you will get 20&#37; more of your donation, so 0.01 STEEM/SBD donation = approx 0.012 STEEM/SBD worth of vote, up to 0.2 STEEM/SBD = 0.24 STEEM/SBD worth of vote.</li>
 </ol>
-<h4>I will share your donations</h4>
+<h4>What happens to your donations/upvote?</h4>
 <ol>
-<li>50&#37; of it is going directly to Cameroon to fund our conservation program to save Abongphen Highland Forest</li>
-<li>50&#37; will help me to grow and get more STEEM POWER to share more happiness and money on Steemit to you Steemians. e.g. If you send me 0.1 STEEM/SBD I will divide it and use half (0.5) for tree planting and the second half to power me up.</li>
+<li>At least 50&#37; of it is going directly to Cameroon to fund our conservation program to save Abongphen Highland Forest</li>
+<li>50&#37; will help me to get more STEEM POWER to plant more trees in the future as well as to run the bot properly</li>
 </ol>
 <center><h3>EACH DOLLAR (sent to Cameroon)<br/>=<br/>1 TREE PLANTED</h3></center>
-<h4>***PLANT A TREE AND GET PAID FOR IT. <br />IT WOULD BE NICE IF SEND IT AS FREE UP VOTE GIFT TO SOMEBODY!***</h4>
-<h3>My rules</h3>
+<h4>PLANT A TREE AND GET PAID FOR IT. <br />IT WOULD BE NICE IF SEND IT AS FREE UP VOTE GIFT TO SOMEBODY!</h4>
+<h3>Rules of @treeplanter</h3>
 <ol>
 <li>Each post/comment could be upvoted by me only once – if you send the same post/comment again, your contribution is going to be considered as donation without upvoting</li>
-<li>If you transfer less than %(minimum)s STEEM/SBD, I will just thank you for your donation – no upvoting</li>
+<li>If you transfer less than %(minimum)s STEEM/SBD, It is going to be considered as donation without upvoting.</li>
 <li>If you transfer more than %(maximum)s STEEM/SBD, I will upvote the post as the donation is %(maximum)s STEEM/SBD, the rest is just a donation – thank you for it.</li>
-<li>I am going to keep my SP always high - meaning I will only vote every day to keep 80&#37; of voting power. The amount of daily available votes depends on my current SP, see above.</li>
-<li>If my SP is exhausted you will be queued – your link will get my upvote immediately I am strong again. If the link will get expired before I will be able to upvote it you get refunded.</li>
+<li>The maximum daily upvotes are equal to 10 - fully 100&#37; upvotes - keeping voting power as close to 98&#37; as much as possible</li>
+<li>If the Voting Power of @treeplanter gets exhausted you will be queued – your link will get @treeplanter’s upvote immediately when the VP is recharged back. If the link will get expired before @treeplanter is able to upvote it you will get refunded.</li>
+<li>Post to be upvoted have to be maximun 4 days old when the bot will upvote it or it donation will be refunded.</li>
 </ol>
-If you have any trouble or you are concern about a donation contact @treeassistant for help.
 
 <center><h5>More opportunities how to help</h5></center>
 <h6>Contribute to our transparent accounts</h6>
