@@ -246,5 +246,13 @@ module.exports = {
       }
       return value;
     },
+    TAG: function() {
+      var value = 'dtube';
+      if ((process.env.TAG !== undefined) &&
+        (process.env.TAG !== null)) {
+        value = process.env.TAG;
+      }
+      return value;
+    },
   },
 };

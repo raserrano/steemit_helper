@@ -4,7 +4,6 @@ const
   conf = require('../config/dev'),
   steem_api = require('../model/steem_api');
 
-// Voting for new users intro posts
 wait.launchFiber(function() {
   var accounts = '';
   try {
@@ -15,8 +14,8 @@ wait.launchFiber(function() {
     console.log(e);
     process.exit();
   }
-  var posts = wait.for(steem_api.steem_getPostsByTag,'utopian-io',5);
+  var posts = wait.for(steem_api.steem_getPostsByTag,conf.env.TAG(),5);
   var report = utils.votePostsByTag(posts,conf.env.WEIGHT());
-  console.log('Finish voting utopian-io posts');
+  console.log('Finish voting #{conf.env.TAG} posts');
   process.exit();
 });
