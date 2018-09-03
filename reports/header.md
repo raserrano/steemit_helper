@@ -5,6 +5,8 @@
   <h5> since June 2017!</h5>
 </center>
 
+<center>If you have not received the vote and you are wondering where it is you can see the [queue](https://treeplanterv2.herokuapp.com/queue)</center>
+
 ---
 
 %s
