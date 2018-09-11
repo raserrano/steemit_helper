@@ -1,3 +1,4 @@
+<center><img src="https://steemitimages.com/DQmcNsUbep88DodSR2hr6NT4speakfuxGE84NfzNSRHpW2p/KK-icon-plant-tree-Green-outline.png" alt="KK-icon-plant-tree-Green-outline.png"></center>
 <h2>Manual how to plan trees with @treeplanter</h2>
 <ol>
 <li>You, good lady or man, transfer between %(minimum)s and %(maximum)s STEEM/SBD to my wallet, with the link in memo of the post or comment you want to have upvoted by me.</li>
