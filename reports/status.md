@@ -14,5 +14,3 @@ Upvote multiplier | %s
 
 The queue size is currently %s donations that are pending to be voted.
 %s
-
-<center><img src="https://steemitimages.com/DQmcNsUbep88DodSR2hr6NT4speakfuxGE84NfzNSRHpW2p/KK-icon-plant-tree-Green-outline.png" alt="KK-icon-plant-tree-Green-outline.png"></center>
