@@ -31,8 +31,9 @@ Rank | Username | SP delegated | Numbers of trees planted daily
 5 | @sc-steemit | ~152 | 0.02
 6 | @acedawnmusic | ~104 | 0.015
 7 | @treebuilder | ~102 | 0.015
-8 | @dylanhobalart | ~20 | 0.001
-9 | @scottcbusiness | ~10 | 0.001
+8 | @scottcbusiness | ~100 | 0.015
+9 | @jrb450 | ~50 | 0.007
+10 | @dylanhobalart | ~20 | 0.001
 
 <center><h3>Delegate SP to @treeplanter or regulary upvote our daily reports to help us to plant more trees and appear in this list of our greatest supporters. 
 Thanks a lot!</h3><center>
