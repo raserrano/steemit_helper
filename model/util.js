@@ -118,10 +118,16 @@ module.exports = {
           steem_api.steem_getAccounts_wrapper,[account]
         );
         var vp = this.getVotingPower(voter[0]);
+
+        var vote_multiplier = conf.env.VOTE_MULTIPLIER();
+        if(data[i].payer === data[i].author){
+          vote_multiplier = conf.env.SELF_VOTE_MULTIPLIER();
+        }
+
         var weight = steem_api.calculateVoteWeight(
           voter[0],
           vp,
-          (amount_to_be_voted * conf.env.VOTE_MULTIPLIER())
+          (amount_to_be_voted * vote_multiplier)
         );
         if (conf.env.VOTE_ACTIVE()) {
           this.debug('VP is :' + vp);
@@ -990,8 +996,11 @@ module.exports = {
     };
     body += sprintf(contents_2 , data);
 
-    var contents_3 = fs.readFileSync('./reports/raserrano.md', 'utf8');
+    var contents_3 = fs.readFileSync('./reports/delegation.md', 'utf8');
     body += contents_3;
+
+    var contents_4 = fs.readFileSync('./reports/raserrano.md', 'utf8');
+    body += contents_4;
 
     var title = '@treeplanter funds raising & voting bot got ';
     title += daily_donation.toFixed(2) + ' SBD today ' + when;
@@ -1070,8 +1079,11 @@ module.exports = {
     };
     body += sprintf(contents_2 , data);
 
-    var contents_3 = fs.readFileSync('./reports/raserrano.md', 'utf8');
+    var contents_3 = fs.readFileSync('./reports/delegation.md', 'utf8');
     body += contents_3;
+
+    var contents_4 = fs.readFileSync('./reports/raserrano.md', 'utf8');
+    body += contents_4;
 
     this.preparePost(
       conf.env.ACCOUNT_NAME(),

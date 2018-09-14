@@ -166,6 +166,14 @@ module.exports = {
       }
       return value;
     },
+    SELF_VOTE_MULTIPLIER: function() {
+      var value = 1.2;
+      if ((process.env.SELF_VOTE_MULTIPLIER !== undefined) &&
+        (process.env.SELF_VOTE_MULTIPLIER !== null)) {
+        value = parseFloat(process.env.SELF_VOTE_MULTIPLIER);
+      }
+      return value;
+    },
     WEIGHT: function() {
       var value = 5;
       if ((process.env.WEIGHT !== undefined) &&
