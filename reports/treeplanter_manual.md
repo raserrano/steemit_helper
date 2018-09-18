@@ -2,7 +2,7 @@
 <h2>How to plant trees with @treeplanter</h2>
 <ol>
 <li>Transfer between %(minimum)s and %(maximum)s STEEM/SBD to my wallet, with the link in memo of the post or comment you want to have upvoted by me.</li>
-<li>I will upvote the post and attempt to add 100&#37; value per vote per STEEM/SBD you send, so %(minimum)s STEEM/SBD donation = approx %(min_voted)s STEEM/SBD worth of vote, up to %(maximum)s STEEM/SBD = %(max_voted)s STEEM/SBD worth of vote - in case of non-self votes. If you want to be self-voted you will get 20% more of your donation, so 0.01 STEEM/SBD donation = approx 0.012 STEEM/SBD worth of vote, up to 0.2 STEEM/SBD = 0.24 STEEM/SBD worth of vote.</li>
+<li>I will upvote the post and attempt to add 100&#37; value per vote per STEEM/SBD you send, so %(minimum)s STEEM/SBD donation = approx %(min_voted)s STEEM/SBD worth of vote, up to %(maximum)s STEEM/SBD = %(max_voted)s STEEM/SBD worth of vote - in case of non-self votes. If you want to be self-voted you will get 20&#37; more of your donation, so 0.01 STEEM/SBD donation = approx 0.012 STEEM/SBD worth of vote, up to 0.2 STEEM/SBD = 0.24 STEEM/SBD worth of vote.</li>
 </ol>
 <h4>What happens to your donations/upvote?</h4>
 <ol>
@@ -16,7 +16,7 @@
 <li>Each post/comment could be upvoted by me only once – if you send the same post/comment again, your contribution is going to be considered as donation without upvoting</li>
 <li>If you transfer less than %(minimum)s STEEM/SBD, It is going to be considered as donation without upvoting.</li>
 <li>If you transfer more than %(maximum)s STEEM/SBD, I will upvote the post as the donation is %(maximum)s STEEM/SBD, the rest is just a donation – thank you for it.</li>
-<li>The maximum daily upvotes are equal to 10 - fully 100% upvotes - keeping voting power as close to 98% as much as possible</li>
+<li>The maximum daily upvotes are equal to 10 - fully 100&#37; upvotes - keeping voting power as close to 98&#37; as much as possible</li>
 <li>If the Voting Power of @treeplanter gets exhausted you will be queued – your link will get @treeplanter’s upvote immediately when the VP is recharged back. If the link will get expired before @treeplanter is able to upvote it you will get refunded.</li>
 <li>Post to be upvoted have to be maximun 4 days old when the bot will upvote it or it donation will be refunded.</li>
 </ol>

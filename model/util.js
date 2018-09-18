@@ -991,7 +991,6 @@ module.exports = {
       body += (j + 1) + ' | @' + trees[j]._id.payer +
       ' | ' + ((trees[j].total * ci.sbd_to_dollar) / 2).toFixed(2) + '\n';
     }
-
     // Read file and add it to body
     var contents_4 = fs.readFileSync('./reports/treeplanter_manual.md', 'utf8');
     var data = {
@@ -1000,7 +999,8 @@ module.exports = {
       min_voted: (conf.env.MIN_DONATION() * conf.env.VOTE_MULTIPLIER()),
       max_voted: (conf.env.MAX_DONATION() * conf.env.VOTE_MULTIPLIER()),
     };
-    body += sprintf(contents_4 , data);
+    delegation_block = sprintf(contents_4 , data);
+    body += delegation_block;
 
     var contents_5 = fs.readFileSync('./reports/raserrano.md', 'utf8');
     body += contents_5;
