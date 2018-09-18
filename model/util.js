@@ -993,17 +993,17 @@ module.exports = {
     }
 
     // Read file and add it to body
-    var contents_2 = fs.readFileSync('./reports/treeplanter_manual.md', 'utf8');
+    var contents_4 = fs.readFileSync('./reports/treeplanter_manual.md', 'utf8');
     var data = {
       minimum: conf.env.MIN_DONATION(),
       maximum: conf.env.MAX_DONATION(),
       min_voted: (conf.env.MIN_DONATION() * conf.env.VOTE_MULTIPLIER()),
       max_voted: (conf.env.MAX_DONATION() * conf.env.VOTE_MULTIPLIER()),
     };
-    body += sprintf(contents_2 , data);
+    body += sprintf(contents_4 , data);
 
-    var contents_4 = fs.readFileSync('./reports/raserrano.md', 'utf8');
-    body += contents_4;
+    var contents_5 = fs.readFileSync('./reports/raserrano.md', 'utf8');
+    body += contents_5;
 
     var title = '@treeplanter funds raising & voting bot got ';
     title += daily_donation.toFixed(2) + ' SBD today ' + when;
