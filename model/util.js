@@ -948,6 +948,12 @@ module.exports = {
 
 
     var contents_1 = fs.readFileSync('./reports/header.md', 'utf8');
+    body += contents_1;
+    var contents_2 = fs.readFileSync('./reports/delegation.md', 'utf8');
+    body += contents_2;
+    var contents_3 = fs.readFileSync('./reports/treeplanter_stats.md', 'utf8');
+    body += contents_3;
+
     var body = sprintf(
       contents_1,
       stat.trees,
@@ -987,7 +993,7 @@ module.exports = {
     }
 
     // Read file and add it to body
-    var contents_2 = fs.readFileSync('./reports/treeplanterv2.md', 'utf8');
+    var contents_2 = fs.readFileSync('./reports/treeplanter_manual.md', 'utf8');
     var data = {
       minimum: conf.env.MIN_DONATION(),
       maximum: conf.env.MAX_DONATION(),
@@ -995,9 +1001,6 @@ module.exports = {
       max_voted: (conf.env.MAX_DONATION() * conf.env.VOTE_MULTIPLIER()),
     };
     body += sprintf(contents_2 , data);
-
-    var contents_3 = fs.readFileSync('./reports/delegation.md', 'utf8');
-    body += contents_3;
 
     var contents_4 = fs.readFileSync('./reports/raserrano.md', 'utf8');
     body += contents_4;
@@ -1070,7 +1073,7 @@ module.exports = {
     );
 
     // Read file and add it to body
-    var contents_2 = fs.readFileSync('./reports/treeplanterv2.md', 'utf8');
+    var contents_2 = fs.readFileSync('./reports/treeplanter_manual.md', 'utf8');
     var data = {
       minimum: conf.env.MIN_DONATION(),
       maximum: conf.env.MAX_DONATION(),
