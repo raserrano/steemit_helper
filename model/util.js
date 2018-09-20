@@ -955,7 +955,7 @@ module.exports = {
       contents_1,
       stat.trees,
       total_trees,
-      pictures.pics[lucky],
+      pictures.pics[lucky]
     );
 
     var part2 = sprintf(
@@ -968,7 +968,7 @@ module.exports = {
       ci.steem_to_dollar,
       ci.sbd_to_dollar
     );
-    body += part1 + contents_2 + part2 + '\n\n';
+    var body = part1 + contents_2 + part2 + '\n\n';
 
     var range = 'TODAY';
     if (period > 8) {
