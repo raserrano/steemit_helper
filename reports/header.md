@@ -17,6 +17,7 @@
 <h2>Our greatest supporters who allow us to plant more trees</h2>
 <h3>Regular Upvoters</h3>
 <h4>The greatest tree planter is @czechglobalhosts</h4>
+<h3>Plant trees with regular upvotes on posts of @treeplanter using [steemauto.com](https://steemauto.com/) or [steemvoter.com](https://steemvoter.com/)</h3>
 </center>
 <center>![31516832_10160202308580702_3975039172145577984_n.jpg](https://steemitimages.com/DQmWrcmJeu2RUUkKtckwTAfCgLn78ornfFkSy2szFe4aguB/31516832_10160202308580702_3975039172145577984_n.jpg)</center>
 <h3>Plant trees with regular upvotes on posts of @treeplanter using [steemauto.com](https://steemauto.com/) or [steemvoter.com](https://steemvoter.com/)</h3>
