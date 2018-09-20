@@ -1,5 +1,3 @@
-## How you could support tree planting in Cameroon?
-
 ### STEEM POWER DELEGATION
 Far the best support you can give us is Steem Power delegation. Thanks to higher SP the bot is able to process more donations every day, therefore to upvote more posts and obviously the most important plant more trees.
 

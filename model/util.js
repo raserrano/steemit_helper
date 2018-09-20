@@ -955,7 +955,7 @@ module.exports = {
     body += contents_3;
 
     var body = sprintf(
-      contents_1,
+      body,
       stat.trees,
       total_trees,
       pictures.pics[lucky],
