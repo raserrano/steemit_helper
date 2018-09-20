@@ -120,7 +120,7 @@ module.exports = {
         var vp = this.getVotingPower(voter[0]);
 
         var vote_multiplier = conf.env.VOTE_MULTIPLIER();
-        if(data[i].payer === data[i].author){
+        if (data[i].payer === data[i].author) {
           vote_multiplier = conf.env.SELF_VOTE_MULTIPLIER();
         }
 
@@ -948,17 +948,18 @@ module.exports = {
 
 
     var contents_1 = fs.readFileSync('./reports/header.md', 'utf8');
-    body += contents_1;
     var contents_2 = fs.readFileSync('./reports/delegation.md', 'utf8');
-    body += contents_2;
     var contents_3 = fs.readFileSync('./reports/treeplanter_stats.md', 'utf8');
-    body += contents_3;
 
-    var body = sprintf(
-      body,
+    var part1 = sprintf(
+      contents_1,
       stat.trees,
       total_trees,
       pictures.pics[lucky],
+    );
+
+    var part2 = sprintf(
+      contents_3,
       count,
       donators,
       total_trees,
@@ -967,7 +968,7 @@ module.exports = {
       ci.steem_to_dollar,
       ci.sbd_to_dollar
     );
-    body += '\n\n';
+    body += part1 + contents_2 + part2 + '\n\n';
 
     var range = 'TODAY';
     if (period > 8) {
@@ -1188,11 +1189,11 @@ module.exports = {
     body += '--- \n';
     body += 'You can also support this project by sending a transfer and a ';
     body += 'post or comment URL in the memo field. **Minimum is ';
-    body += conf.env.MIN_DONATION()+' SBD/STEEM** ';
+    body += conf.env.MIN_DONATION() + ' SBD/STEEM** ';
     body += 'I will upvote it to a value of ';
-    body += conf.env.VOTE_MULTIPLIER()+' times your donation. \n';
+    body += conf.env.VOTE_MULTIPLIER() + ' times your donation. \n';
     body += '**Max upvote value to ';
-    body += conf.env.MAX_DONATION()+' SBD/STEEM**, you can always send more  ';
+    body += conf.env.MAX_DONATION() + ' SBD/STEEM**, you can always send more  ';
     body += 'but it will be consider a donation.';
 
     var contents_3 = fs.readFileSync('./reports/tuanis.md', 'utf8');
