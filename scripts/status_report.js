@@ -20,6 +20,7 @@ wait.launchFiber(function() {
   // Status
   var options_status = {
     voted: true,
+    status: 'processed',
     limit: 50,
   };
   var report_status = wait.for(utils.getReport,options_status);
