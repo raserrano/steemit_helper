@@ -39,6 +39,7 @@ process.on('SIGINT', function() {
 
 // Models
 require('../model/transfer');
+require('../model/transfer_record');
 require('../model/accounts');
 require('../model/followers');
 require('../model/information');

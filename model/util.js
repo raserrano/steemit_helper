@@ -54,6 +54,24 @@ module.exports = {
       i++;
     }
   },
+  getTransfers: function(account,data) {
+    var i = 0;
+    while (i < data.length) {
+      var query = {number: data[i][0]};
+      if (data[i][1].op[0] == 'transfer') {
+        var res = {
+          number: data[i][0],
+          timestamp: data[i][1].timestamp,
+          from:data[i][1].op[1].from,
+          to:data[i][1].op[1].to,
+          amount:data[i][1].op[1].amount,
+          memo:data[i][1].op[1].memo,
+        }
+        wait.for(this.upsertTransferRecord,query,res);
+      }
+      i++;
+    }
+  },
   startVotingProcess: function(account,data,weight,voter) {
     var vp = this.getVotingPower(voter);
     var posts = new Array();
@@ -613,6 +631,13 @@ module.exports = {
       }
     );
   },
+  getLastTransferRecord: function(callback) {
+    db.model('TransferRecord').find().limit(1).sort({number: -1}).exec(
+      function(err,data) {
+        callback(err,data);
+      }
+    );
+  },
   getQueue: function(callback) {
     db.model('Transfer').find(
       {
@@ -712,6 +737,12 @@ module.exports = {
   },
   upsertTransfer: function(query,doc,callback) {
     db.model('Transfer').update(
+      query,doc,{upsert: true,new: true},
+      function(err,data) {callback(err,data);}
+    );
+  },
+  upsertTransferRecord: function(query,doc,callback) {
+    db.model('TransferRecord').update(
       query,doc,{upsert: true,new: true},
       function(err,data) {callback(err,data);}
     );
