@@ -146,8 +146,8 @@ module.exports = {
       callback(err, result);
     });
   },
-  steem_getAccounts_wrapper: function(accounts, callback) {
-    steem.api.getAccounts(accounts, function(err, result) {
+  steem_getAccounts_wrapper: async function(accounts, callback) {
+    await steem.api.getAccounts(accounts, function(err, result) {
       callback(err, result);
     });
   },
@@ -197,6 +197,17 @@ module.exports = {
   steem_getPostsByAuthor: function(author, amount, callback) {
     steem.api.getDiscussionsByBlog(
       {tag: author, limit: amount},
+      function(err, result) {
+        if (err) {
+          console.log(err);
+        }
+        callback(err, result);
+      }
+    );
+  },
+  steem_getComments: function(author, callback){
+    steem.api.getDiscussionsByComments(
+      {"start_author": author,"limit": 10},
       function(err, result) {
         if (err) {
           console.log(err);

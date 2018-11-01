@@ -1,5 +1,7 @@
 # Steemit helper
 
+
+
 ## Features
 - [x] Voting feature
 - [x] Welcome message feature
@@ -24,3 +26,7 @@
 - [ ] Games like minnow frenzy eat competition
 - [ ] Follow X user votes like guild feature
 - [ ] Daily STEEM/SBD price
+- [ ] Improve curation earnings by looking at post age and possible rewards
+- [ ] Improve algorythm for curation feature
+
+## Settings

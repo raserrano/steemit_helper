@@ -1298,6 +1298,17 @@ module.exports = {
     result += '-' + when.getDate() + '-' + when.getFullYear();
     return result;
   },
+  getRandom: function(count, limit) {
+    // Random
+    var min = Math.ceil(0);
+    var max = Math.floor(count);
+    var lucky = new Array();
+    var k = 0;
+    while (k++ < limit) {
+      lucky.push(Math.floor(Math.random() * (max - min + 1)) + min);
+    }
+    return lucky;
+  },
   debug: function(message) {
     if (conf.env.DEBUG() === true) {
       console.log(message);
