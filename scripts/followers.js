@@ -82,7 +82,7 @@ wait.launchFiber(function() {
   for (var i = 0; i < lucky.length; i++) {
     console.log('Processing ' + followers_db[lucky[i]].username);
     var posts = wait.for(steem_api.steem_getPostsByAuthor,followers_db[lucky[i]].username,20);
-    var comments = wait.for(steem_api.steem_getComments,followers_db[lucky[i]].username,);
+    var comments = wait.for(steem_api.steem_getComments,followers_db[lucky[i]].username);
     var posts = posts.concat(comments);
     if (posts.length > 0) {
       for (var j = 0; j < posts.length;j++) {
@@ -96,7 +96,7 @@ wait.launchFiber(function() {
               posts[j].author,
               posts[j].permlink
             );
-            console.log(result)
+            console.log(result);
             // var voted = steem_api.verifyAccountHasVoted(
             //   [conf.env.ACCOUNT_NAME()],
             //   result
