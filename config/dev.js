@@ -52,6 +52,9 @@ const self = module.exports = {
     ACCOUNT_NAME: function() {
       return self.setString(process.env.ACCOUNT_NAME);
     },
+    ABUSE_COUNT: function() {
+      return self.setInt(process.env.ABUSE_COUNT,5);
+    },
     BENEFICIARIES: function() {
       return self.setString(process.env.BENEFICIARIES);
     },

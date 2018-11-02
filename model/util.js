@@ -32,6 +32,7 @@ module.exports = {
     }
   },
   getTransfersToVote: function(account,data) {
+    var memo = 'You have send too many donation, let others donate or come back later on.';
     var i = 0;
     while (i < data.length) {
       var query = {number: data[i][0]};
@@ -42,9 +43,23 @@ module.exports = {
           if (found.length > 0) {
             var status_ok = (found[0].status !== 'refunded') ||
             (found[0].status !== 'due date') ||
-            (found[0].status !== 'min amount');
+            (found[0].status !== 'min amount') ||
+            (found[0].status !== 'abuse');
             if (status_ok) {
-              wait.for(this.upsertTransfer,query,found);
+              // Abuse rule
+              var abuse_query = {payer: res.payer};
+              var donations = wait.for(this.getTransfer,abuse_query);
+              if(donations.length <= conf.en.ABUSE_COUNT()){
+                wait.for(this.upsertTransfer,query,found);
+              }else{
+                wait.for(
+                  steem_api.doTransfer,
+                  account,
+                  res.payer,
+                  res.amount + ' ' + res.currency,
+                  memo
+                );
+              }
             }
           }else {
             wait.for(this.upsertTransfer,query,res);
@@ -62,10 +77,10 @@ module.exports = {
         var res = {
           number: data[i][0],
           timestamp: data[i][1].timestamp,
-          from:data[i][1].op[1].from,
-          to:data[i][1].op[1].to,
-          amount:data[i][1].op[1].amount,
-          memo:data[i][1].op[1].memo,
+          from: data[i][1].op[1].from,
+          to: data[i][1].op[1].to,
+          amount: data[i][1].op[1].amount,
+          memo: data[i][1].op[1].memo,
         }
         wait.for(this.upsertTransferRecord,query,res);
       }
@@ -75,15 +90,26 @@ module.exports = {
   startVotingProcess: function(account,data,weight,voter) {
     var vp = this.getVotingPower(voter);
     var posts = new Array();
+    // if(accs === null){
+    //   accs = [account,conf.env.ACCOUNT_NAME()];      
+    // }
     for (var i = 0; i < data.length;i++) {
       if (data[i][1].op[0] == 'transfer') {
         if (data[i][1].op[1].to == account) {
           var post = this.getContent([account,conf.env.ACCOUNT_NAME()],data[i]);
           if (post !== null) {
-            if (!post.voted
-              && ((post.status == 'pending') || (post.status == 'processed'))) {
-              posts.push(post);
-            }
+            // New curation rules
+            // amount / (votes * pending)
+            if(this.dateDiff(post.created) > (60 * 15) &&
+              this.dateDiff(post.created) < (86400 * 4.5)){
+              if(parseFloat(post.pending_payout_value.split(' ')[0]) < 20){
+                if (!post.voted
+                  && ((post.status == 'pending') ||
+                    (post.status == 'processed'))) {
+                  posts.push(post);
+                }
+              }
+            } 
           }
         }
       }
@@ -528,6 +554,9 @@ module.exports = {
     obj.status = 'pending';
     obj.author = '';
     obj.url = '';
+    obj.post_created = '';
+    obj.pending_payout_value = '';
+    obj.votes = 0;
     obj.created = null;
     if (obj.memo.indexOf('/') != -1) {
       if (conf.env.COMMENT_VOTE()) {
@@ -553,11 +582,14 @@ module.exports = {
               obj.author,
               obj.url
             );
+            obj.pending_payout_value = result.pending_payout_value;
+            obj.post_created = result.created;
             if (!conf.env.SELF_VOTE()) {
               if (obj.payer !== obj.author) {
                 if ((result !== undefined) && (result !== null)) {
                   obj.created = result.created;
                   if (this.dateDiff(obj.created) < (86400 * 4.5)) {
+                    obj.votes = result.active_votes.length;
                     obj.voted = steem_api.verifyAccountHasVoted(
                       account,
                       result
@@ -664,6 +696,7 @@ module.exports = {
           'url not valid',
           'content-not-found',
           'url-not-found',
+          'abuse'
           ],},
         number: {$gt: last_refunded},
       }
