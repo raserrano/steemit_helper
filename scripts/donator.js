@@ -19,12 +19,13 @@ wait.launchFiber(function() {
 
   // Find last voted post number
   var last_voted = wait.for(utils.getLastTransfer);
+
   if (last_voted.length !== 0) {
     last_voted = last_voted[0].number;
   }else {
     last_voted = 0;
   }
-  if (conf.env.LAST_VOTED() !== null && conf.env.LAST_VOTED() !== undefined) {
+  if (conf.env.LAST_VOTED() !== 0) {
     last_voted = conf.env.LAST_VOTED();
   }
   console.log('Last: ' + last_voted);

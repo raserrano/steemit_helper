@@ -47,18 +47,23 @@ module.exports = {
             (found[0].status !== 'abuse');
             if (status_ok) {
               // Abuse rule
-              var abuse_query = {payer: res.payer};
-              var donations = wait.for(this.getTransfer,abuse_query);
-              if(donations.length <= conf.en.ABUSE_COUNT()){
+              var abuse_count = wait.for(this.getQueueForPayer,res.payer);
+              console.log(abuse_count.length,conf.env.ABUSE_COUNT());
+              console.log(abuse_count.length <= conf.env.ABUSE_COUNT());
+              if(abuse_count.length <= conf.env.ABUSE_COUNT()){
                 wait.for(this.upsertTransfer,query,found);
               }else{
-                wait.for(
-                  steem_api.doTransfer,
-                  account,
-                  res.payer,
-                  res.amount + ' ' + res.currency,
-                  memo
-                );
+               found[0].status = 'abuse';
+                console.log(found,query);
+                wait.for(this.upsertTransfer,query,found);
+                // wait.for(
+                //   steem_api.doTransfer,
+                //   account,
+                //   res.payer,
+                //   res.amount + ' ' + res.currency,
+                //   memo
+                // );
+                console.log('Sent funds back');
               }
             }
           }else {
@@ -102,21 +107,25 @@ module.exports = {
             // amount / (votes * pending)
             if(this.dateDiff(post.created) > (60 * 15) &&
               this.dateDiff(post.created) < (86400 * 4.5)){
-              if(parseFloat(post.pending_payout_value.split(' ')[0]) < 20){
-                if (!post.voted
-                  && ((post.status == 'pending') ||
-                    (post.status == 'processed'))) {
-                  posts.push(post);
-                }
+              var votes_calc = parseFloat(post.votes);
+              var pending = parseFloat(post.pending_payout_value.split(' ')[0]);
+              var magic_number = ( post.amount / pending )*(post.amount/votes_calc);
+              post.magic_number = magic_number;
+              if (!post.voted
+                && ((post.status == 'pending') ||
+                  (post.status == 'processed'))) {
+                posts.push(post);
               }
             } 
           }
         }
       }
     }
+    console.log(posts);
     if (posts.length > 0) {
       posts.sort(function(a,b) {
-        return (a.amount > b.amount) ? 1 : ((b.amount > a.amount) ? -1 : 0);
+        return (a.magic_number > b.magic_number) ? 1 : ((b.magic_number > a.magic_number) ? -1 : 0);
+        // return (a.amount > b.amount) ? 1 : ((b.amount > a.amount) ? -1 : 0);
       });
       if (conf.env.VOTE_ACTIVE()) {
         if (vp >= (conf.env.MIN_VOTING_POWER() * conf.env.VOTE_POWER_1_PC())) {
@@ -584,12 +593,12 @@ module.exports = {
             );
             obj.pending_payout_value = result.pending_payout_value;
             obj.post_created = result.created;
+            obj.votes = result.active_votes.length;
             if (!conf.env.SELF_VOTE()) {
               if (obj.payer !== obj.author) {
                 if ((result !== undefined) && (result !== null)) {
                   obj.created = result.created;
                   if (this.dateDiff(obj.created) < (86400 * 4.5)) {
-                    obj.votes = result.active_votes.length;
                     obj.voted = steem_api.verifyAccountHasVoted(
                       account,
                       result
@@ -679,6 +688,21 @@ module.exports = {
         created: {$ne: null},
       }
       ).sort({number: 1}).exec(
+      function(err,data) {
+        callback(err,data);
+      }
+    );
+  },
+  getQueueForPayer: function(payer_name, callback) {
+    db.model('Transfer').find(
+      {
+        payer: payer_name,
+        voted: false,
+        processed: false,
+        status: {$in: ['pending','processed','comment']},
+        created: {$ne: null},
+      }
+      ).exec(
       function(err,data) {
         callback(err,data);
       }

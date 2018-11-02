@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 const self = module.exports = {
   database: {
     options: {
@@ -29,24 +31,30 @@ const self = module.exports = {
       return uri.toString();
     },
   },
-  setBoolean: function(attribute, value=false){
-     return self.setAtribute(JSON.parse(attribute), value);
+  setBoolean: function(attribute,value=false){
+    if(attribute!==null && attribute !== undefined){
+      value=JSON.parse(attribute);
+    }
+    return value;
   },
   setString: function(attribute, value=''){
-    return self.setAtribute(attribute, value);
-  },
-  setFloat: function(attribute, value=0){
-    return self.setAtribute(parseFloat(attribute), value);
-  },
-  setInt: function(attribute, value=0){
-    return self.setAtribute(parseInt(attribute), value);
-  },
-  setAtribute: function(attribute, value){
-    if ((attribute !== undefined) &&
-      (attribute !== null)) {
-      value = attribute;
+    if(attribute!==null && attribute !== undefined){
+      value=attribute;
     }
-    return value; 
+    return value;
+  },
+  setFloat: function(attribute,value=0){
+    if(attribute!==null && attribute !== undefined){
+      value=parseFloat(attribute);
+    }
+    return value;
+  },
+  setInt: function(attribute,value=0){
+    console.log(attribute);
+    if(attribute!==null && attribute !== undefined){
+      value=parseInt(attribute);
+    }
+    return value;
   },
   env: {
     ACCOUNT_NAME: function() {

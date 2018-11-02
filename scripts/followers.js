@@ -96,37 +96,36 @@ wait.launchFiber(function() {
               posts[j].author,
               posts[j].permlink
             );
-            console.log(result);
-            // var voted = steem_api.verifyAccountHasVoted(
-            //   [conf.env.ACCOUNT_NAME()],
-            //   result
-            // );
-            // if (!voted) {
-            //   steem_api.votePost(posts[j].author, posts[j].permlink, weight);
-            //   var title = 'Free upvote!';
-            //   var comment = 'Congratulations @' + posts[j].author + '!';
-            //   comment += ' You have received a vote as ';
-            //   comment += 'a way to thank you for supporting my program.';
-            //   // Decide how to handle this with a form and mongodb document
-            //   var comment_result = steem_api.commentPost(posts[j].author, posts[j].permlink, title,comment);
-            //   var link = {
-            //     author: comment_result.operations[0][1].author,
-            //     url: comment_result.operations[0][1].permlink,
-            //     created: new Date(),
-            //   };
-            //   if (conf.env.SUPPORT_ACCOUNT() !== '') {
-            //     wait.for(utils.upsertLink,{
-            //       author: comment_result.operations[0][1].author,
-            //       url: comment_result.operations[0][1].permlink,
-            //     },link);
-            //   }
-            //   wait.for(utils.timeout_wrapper,22000);
-            //   votes++;
-            //   break;
-            // }else {
-            //   console.log(posts[j].permlink);
-            //   console.log('Already voted');
-            // }
+            var voted = steem_api.verifyAccountHasVoted(
+              [conf.env.ACCOUNT_NAME()],
+              result
+            );
+            if (!voted) {
+              steem_api.votePost(posts[j].author, posts[j].permlink, weight);
+              var title = 'Free upvote!';
+              var comment = 'Congratulations @' + posts[j].author + '!';
+              comment += ' You have received a vote as ';
+              comment += 'a way to thank you for supporting my program.';
+              // Decide how to handle this with a form and mongodb document
+              var comment_result = steem_api.commentPost(posts[j].author, posts[j].permlink, title,comment);
+              var link = {
+                author: comment_result.operations[0][1].author,
+                url: comment_result.operations[0][1].permlink,
+                created: new Date(),
+              };
+              if (conf.env.SUPPORT_ACCOUNT() !== '') {
+                wait.for(utils.upsertLink,{
+                  author: comment_result.operations[0][1].author,
+                  url: comment_result.operations[0][1].permlink,
+                },link);
+              }
+              wait.for(utils.timeout_wrapper,22000);
+              votes++;
+              break;
+            }else {
+              console.log(posts[j].permlink);
+              console.log('Already voted');
+            }
           }
         }
       }
