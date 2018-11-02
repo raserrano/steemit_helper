@@ -72,25 +72,27 @@ module.exports = {
       i++;
     }
   },
-  startVotingProcess: function(account,data,weight,voter, accs = null) {
+  startVotingProcess: function(account,data,weight,voter) {
     var vp = this.getVotingPower(voter);
     var posts = new Array();
-    if(accs === null){
-      accs = [account,conf.env.ACCOUNT_NAME()];      
-    }
+    // if(accs === null){
+    //   accs = [account,conf.env.ACCOUNT_NAME()];      
+    // }
     for (var i = 0; i < data.length;i++) {
       if (data[i][1].op[0] == 'transfer') {
         if (data[i][1].op[1].to == account) {
-          var post = this.getContent(accs,data[i]);
+          var post = this.getContent([account,conf.env.ACCOUNT_NAME()],data[i]);
           if (post !== null) {
             // New curation rules
+            // amount / (votes * pending)
             if(this.dateDiff(post.created) > (60 * 15) &&
-              this.dateDiff(post.created) < (60 * 120)){
-
-              if (!post.voted
-                && ((post.status == 'pending') ||
-                  (post.status == 'processed'))) {
-                posts.push(post);
+              this.dateDiff(post.created) < (86400 * 4.5)){
+              if(parseFloat(post.pending_payout_value.split(' ')[0]) < 20){
+                if (!post.voted
+                  && ((post.status == 'pending') ||
+                    (post.status == 'processed'))) {
+                  posts.push(post);
+                }
               }
             } 
           }
@@ -539,6 +541,7 @@ module.exports = {
     obj.url = '';
     obj.post_created = '';
     obj.pending_payout_value = '';
+    obj.votes = 0;
     obj.created = null;
     if (obj.memo.indexOf('/') != -1) {
       if (conf.env.COMMENT_VOTE()) {
@@ -571,6 +574,7 @@ module.exports = {
                 if ((result !== undefined) && (result !== null)) {
                   obj.created = result.created;
                   if (this.dateDiff(obj.created) < (86400 * 4.5)) {
+                    obj.votes = result.active_votes.length;
                     obj.voted = steem_api.verifyAccountHasVoted(
                       account,
                       result
