@@ -32,6 +32,7 @@ module.exports = {
     }
   },
   getTransfersToVote: function(account,data) {
+    var memo = 'You have send too many donation, let others donate or come back later on.';
     var i = 0;
     while (i < data.length) {
       var query = {number: data[i][0]};
@@ -42,9 +43,23 @@ module.exports = {
           if (found.length > 0) {
             var status_ok = (found[0].status !== 'refunded') ||
             (found[0].status !== 'due date') ||
-            (found[0].status !== 'min amount');
+            (found[0].status !== 'min amount') ||
+            (found[0].status !== 'abuse');
             if (status_ok) {
-              wait.for(this.upsertTransfer,query,found);
+              // Abuse rule
+              var abuse_query = {payer: res.payer};
+              var donations = wait.for(this.getTransfer,abuse_query);
+              if(donations.length <= conf.en.ABUSE_COUNT()){
+                wait.for(this.upsertTransfer,query,found);
+              }else{
+                wait.for(
+                  steem_api.doTransfer,
+                  account,
+                  res.payer,
+                  res.amount + ' ' + res.currency,
+                  memo
+                );
+              }
             }
           }else {
             wait.for(this.upsertTransfer,query,res);
@@ -681,6 +696,7 @@ module.exports = {
           'url not valid',
           'content-not-found',
           'url-not-found',
+          'abuse'
           ],},
         number: {$gt: last_refunded},
       }

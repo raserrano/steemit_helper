@@ -54,6 +54,14 @@ module.exports = {
       }
       return value;
     },
+    ABUSE_COUNT: function() {
+      var value = 2;
+      if ((process.env.ABUSE_COUNT !== undefined) &&
+        (process.env.ABUSE_COUNT !== null)) {
+        value = parseInt(process.env.ABUSE_COUNT);
+      }
+      return value;
+    },
     POSTING_KEY_PRV: function() {
       var value = '';
       if ((process.env.POSTING_KEY_PRV !== undefined) &&
