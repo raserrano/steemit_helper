@@ -74,16 +74,14 @@ wait.launchFiber(function() {
   }
   // Verify if follower has active posts
 
-  var lucky = utils.getRandom(count.follower_count, 10);
+  var lucky = utils.getRandom(count.follower_count, 1);
   console.log(lucky);
   var votes = 0;
   var followers_db = wait.for(utils.getFollowers);
-  console.log(followers_db);
+
   for (var i = 0; i < lucky.length; i++) {
     console.log('Processing ' + followers_db[lucky[i]].username);
-    var posts = wait.for(steem_api.steem_getPostsByAuthor,followers_db[lucky[i]].username,20);
-    var comments = wait.for(steem_api.steem_getComments,followers_db[lucky[i]].username);
-    var posts = posts.concat(comments);
+    var posts = wait.for(steem_api.steem_getComments,followers_db[lucky[i]].username);
     if (posts.length > 0) {
       for (var j = 0; j < posts.length;j++) {
         if (followers_db[lucky[i]].username == posts[j].author) {
