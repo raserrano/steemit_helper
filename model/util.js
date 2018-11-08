@@ -106,7 +106,7 @@ module.exports = {
             // New curation rules
             // amount / (votes * pending)
             if(this.dateDiff(post.created) > (60 * 15) &&
-              this.dateDiff(post.created) < (86400 * 4.5)){
+              this.dateDiff(post.created) < (86400 * 2)){
               var votes_calc = parseFloat(post.votes);
               var pending = parseFloat(post.pending_payout_value.split(' ')[0]);
               var magic_number = ( post.amount / pending )*(post.amount/votes_calc);
