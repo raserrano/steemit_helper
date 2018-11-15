@@ -50,13 +50,13 @@ module.exports = {
               var abuse_count = wait.for(this.getQueueForPayer,res.payer);
               console.log(abuse_count.length,conf.env.ABUSE_COUNT());
               console.log(abuse_count.length <= conf.env.ABUSE_COUNT());
-              if(abuse_count.length <= conf.env.ABUSE_COUNT()){
+              if (abuse_count.length <= conf.env.ABUSE_COUNT()) {
                 wait.for(this.upsertTransfer,query,found);
-              }else{
-               found[0].status = 'abuse';
+              }else {
+                found[0].status = 'abuse';
                 console.log(found,query);
                 wait.for(this.upsertTransfer,query,found);
-                // wait.for(
+                // Wait.for(
                 //   steem_api.doTransfer,
                 //   account,
                 //   res.payer,
@@ -92,64 +92,61 @@ module.exports = {
       i++;
     }
   },
-  startVotingProcess: function(account,data,weight,voter) {
-    var vp = this.getVotingPower(voter);
+  getHighCurationPosts: function(account,voters,data) {
     var posts = new Array();
-    // if(accs === null){
-    //   accs = [account,conf.env.ACCOUNT_NAME()];      
-    // }
     for (var i = 0; i < data.length;i++) {
       if (data[i][1].op[0] == 'transfer') {
         if (data[i][1].op[1].to == account) {
-          var post = this.getContent([account,conf.env.ACCOUNT_NAME()],data[i]);
+          var post = this.getContent(voters.concat(conf.env.ACCOUNT_NAME()),data[i]);
           if (post !== null) {
             // New curation rules
             // amount / (votes * pending)
-            if(this.dateDiff(post.created) > (60 * 15) &&
-              this.dateDiff(post.created) < (86400 * 2)){
+            if (this.dateDiff(post.created) > (60 * 15) &&
+              this.dateDiff(post.created) < (86400 * 2)) {
               var votes_calc = parseFloat(post.votes);
               var pending = parseFloat(post.pending_payout_value.split(' ')[0]);
-              var magic_number = ( post.amount / pending )*(post.amount/votes_calc);
+              var magic_number = (post.amount / pending) * (post.amount / votes_calc);
               post.magic_number = magic_number;
               if (!post.voted
                 && ((post.status == 'pending') ||
                   (post.status == 'processed'))) {
                 posts.push(post);
               }
-            } 
+            }
           }
         }
       }
     }
-    console.log(posts);
-    if (posts.length > 0) {
-      posts.sort(function(a,b) {
-        return (a.magic_number > b.magic_number) ? 1 : ((b.magic_number > a.magic_number) ? -1 : 0);
-        // return (a.amount > b.amount) ? 1 : ((b.amount > a.amount) ? -1 : 0);
-      });
-      if (conf.env.VOTE_ACTIVE()) {
-        if (vp >= (conf.env.MIN_VOTING_POWER() * conf.env.VOTE_POWER_1_PC())) {
-          var to_vote = posts[posts.length - 1];
-          if ((to_vote.author !== undefined) && (to_vote.author !== null)
-            && (to_vote.url !== undefined) && (to_vote.url !== null)) {
-            if (!to_vote.voted) {
-              steem_api.votePost(
-                to_vote.author,
-                to_vote.url,
-                weight
-              );
-              wait.for(this.timeout_wrapper,5000);
-            }
+    return posts;
+  },
+  startVotingProcess: function(account,data,weight,voter) {
+    var vp = this.getVotingPower(voter);
+    if (conf.env.VOTE_ACTIVE()) {
+      if (vp >= (conf.env.MIN_VOTING_POWER() * conf.env.VOTE_POWER_1_PC())) {
+        var to_vote = data[data.length - 1];
+        if ((to_vote.author !== undefined) && (to_vote.author !== null)
+          && (to_vote.url !== undefined) && (to_vote.url !== null)) {
+          if (!to_vote.voted) {
+            this.debug('Amount: ' + to_vote.amount);
+            this.debug('Votes: ' + to_vote.votes);
+            this.debug('Number: ' + to_vote.magic_number);
+            this.debug('Pending: ' + to_vote.pending_payout_value);
+            steem_api.votePost(
+              to_vote.author,
+              to_vote.url,
+              weight
+            );
+            wait.for(this.timeout_wrapper,5000);
           }
-        }else {
-          this.debug('VP to low to vote');
         }
       }else {
-        this.debug(
-          'Voting is not active, voting: '
-          + JSON.stringify(posts[posts.length - 1])
-        );
+        this.debug('VP to low to vote');
       }
+    }else {
+      this.debug(
+        'Voting is not active, voting: ' +
+        JSON.stringify(data[data.length - 1])
+      );
     }
   },
   startVotingDonationsProcess: function(account,data) {
@@ -720,7 +717,7 @@ module.exports = {
           'url not valid',
           'content-not-found',
           'url-not-found',
-          'abuse'
+          'abuse',
           ],},
         number: {$gt: last_refunded},
       }

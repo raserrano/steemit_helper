@@ -78,7 +78,7 @@ wait.launchFiber(function() {
   console.log(lucky);
   var votes = 0;
   var followers_db = wait.for(utils.getFollowers);
-  console.log(followers_db);
+  // console.log(followers_db);
   for (var i = 0; i < lucky.length; i++) {
     console.log('Processing ' + followers_db[lucky[i]].username);
     var posts = wait.for(steem_api.steem_getPostsByAuthor,followers_db[lucky[i]].username,20);

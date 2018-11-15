@@ -50,7 +50,6 @@ const self = module.exports = {
     return value;
   },
   setInt: function(attribute,value=0){
-    console.log(attribute);
     if(attribute!==null && attribute !== undefined){
       value=parseInt(attribute);
     }

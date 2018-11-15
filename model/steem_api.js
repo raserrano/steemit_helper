@@ -110,7 +110,7 @@ module.exports = {
       console.log(e);
     }
   },
-  publishPostOptionsAsync: function(author, permlink, tags, title, bodyText, percent, ext){
+  publishPostOptionsAsync: function(author, permlink, tags, title, bodyText, percent, ext) {
     var  operations = [
       ['comment',
         {
@@ -120,8 +120,8 @@ module.exports = {
           permlink,
           title: title,
           body: bodyText,
-          json_metadata : JSON.stringify(tags)
-        }
+          json_metadata: JSON.stringify(tags),
+        },
       ],
       ['comment_options',
         {
@@ -131,9 +131,9 @@ module.exports = {
           percent_steem_dollars: percent,
           allow_votes: true,
           allow_curation_rewards: true,
-          extensions: ext
-        }
-      ]
+          extensions: ext,
+        },
+      ],
     ];
     return wait.for(
       steem.broadcast.sendAsync,
@@ -205,9 +205,9 @@ module.exports = {
       }
     );
   },
-  steem_getComments: function(author, callback){
+  steem_getComments: function(author, callback) {
     steem.api.getDiscussionsByComments(
-      {"start_author": author,"limit": 10},
+      {start_author: author,limit: 10},
       function(err, result) {
         if (err) {
           console.log(err);
@@ -258,25 +258,8 @@ module.exports = {
       for (var i = 0; i < result.active_votes.length;i++) {
         votes.push(result.active_votes[i].voter);
       }
-      // Debug
-      // console.log('Votes: '+votes);
-      // console.log(account);
-      for (var j = 0;j < account.length;j++) {
-        var match = '';
-        if (account[j] instanceof Function) {
-          match = account[j]();
-        }else {
-          match = account[j];
-        }
-        if (votes.indexOf(match) != -1) {
-          pos++;
-          break;
-        }
-      }
     }
-    // Debug
-    // console.log('Found '+ match +' '+(pos !== 0));
-    return pos !== 0;
+    return votes.some(r=> account.includes(r));
   },
   getSteemPower: function(account) {
     var globalData = wait.for(
