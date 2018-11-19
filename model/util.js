@@ -103,14 +103,21 @@ module.exports = {
             // amount / (votes * pending)
             if (this.dateDiff(post.created) > (60 * 15) &&
               this.dateDiff(post.created) < (86400 * 2)) {
-              var votes_calc = parseFloat(post.votes);
-              var pending = parseFloat(post.pending_payout_value.split(' ')[0]);
-              var magic_number = (post.amount / pending) * (post.amount / votes_calc);
-              post.magic_number = magic_number;
-              if (!post.voted
-                && ((post.status == 'pending') ||
-                  (post.status == 'processed'))) {
-                posts.push(post);
+              if (post.amount >= 5) {
+                var votes_calc = parseFloat(post.votes);
+                if (votes_calc <= 50) {
+                  var pending = parseFloat(
+                    post.pending_payout_value.split(' ')[0]
+                  );
+                  var magic_number = (post.amount / pending) *
+                    (post.amount / votes_calc);
+                  post.magic_number = magic_number;
+                  if (!post.voted && ((post.status == 'pending') ||
+                      (post.status == 'processed'))) {
+                    post.bot = account;
+                    posts.push(post);
+                  }
+                }
               }
             }
           }
@@ -127,10 +134,7 @@ module.exports = {
         if ((to_vote.author !== undefined) && (to_vote.author !== null)
           && (to_vote.url !== undefined) && (to_vote.url !== null)) {
           if (!to_vote.voted) {
-            this.debug('Amount: ' + to_vote.amount);
-            this.debug('Votes: ' + to_vote.votes);
-            this.debug('Number: ' + to_vote.magic_number);
-            this.debug('Pending: ' + to_vote.pending_payout_value);
+            this.debug(to_vote);
             steem_api.votePost(
               to_vote.author,
               to_vote.url,
@@ -207,6 +211,7 @@ module.exports = {
                 trees_total = (
                   (trees_total[0].total * ci.sbd_to_dollar) / 2
                 ).toFixed(2);
+                // Refactor this
                 if (conf.env.ACCOUNT_NAME() === 'treeplanter') {
                   var sp = steem_api.getSteemPower(voter[0]).toFixed(2);
                   var trees = ((data[i].amount * ci.sbd_to_dollar) / 2).toFixed(2);
@@ -526,7 +531,7 @@ module.exports = {
             conf.env.MIN_VOTING_POWER() * conf.env.VOTE_POWER_1_PC()
             )) {
         if (!steem_api.verifyAccountHasVoted(
-          [conf.env.ACCOUNT_NAME],posts[i]
+          [conf.env.ACCOUNT_NAME()],posts[i]
           )) {
           if (conf.env.VOTE_ACTIVE()) {
             steem_api.votePost(posts[i].author,posts[i].permlink,weight);
