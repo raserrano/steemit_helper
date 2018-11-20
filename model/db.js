@@ -44,5 +44,6 @@ require('../model/accounts');
 require('../model/followers');
 require('../model/information');
 require('../model/links');
+require('../model/delegators');
 
 module.exports = db;

@@ -4,7 +4,7 @@ const
   steem_api = require('../model/steem_api'),
   fs = require('fs'),
   sprintf = require('sprintf-js').sprintf,
-  conf = require('../config/dev');
+  conf = require('../config/current');
 // Generates a report on sunday
 wait.launchFiber(function() {
   // Things that I need to do for the growth report
@@ -65,16 +65,13 @@ wait.launchFiber(function() {
     pictures = JSON.parse(fs.readFileSync('./reports/tuanis_pics.json', 'utf8'));
     contents_2 = fs.readFileSync('./reports/footer_tuanis.md', 'utf8');
   }
-  // Random
-  var min = Math.ceil(0);
-  var max = Math.floor(pictures.pics.length);
-  var lucky = Math.floor(Math.random() * (max - min + 1)) + min;
+
   var data = {
     followers: account.followers,
     reputation: account.reputation,
     vote: account.vote,
     sp: account.sp,
-    picture: pictures.pics[lucky],
+    picture: pictures.pics[utils.getRandom(pictures.pics.length,1)],
     minimum: conf.env.MIN_DONATION(),
     maximum: conf.env.MAX_DONATION(),
     multiplier: conf.env.VOTE_MULTIPLIER(),

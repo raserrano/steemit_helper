@@ -24,16 +24,3 @@
 
 <h4>SP delegators</h4>
 Thanks following steemians for delegated power
-
-Rank | Username | SP delegated | Numbers of trees planted daily
----|---|---|---
-1 | @itchykitten | ~5242 | 2
-2 | @martin.mikes | ~5138 | 2
-3 | @jean-gregoire | ~5115 | 2
-4 | @kedjom-keku | ~2370 | 1
-5 | @sc-steemit | ~152 | 0.02
-6 | @acedawnmusic | ~104 | 0.015
-7 | @treebuilder | ~102 | 0.015
-8 | @scottcbusiness | ~100 | 0.015
-9 | @jrb450 | ~50 | 0.007
-10 | @dylanhobalart | ~20 | 0.001

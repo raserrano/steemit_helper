@@ -259,9 +259,9 @@ module.exports = {
         votes.push(result.active_votes[i].voter);
       }
     }
-    console.log(account);
-    console.log('Votes: ' + votes);
-    console.log('Voted: ' + votes.some(r=> account.includes(r)));
+    // console.log(account);
+    // console.log('Votes: ' + votes);
+    // console.log('Voted: ' + votes.some(r=> account.includes(r)));
     return votes.some(r=> account.includes(r));
   },
   getSteemPower: function(account) {

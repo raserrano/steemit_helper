@@ -4,7 +4,7 @@ const
   steem_api = require('../model/steem_api'),
   fs = require('fs'),
   sprintf = require('sprintf-js').sprintf,
-  conf = require('../config/dev');
+  conf = require('../config/current');
 // Daily stats
 wait.launchFiber(function() {
   var voter = '';
@@ -112,7 +112,8 @@ wait.launchFiber(function() {
   );
   body += footer;
 
-  if (conf.env.DAYS().includes(account.created.getDay().toString())) {
+  var today = new Date();
+  if (conf.env.DAYS().includes(today.getDay().toString())) {
     utils.preparePost(
       conf.env.ACCOUNT_NAME(),
       permlink,

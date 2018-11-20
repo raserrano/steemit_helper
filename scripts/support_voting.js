@@ -1,7 +1,7 @@
 const
   wait = require('wait.for'),
   utils = require('../model/util'),
-  conf = require('../config/dev'),
+  conf = require('../config/current'),
   steem_api = require('../model/steem_api');
 
 // Voting for donations
@@ -16,8 +16,8 @@ wait.launchFiber(function() {
     var vp = utils.getVotingPower(voter[0]);
     if (vp >= 9800) {
       var diff = utils.dateDiff(links[i].created);
-      if (diff > 1800) {
-        if (diff < (86400 * 6)) {
+      if (diff > (60 * 15)) {
+        if (diff < (60 * 60)) {
           steem_api.voteSupport(links[i].author, links[i].url, weight);
           wait.for(utils.deleteLink,{_id: links[i]._id});
           wait.for(utils.timeout_wrapper,5100);
