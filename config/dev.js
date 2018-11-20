@@ -74,6 +74,9 @@ const self = module.exports = {
     COMMENT_WAIT: function() {
       return self.setInt(process.env.COMMENT_WAIT,5);
     },
+    DAYS: function() {
+      return self.setString(process.env.DAYS);
+    },
     DEBUG: function() {
       return self.setBoolean(process.env.DEBUG);
     },

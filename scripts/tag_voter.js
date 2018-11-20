@@ -16,6 +16,6 @@ wait.launchFiber(function() {
   }
   var posts = wait.for(steem_api.steem_getPostsByTag,conf.env.TAG(),5);
   var report = utils.votePostsByTag(posts,conf.env.WEIGHT());
-  console.log("Finish voting " + conf.env.TAG() + " posts");
+  console.log('Finish voting ' + conf.env.TAG() + ' posts');
   process.exit();
 });

@@ -103,9 +103,9 @@ module.exports = {
             // amount / (votes * pending)
             if (this.dateDiff(post.created) > (60 * 15) &&
               this.dateDiff(post.created) < (86400 * 2)) {
-              if (post.amount >= 5) {
+              if (post.amount >= 10) {
                 var votes_calc = parseFloat(post.votes);
-                if (votes_calc <= 50) {
+                if (votes_calc <= 100) {
                   var pending = parseFloat(
                     post.pending_payout_value.split(' ')[0]
                   );
@@ -213,31 +213,23 @@ module.exports = {
                 ).toFixed(2);
                 // Refactor this
                 if (conf.env.ACCOUNT_NAME() === 'treeplanter') {
-                  var sp = steem_api.getSteemPower(voter[0]).toFixed(2);
-                  var trees = ((data[i].amount * ci.sbd_to_dollar) / 2).toFixed(2);
                   title = 'Thanks for your donation';
-                  comment += '<center>';
-                  comment += '<h3>You just planted ' + trees + ' tree(s)!</h3>\n';
-                  comment += 'Thanks to @' + data[i].payer + ' \n';
-                  comment += '<h3>We have planted already ' + trees_total;
-                  comment += ' trees\n out of 1,000,000<h3>\n';
-                  comment += 'Let\'s save and restore Abongphen Highland';
-                  comment += ' Forest\nin Cameroonian village Kedjom-Keku!\n';
-                  comment += 'Plant trees with @treeplanter and get';
-                  comment += ' paid for it!\nMy Steem Power = ' + sp + '\n';
-                  comment += 'Thanks a lot!\n @martin.mikes';
-                  comment += ' coordinator of @kedjom-keku\n';
-                  comment += '![treeplantermessage_ok.png](https://';
-                  comment += 'steemitimages.com/DQmdeFhTevmcmLvubxMMDoYBoNSa';
-                  comment += 'z4ftt7PxktmLDmF2WGg/treeplantermessage_ok.png)';
-                  comment += '</center>';
+                  var contents_1 = fs.readFileSync('./reports/treeplanter_comment.md', 'utf8');
+                  var data = {
+                    trees: ((data[i].amount * ci.sbd_to_dollar) / 2).toFixed(2),
+                    payer: data[i].payer,
+                    trees_total: trees_total,
+                    sp: steem_api.getSteemPower(voter[0]).toFixed(2),
+                  };
+                  comment = sprintf(contents_1, data);
                 }else {
                   title = 'Thanks for your donation';
-                  comment = 'Congratulations @' + data[i].author + '!';
-                  comment += ' You have received a vote as ';
-                  comment += 'part of  @' + data[i].payer;
-                  comment += ' donation to this project.\n';
-                  comment += 'I will be able to help more #minnows \n';
+                  var contents_1 = fs.readFileSync('./reports/tuanis_comment.md', 'utf8');
+                  var data = {
+                    author: data[i].author,
+                    payer: data[i].payer,
+                  };
+                  comment = sprintf(contents_1, data);
                 }
                 // Decide how to handle this with a form and mongodb document
                 var comment_result = steem_api.commentPost(
@@ -960,7 +952,7 @@ module.exports = {
     body += '\n\nMake sure to visit their profile and welcome them as well.\n';
     body += 'Long live Steemit, the social revolution platform.';
 
-    var contents_3 = fs.readFileSync('./reports/tuanis.md', 'utf8');
+    var contents_3 = fs.readFileSync('./reports/footer_tuanis.md', 'utf8');
     body += contents_3;
 
     this.preparePost(
@@ -1100,196 +1092,6 @@ module.exports = {
     title += daily_donation.toFixed(2) + ' SBD today ' + when;
     title += ' to save Abongphen Highland Forest in Cameroon. Thank you!';
 
-    this.preparePost(
-      conf.env.ACCOUNT_NAME(),
-      permlink,
-      title,
-      body,
-      tags
-    );
-  },
-  generateStatusReport: function(status,queue) {
-    var when = this.getDate(new Date());
-    var permlink = 'treeplanter-status-' + when;
-
-    var tags = {tags: ['treeplanter','status','report','bot']};
-
-    var title = '@treeplanter status report ' + when;
-    var response_time = 0;
-    for (var i = 0;i < status.length;i++) {
-      response_time += this.dateDiff(status[i].processed_date,status[i].voted_date);
-    }
-    var avg_response = parseFloat(response_time) / 50;
-    var duration = 'The average duration for the last donations was ';
-    var days = parseInt(avg_response / (60 * 60 * 24));
-    var hours = parseInt(avg_response / (60 * 60));
-    var minutes = parseInt(avg_response / (60));
-    if (days > 0) {
-      duration += days + ' day(s) ';
-      hours -= days * 24;
-      if (hours > 0) {
-        duration += 'and ' + hours + ' hour(s) ';
-        minutes -= hours * 60;
-      }else {
-        duration += 'and ' + minutes + ' minute(s).';
-      }
-    }else {
-      if (hours > 0) {
-        if (days === 0) {
-          duration += hours + ' hour(s) ';
-          minutes -= hours * 60;
-        }else {
-          duration += 'and ' + hours + ' hour(s) ';
-          minutes -= hours * 60;
-        }
-      }else {
-        if (hours === 0) {
-          duration += minutes + ' minute(s).';
-        }else {
-          duration += 'and ' + minutes + ' minute(s).';
-        }
-      }
-    }
-    // Read file and add it to body
-    var contents_1 = fs.readFileSync('./reports/status.md', 'utf8');
-    var body = sprintf(
-      contents_1,
-      'Hello treeplanters!',
-      conf.env.MAX_DONATION(),
-      conf.env.MIN_DONATION(),
-      conf.env.VOTE_MULTIPLIER(),
-      duration,
-      queue.length,
-      '[Check the queue here](https://treeplanterv2.herokuapp.com/queue)'
-    );
-
-    // Read file and add it to body
-    var contents_2 = fs.readFileSync('./reports/treeplanter_manual.md', 'utf8');
-    var data = {
-      minimum: conf.env.MIN_DONATION(),
-      maximum: conf.env.MAX_DONATION(),
-      min_voted: (conf.env.MIN_DONATION() * conf.env.VOTE_MULTIPLIER()),
-      max_voted: (conf.env.MAX_DONATION() * conf.env.VOTE_MULTIPLIER()),
-    };
-    body += sprintf(contents_2 , data);
-
-    var contents_3 = fs.readFileSync('./reports/delegation.md', 'utf8');
-    body += contents_3;
-
-    var contents_4 = fs.readFileSync('./reports/raserrano.md', 'utf8');
-    body += contents_4;
-
-    this.preparePost(
-      conf.env.ACCOUNT_NAME(),
-      permlink,
-      title,
-      body,
-      tags
-    );
-  },
-  generateStatusReportTuanis: function(status,queue) {
-    var when = this.getDate(new Date());
-    var permlink = 'tuanis-status-' + when;
-
-    var tags = {tags: ['helpmejoin', 'status', 'report', 'bot']};
-
-    var title = '@tuanis status report ' + when;
-    var response_time = 0;
-    for (var i = 0;i < status.length;i++) {
-      response_time += this.dateDiff(status[i].processed_date,status[i].voted_date);
-    }
-    var avg_response = parseFloat(response_time) / 50;
-    var duration = 'The average duration for the last donations was ';
-    var days = parseInt(avg_response / (60 * 60 * 24));
-    var hours = parseInt(avg_response / (60 * 60));
-    var minutes = parseInt(avg_response / (60));
-    if (days > 0) {
-      duration += days + ' day(s) ';
-      hours -= days * 24;
-      if (hours > 0) {
-        duration += 'and ' + hours + ' hour(s) ';
-        minutes -= hours * 60;
-      }else {
-        duration += 'and ' + minutes + ' minute(s).';
-      }
-    }else {
-      if (hours > 0) {
-        if (days === 0) {
-          duration += hours + ' hour(s) ';
-          minutes -= hours * 60;
-        }else {
-          duration += 'and ' + hours + ' hour(s) ';
-          minutes -= hours * 60;
-        }
-      }else {
-        if (hours === 0) {
-          duration += minutes + ' minute(s).';
-        }else {
-          duration += 'and ' + minutes + ' minute(s).';
-        }
-      }
-    }
-    // Read file and add it to body
-    var contents_1 = fs.readFileSync('./reports/status.md', 'utf8');
-    var body = sprintf(
-      contents_1,
-      'Hello minnows!',
-      conf.env.MAX_DONATION(),
-      conf.env.MIN_DONATION(),
-      conf.env.VOTE_MULTIPLIER(),
-      duration,
-      queue.length,
-      ''
-    );
-
-    var contents_3 = fs.readFileSync('./reports/tuanis.md', 'utf8');
-    body += contents_3;
-
-    this.preparePost(
-      conf.env.ACCOUNT_NAME(),
-      permlink,
-      title,
-      body,
-      tags
-    );
-  },
-  generateGrowthReport: function(account) {
-    var when = this.getDate(account.created);
-    var permlink = account.username + '-growth-' + when;
-    var title = 'Growth report for ' + when;
-    var body = '<h3>Growth Report</h3>\n With your help I have grown and ';
-
-    var pictures = JSON.parse(fs.readFileSync('./reports/tuanis_pics.json', 'utf8'));
-
-    // Random
-    var min = Math.ceil(0);
-    var max = Math.floor(pictures.pics.length);
-    var lucky = Math.floor(Math.random() * (max - min + 1)) + min;
-
-    body += 'I am able to help more minnows. Thanks for your support.\n ';
-    body += '\n';
-    body += '- **Followers:** ' + account.followers + '\n';
-    body += '- **Reputation:** ' + account.reputation + '\n';
-    body += '- **Vote value:** ' + account.vote + '\n';
-    body += '- **Steem power:** ' + account.sp + '\n';
-    body += '\n\n';
-    body += pictures.pics[lucky];
-    body += '\n\n';
-    body += 'Upvote this report to keep supporting this project. \n\n';
-    body += '--- \n';
-    body += 'You can also support this project by sending a transfer and a ';
-    body += 'post or comment URL in the memo field. **Minimum is ';
-    body += conf.env.MIN_DONATION() + ' SBD/STEEM** ';
-    body += 'I will upvote it to a value of ';
-    body += conf.env.VOTE_MULTIPLIER() + ' times your donation. \n';
-    body += '**Max upvote value to ';
-    body += conf.env.MAX_DONATION() + ' SBD/STEEM**, you can always send more  ';
-    body += 'but it will be consider a donation.';
-
-    var contents_3 = fs.readFileSync('./reports/tuanis.md', 'utf8');
-    body += contents_3;
-
-    var tags = {tags: ['helpmejoin','minnowsupportproject','minnows']};
     this.preparePost(
       conf.env.ACCOUNT_NAME(),
       permlink,
