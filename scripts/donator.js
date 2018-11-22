@@ -25,6 +25,7 @@ wait.launchFiber(function() {
   }else {
     last_voted = 0;
   }
+  console.log(last_voted);
   if (conf.env.LAST_VOTED() !== 0) {
     last_voted = conf.env.LAST_VOTED();
   }

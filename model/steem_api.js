@@ -53,20 +53,22 @@ module.exports = {
       permlink
     ).toLowerCase().replace(/\./g,'');
     console.log('Comment permlink: ' + comment_permlink);
-    try {
-      result = wait.for(
-        steem.broadcast.comment,
-        conf.env.POSTING_KEY_PRV(),
-        author,
-        permlink,
-        conf.env.ACCOUNT_NAME(),
-        comment_permlink,
-        title,
-        comment,
-        {}
-      );
-    }catch (e) {
-      console.log(e);
+    if(comment_permlink.length < 200){
+      try {
+        result = wait.for(
+          steem.broadcast.comment,
+          conf.env.POSTING_KEY_PRV(),
+          author,
+          permlink,
+          conf.env.ACCOUNT_NAME(),
+          comment_permlink,
+          title,
+          comment,
+          {}
+        );
+      }catch (e) {
+        console.log(e);
+      }
     }
     return result;
   },

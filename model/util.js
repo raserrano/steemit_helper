@@ -35,11 +35,11 @@ module.exports = {
     var memo = 'You have send too many donation, let others donate or come back later on.';
     var i = 0;
     while (i < data.length) {
-      var query = {number: data[i][0]};
       if (data[i][1].op[0] == 'transfer') {
         if (data[i][1].op[1].to == account) {
-          var found = wait.for(this.getData,'Transfer',query);
           var res = this.getContent([account],data[i]);
+          var query = {$and:[{author:res.author},{url:res.url}]};
+          var found = wait.for(this.getData,'Transfer',query);
           if (found.length > 0) {
             var status_ok = (found[0].status !== 'refunded') ||
             (found[0].status !== 'due date') ||
@@ -47,24 +47,20 @@ module.exports = {
             (found[0].status !== 'abuse');
             if (status_ok) {
               // Abuse rule
-              var abuse_count = wait.for(this.getQueueForPayer,res.payer);
-              console.log(abuse_count.length,conf.env.ABUSE_COUNT());
-              console.log(abuse_count.length <= conf.env.ABUSE_COUNT());
-              if (abuse_count.length <= conf.env.ABUSE_COUNT()) {
-                wait.for(this.upsertModel,'Transfer',query,found);
-              }else {
-                found[0].status = 'abuse';
-                console.log(found,query);
-                wait.for(this.upsertModel,'Transfer',query,found);
-                // Wait.for(
-                //   steem_api.doTransfer,
-                //   account,
-                //   res.payer,
-                //   res.amount + ' ' + res.currency,
-                //   memo
-                // );
-                console.log('Sent funds back');
-              }
+              // var abuse_count = wait.for(this.getQueueForPayer,res.payer);
+              // if (abuse_count.length <= conf.env.ABUSE_COUNT()) {
+              wait.for(this.upsertModel,'Transfer',query,found);
+              // }else {
+              //   found[0].status = 'abuse';
+              //   wait.for(this.upsertModel,'Transfer',query,found);
+              //   wait.for(
+              //     steem_api.doTransfer,
+              //     account,
+              //     res.payer,
+              //     res.amount.toFixed(3) + ' ' + res.currency,
+              //     memo
+              //   );
+              // }
             }
           }else {
             wait.for(this.upsertModel,'Transfer',query,res);
@@ -99,7 +95,7 @@ module.exports = {
         if (data[i][1].op[1].to == account) {
           var post = this.getContent([conf.env.ACCOUNT_NAME(),account],data[i]);
           if (post !== null) {
-            if (!post.voted) {
+            if (!post.voted && !post.flags) {
               if (this.dateDiff(post.created) > (60 * 15) &&
                 this.dateDiff(post.created) < (86400 * 3)) {
                 if (post.amount >= 5) {
@@ -212,21 +208,21 @@ module.exports = {
                 if (conf.env.ACCOUNT_NAME() === 'treeplanter') {
                   title = 'Thanks for your donation';
                   var contents_1 = fs.readFileSync('./reports/treeplanter_comment.md', 'utf8');
-                  var data = {
+                  var comment_params = {
                     trees: ((data[i].amount * ci.sbd_to_dollar) / 2).toFixed(2),
                     payer: data[i].payer,
                     trees_total: trees_total,
                     sp: steem_api.getSteemPower(voter[0]).toFixed(2),
                   };
-                  comment = sprintf(contents_1, data);
+                  comment = sprintf(contents_1, comment_params);
                 }else {
                   title = 'Thanks for your donation';
                   var contents_1 = fs.readFileSync('./reports/tuanis_comment.md', 'utf8');
-                  var data = {
+                  var comment_params = {
                     author: data[i].author,
                     payer: data[i].payer,
                   };
-                  comment = sprintf(contents_1, data);
+                  comment = sprintf(contents_1, comment_params);
                 }
                 // Decide how to handle this with a form and mongodb document
                 var comment_result = steem_api.commentPost(
@@ -306,13 +302,7 @@ module.exports = {
         wait.for(
           this.upsertModel,
           'Transfer',
-          {_id: data[i]._id},
-          {voted: true}
-        );
-        wait.for(
-          this.upsertModel,
-          'Transfer',
-          {url: data[i].url},
+          {$and:[{author:data[i].author},{url:data[i].url}]},
           {voted: true}
         );
       }else {
@@ -334,6 +324,11 @@ module.exports = {
         if (refunded_urls.includes(data[i].memo)) {
           data[i].status = 'refunded';
         }else {
+          conditions = data[i].status === 'due date' ||
+            data[i].status === 'comment' ||
+            data[i].status === 'self-vote' ||
+            data[i].status === 'abuse' ||
+            data[i].status === 'refunded'; 
           if (conditions) {
             // Comment in post or comment that amount was refunded *-*
             var title = 'Thanks for your donation';
@@ -354,7 +349,7 @@ module.exports = {
             wait.for(
               this.upsertModel,
               'Transfer',
-              {_id: data[i]._id},
+              {$and:[{author:data[i].author},{url:data[i].url}]},
               {status: 'refunded'}
             );
             refunded_urls.push(data[i].memo);
@@ -371,7 +366,7 @@ module.exports = {
               wait.for(
                 this.upsertModel,
                 'Transfer',
-                {_id: data[i]._id},
+                {$and:[{author:data[i].author},{url:data[i].url}]},
                 {status: 'refunded'}
               );
               refunded_urls.push(data[i].memo);
@@ -381,13 +376,7 @@ module.exports = {
         wait.for(
           this.upsertModel,
           'Transfer',
-          {memo: data[i].memo},
-          {status: 'refunded'}
-        );
-        wait.for(
-          this.upsertModel,
-          'Transfer',
-          {url: data[i].url},
+          {$and:[{author:data[i].author},{url:data[i].url}]},
           {status: 'refunded'}
         );
       }
@@ -602,9 +591,8 @@ module.exports = {
       if (vp >= (
             conf.env.MIN_VOTING_POWER() * conf.env.VOTE_POWER_1_PC()
             )) {
-        if (!steem_api.verifyAccountHasVoted(
-          [conf.env.ACCOUNT_NAME()],posts[i]
-          )) {
+        if (!steem_api.verifyAccountHasVoted([conf.env.ACCOUNT_NAME()],posts[i]) && 
+          !steem_api.verifyAccountHasVoted(['cheetah','steemcleaners'],posts[i])) {
           if (conf.env.VOTE_ACTIVE()) {
             steem_api.votePost(posts[i].author,posts[i].permlink,weight);
             wait.for(this.timeout_wrapper,4000);
@@ -675,6 +663,10 @@ module.exports = {
                   if (this.dateDiff(obj.created) < (86400 * 4.5)) {
                     obj.voted = steem_api.verifyAccountHasVoted(
                       account,
+                      result
+                    );
+                    obj.flags = steem_api.verifyAccountHasVoted(
+                      ['cheetah','steemcleaners'],
                       result
                     );
                     obj.status = 'processed';

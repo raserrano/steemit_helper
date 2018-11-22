@@ -6,7 +6,7 @@ const
 
 // Voting for donations
 wait.launchFiber(function() {
-  var links = wait.for(utils.getLinks);
+  var links = wait.for(utils.getData,'Link',{});
   var weight =  conf.env.WEIGHT();
   console.log('Links to vote: ' + links.length);
   for (var i = 0; i < links.length;i++) {
@@ -14,7 +14,7 @@ wait.launchFiber(function() {
        steem_api.steem_getAccounts_wrapper,[conf.env.SUPPORT_ACCOUNT()]
     );
     var vp = utils.getVotingPower(voter[0]);
-    if (vp >= 9800) {
+    if (vp >= conf.env.MIN_VOTING_POWER()) {
       var diff = utils.dateDiff(links[i].created);
       if (diff > (60 * 15)) {
         if (diff < (60 * 60)) {

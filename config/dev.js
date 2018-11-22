@@ -44,13 +44,13 @@ const self = module.exports = {
     return value;
   },
   setFloat: function(attribute,value=0){
-    if(attribute!==null && attribute !== undefined){
+    if(attribute!==null && attribute !== undefined && attribute.length !== 0){
       value=parseFloat(attribute);
     }
     return value;
   },
   setInt: function(attribute,value=0){
-    if(attribute!==null && attribute !== undefined){
+    if(attribute!==null && attribute !== undefined && attribute.length !== 0){
       value=parseInt(attribute);
     }
     return value;
