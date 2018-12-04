@@ -106,9 +106,11 @@ module.exports = {
                     );
                     var magic_number = (post.amount / pending) *
                       (post.amount / votes_calc);
-                    post.magic_number = magic_number;
-                    post.bot = account;
-                    posts.push(post);
+                    if(magic_number >= 20){
+                      post.magic_number = magic_number;
+                      post.bot = account;
+                      posts.push(post);
+                    }
                   }
                 }
               }
