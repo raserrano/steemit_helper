@@ -12,6 +12,7 @@ var followerSchema = new Schema({
   tier: { type: Object, required: false},
   created: { type: Date, required: false},
   active: { type: Boolean, required: false},
+  deleted: { type: Boolean, required: false},
 
 });
 

@@ -1,12 +1,12 @@
 const
   wait = require('wait.for'),
   utils = require('../model/util'),
-  conf = require('../config/dev'),
+  conf = require('../config/current'),
   steem_api = require('../model/steem_api');
 
 // Voting for high bids
 wait.launchFiber(function() {
-  var voter = '';
+  var voter = null;
   try {
     voter = wait.for(
       steem_api.steem_getAccounts_wrapper,[conf.env.ACCOUNT_NAME()]
@@ -33,6 +33,8 @@ wait.launchFiber(function() {
     }else {
       utils.debug('Nothing to claim');
     }
+  }else{
+    console.log('ACCOUNT_NAME is not set');
   }
   console.log('Finish claiming rewards');
   process.exit();

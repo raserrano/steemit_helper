@@ -1,7 +1,7 @@
 const
   wait = require('wait.for'),
   utils = require('../model/util'),
-  conf = require('../config/dev'),
+  conf = require('../config/current'),
   steem_api = require('../model/steem_api');
 
 // Voting for new users intro posts

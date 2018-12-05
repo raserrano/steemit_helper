@@ -15,77 +15,21 @@ wait.launchFiber(function() {
     steem_api.steem_getFollowersCount,
     conf.env.ACCOUNT_NAME()
   );
+  console.log('From API');
+  console.log(count);
+  console.log('From DB');
   var followers_db = wait.for(utils.getData,'Follower',{});
-  // Clean followers who unfollowed
-  if (count.follower_count !== followers_db.length) {
-    wait.for(utils.cleanFollowers);
-  }
-  var followers_clean = wait.for(utils.getData,'Follower',{});
-  // console.log(date.getDay(),count.follower_count,followers_db.length);
-  if (date.getDay() === 0 || (count.follower_count !== followers_db.length)) {
-
-    console.log('Followers ' + count.follower_count);
-    // Verify followers
-    var batch = 100;
-    var processed = '';
-    var followers = [];
-    var i = 0;
-    while (i < count.follower_count) {
-      try {
-        followers = wait.for(
-          steem_api.steem_getFollowers,
-          conf.env.ACCOUNT_NAME(),
-          processed,
-          'blog',
-          batch
-        );
-      }catch (e) {
-        console.log(e);
-      }
-      // console.log(followers.length);
-      for (var current = 0; current < followers.length; current++) {
-        var user = {};
-        try {
-          user = wait.for(
-            steem_api.steem_getAccounts_wrapper,[followers[current].follower]
-          );
-        }catch (e) {
-          console.log(e);
-        }
-        // console.log(followers[current])
-        if (user[0] !== undefined) {
-          var rep = utils.getReputation(user[0]);
-          obj = {
-            username: followers[current].follower,
-            tier: {level: 0,vote: 10,vote_count: 2},
-            active: true,
-            created: date,
-            reputation: rep,
-          };
-          wait.for(
-            utils.upsertModel,
-            'Follower',
-            {username: followers[current].follower},
-            obj
-          );
-        }
-        processed = followers[current].follower;
-        i++;
-      }
-    }
-  }
+  console.log(followers_db);
   // Verify if follower has active posts
 
   var lucky = utils.getRandom(count.follower_count, 10);
   console.log(lucky);
   var votes = 0;
   var followers_db = wait.for(utils.getData,'Follower',{});
-  // console.log(followers_db);
+
   for (var i = 0; i < lucky.length; i++) {
     console.log('Processing ' + followers_db[lucky[i]].username);
-    var posts = wait.for(steem_api.steem_getPostsByAuthor,followers_db[lucky[i]].username,20);
-    var comments = wait.for(steem_api.steem_getComments,followers_db[lucky[i]].username);
-    var posts = posts.concat(comments);
+    var posts = wait.for(steem_api.steem_getComments,followers_db[lucky[i]].username);
     if (posts.length > 0) {
       for (var j = 0; j < posts.length;j++) {
         if (followers_db[lucky[i]].username == posts[j].author) {

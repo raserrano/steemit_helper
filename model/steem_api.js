@@ -53,20 +53,22 @@ module.exports = {
       permlink
     ).toLowerCase().replace(/\./g,'');
     console.log('Comment permlink: ' + comment_permlink);
-    try {
-      result = wait.for(
-        steem.broadcast.comment,
-        conf.env.POSTING_KEY_PRV(),
-        author,
-        permlink,
-        conf.env.ACCOUNT_NAME(),
-        comment_permlink,
-        title,
-        comment,
-        {}
-      );
-    }catch (e) {
-      console.log(e);
+    if(comment_permlink.length < 200){
+      try {
+        result = wait.for(
+          steem.broadcast.comment,
+          conf.env.POSTING_KEY_PRV(),
+          author,
+          permlink,
+          conf.env.ACCOUNT_NAME(),
+          comment_permlink,
+          title,
+          comment,
+          {}
+        );
+      }catch (e) {
+        console.log(e);
+      }
     }
     return result;
   },
@@ -110,7 +112,7 @@ module.exports = {
       console.log(e);
     }
   },
-  publishPostOptionsAsync: function(author, permlink, tags, title, bodyText, percent, ext){
+  publishPostOptionsAsync: function(author, permlink, tags, title, bodyText, percent, ext) {
     var  operations = [
       ['comment',
         {
@@ -120,8 +122,8 @@ module.exports = {
           permlink,
           title: title,
           body: bodyText,
-          json_metadata : JSON.stringify(tags)
-        }
+          json_metadata: JSON.stringify(tags),
+        },
       ],
       ['comment_options',
         {
@@ -131,9 +133,9 @@ module.exports = {
           percent_steem_dollars: percent,
           allow_votes: true,
           allow_curation_rewards: true,
-          extensions: ext
-        }
-      ]
+          extensions: ext,
+        },
+      ],
     ];
     return wait.for(
       steem.broadcast.sendAsync,
@@ -146,8 +148,8 @@ module.exports = {
       callback(err, result);
     });
   },
-  steem_getAccounts_wrapper: function(accounts, callback) {
-    steem.api.getAccounts(accounts, function(err, result) {
+  steem_getAccounts_wrapper: async function(accounts, callback) {
+    await steem.api.getAccounts(accounts, function(err, result) {
       callback(err, result);
     });
   },
@@ -205,6 +207,17 @@ module.exports = {
       }
     );
   },
+  steem_getComments: function(author, callback) {
+    steem.api.getDiscussionsByComments(
+      {start_author: author,limit: 10},
+      function(err, result) {
+        if (err) {
+          console.log(err);
+        }
+        callback(err, result);
+      }
+    );
+  },
   steem_transferToVesting: function(from, to, amount) {
     steem.broadcast.transferToVesting(
       conf.env.WIF(),
@@ -247,25 +260,11 @@ module.exports = {
       for (var i = 0; i < result.active_votes.length;i++) {
         votes.push(result.active_votes[i].voter);
       }
-      // Debug
-      // console.log('Votes: '+votes);
-      // console.log(account);
-      for (var j = 0;j < account.length;j++) {
-        var match = '';
-        if (account[j] instanceof Function) {
-          match = account[j]();
-        }else {
-          match = account[j];
-        }
-        if (votes.indexOf(match) != -1) {
-          pos++;
-          break;
-        }
-      }
     }
-    // Debug
-    // console.log('Found '+ match +' '+(pos !== 0));
-    return pos !== 0;
+    // console.log(account);
+    // console.log('Votes: ' + votes);
+    // console.log('Voted: ' + votes.some(r=> account.includes(r)));
+    return votes.some(r=> account.includes(r));
   },
   getSteemPower: function(account) {
     var globalData = wait.for(

@@ -2,7 +2,7 @@ const
   wait = require('wait.for'),
   utils = require('../model/util'),
   steem_api = require('../model/steem_api'),
-  conf = require('../config/dev');
+  conf = require('../config/current');
 // Generates a report for the voted posts of account
 wait.launchFiber(function() {
   var voter = '';

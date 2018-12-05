@@ -18,15 +18,13 @@ wait.launchFiber(function() {
   }
 
   // Find last voted post number
-  var last_voted = wait.for(utils.getDataLast,'Transfer',{},{number: -1});
-
+  var last_voted = wait.for(utils.getDataLast,'TransferRecord',{},{number: -1});
   if (last_voted.length !== 0) {
     last_voted = last_voted[0].number;
   }else {
     last_voted = 0;
   }
-  console.log(last_voted);
-  if (conf.env.LAST_VOTED() !== 0) {
+  if (conf.env.LAST_VOTED() !== null && conf.env.LAST_VOTED() !== undefined) {
     last_voted = conf.env.LAST_VOTED();
   }
   console.log('Last: ' + last_voted);
@@ -58,18 +56,12 @@ wait.launchFiber(function() {
       from,
       RECORDS_FETCH_LIMIT
     );
-    utils.getTransfersToVote(
+    utils.getTransfers(
       conf.env.ACCOUNT_NAME(),
       results
     );
     last_voted += RECORDS_FETCH_LIMIT;
   }
-  var queue = wait.for(utils.getQueue);
-  console.log('Queue to vote: ' + queue.length);
-  utils.startVotingDonationsProcess(
-    conf.env.ACCOUNT_NAME(),
-    queue
-  );
-  console.log('Finish voting donations');
+  console.log('Finish getting transfer');
   process.exit();
 });

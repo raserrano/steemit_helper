@@ -2,7 +2,9 @@ const
   wait = require('wait.for'),
   utils = require('../model/util'),
   steem_api = require('../model/steem_api'),
-  conf = require('../config/dev');
+  fs = require('fs'),
+  sprintf = require('sprintf-js').sprintf,
+  conf = require('../config/current');
 // Generates a report on sunday
 wait.launchFiber(function() {
   // Things that I need to do for the growth report
@@ -31,7 +33,6 @@ wait.launchFiber(function() {
   var steempower = steem_api.getSteemPower(voter[0]);
   account.created = new Date();
 
-  // Saving the data
   account.username = conf.env.ACCOUNT_NAME();
   account.followers = followers.follower_count;
   account.sp = steempower.toFixed(3);
@@ -48,25 +49,41 @@ wait.launchFiber(function() {
   var r = account.sp / a;
   var vote = parseInt(r * m * 100) * i * o;
   account.vote = vote.toFixed(2);
-
   account.reputation = utils.getReputation(voter[0]);
-  if (account.created.getDay() === 1) {
-    utils.generateGrowthReport(
-      account
-    );
-  }
-  if (account.created.getDay() === 4) {
-    // Status
-    var options_status = {
-      voted: true,
-      limit: 50,
-    };
-    var report_status = wait.for(utils.getReport,options_status);
-    var report_queue = wait.for(utils.getQueue);
 
-    utils.generateStatusReportTuanis(
-      report_status,
-      report_queue
+  var when = utils.getDate(account.created);
+  var permlink = account.username + '-growth-' + when;
+  var title = 'Growth report for ' + when;
+
+  var contents_1 = fs.readFileSync('./reports/growth.md', 'utf8');
+  var tags = {};
+  var pictures = {};
+  var contents_2 = '';
+
+  if (conf.env.ACCOUNT_NAME() === 'tuanis') {
+    tags = {tags: ['helpmejoin','minnowsupportproject','minnows']};
+    pictures = JSON.parse(fs.readFileSync('./reports/tuanis_pics.json', 'utf8'));
+    contents_2 = fs.readFileSync('./reports/footer_tuanis.md', 'utf8');
+  }
+
+  var data = {
+    followers: account.followers,
+    reputation: account.reputation,
+    vote: account.vote,
+    sp: account.sp,
+    picture: pictures.pics[utils.getRandom(pictures.pics.length,1)],
+    minimum: conf.env.MIN_DONATION(),
+    maximum: conf.env.MAX_DONATION(),
+    multiplier: conf.env.VOTE_MULTIPLIER(),
+  };
+  var body = sprintf(contents_1 + contents_2, data);
+  if (conf.env.DAYS().includes(account.created.getDay().toString())) {
+    utils.preparePost(
+      conf.env.ACCOUNT_NAME(),
+      permlink,
+      title,
+      body,
+      tags
     );
   }
   console.log('Finish report');
