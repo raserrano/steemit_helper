@@ -1,7 +1,7 @@
 const
   wait = require('wait.for'),
   utils = require('../model/util'),
-  conf = require('../config/dev'),
+  conf = require('../config/current'),
   steem_api = require('../model/steem_api');
 
 // Voting for donations
@@ -18,7 +18,7 @@ wait.launchFiber(function() {
     process.exit();
   }
   // Get not voted posts from DB
-  var last_refunded = wait.for(utils.getLastRefunded);
+  var last_refunded = wait.for(utils.getDataLast,'Transfer',{status: 'refunded'},{number: -1});
   if (last_refunded.length === 0) {
     last_refunded = conf.env.LAST_REFUNDED();
   }else {

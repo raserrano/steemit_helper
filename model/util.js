@@ -32,22 +32,38 @@ module.exports = {
     }
   },
   getTransfersToVote: function(account,data) {
+    var memo = 'You have send too many donation, let others donate or come back later on.';
     var i = 0;
     while (i < data.length) {
-      var query = {number: data[i][0]};
       if (data[i][1].op[0] == 'transfer') {
         if (data[i][1].op[1].to == account) {
-          var found = wait.for(this.getTransfer,query);
           var res = this.getContent([account],data[i]);
+          var query = {$and:[{author:res.author},{url:res.url}]};
+          var found = wait.for(this.getData,'Transfer',query);
           if (found.length > 0) {
             var status_ok = (found[0].status !== 'refunded') ||
             (found[0].status !== 'due date') ||
-            (found[0].status !== 'min amount');
+            (found[0].status !== 'min amount') ||
+            (found[0].status !== 'abuse');
             if (status_ok) {
-              wait.for(this.upsertTransfer,query,found);
+              // Abuse rule
+              // var abuse_count = wait.for(this.getQueueForPayer,res.payer);
+              // if (abuse_count.length <= conf.env.ABUSE_COUNT()) {
+              wait.for(this.upsertModel,'Transfer',query,found);
+              // }else {
+              //   found[0].status = 'abuse';
+              //   wait.for(this.upsertModel,'Transfer',query,found);
+              //   wait.for(
+              //     steem_api.doTransfer,
+              //     account,
+              //     res.payer,
+              //     res.amount.toFixed(3) + ' ' + res.currency,
+              //     memo
+              //   );
+              // }
             }
           }else {
-            wait.for(this.upsertTransfer,query,res);
+            wait.for(this.upsertModel,'Transfer',query,res);
           }
         }
       }
@@ -62,59 +78,74 @@ module.exports = {
         var res = {
           number: data[i][0],
           timestamp: data[i][1].timestamp,
-          from:data[i][1].op[1].from,
-          to:data[i][1].op[1].to,
-          amount:data[i][1].op[1].amount,
-          memo:data[i][1].op[1].memo,
+          from: data[i][1].op[1].from,
+          to: data[i][1].op[1].to,
+          amount: data[i][1].op[1].amount,
+          memo: data[i][1].op[1].memo,
         }
-        wait.for(this.upsertTransferRecord,query,res);
+        wait.for(this.upsertModel,'TransferRecord',query,res);
       }
       i++;
     }
   },
-  startVotingProcess: function(account,data,weight,voter) {
-    var vp = this.getVotingPower(voter);
+  getHighCurationPosts: function(account,voters,data) {
     var posts = new Array();
     for (var i = 0; i < data.length;i++) {
       if (data[i][1].op[0] == 'transfer') {
         if (data[i][1].op[1].to == account) {
-          var post = this.getContent([account,conf.env.ACCOUNT_NAME()],data[i]);
+          var post = this.getContent([conf.env.ACCOUNT_NAME(),account],data[i]);
           if (post !== null) {
-            if (!post.voted
-              && ((post.status == 'pending') || (post.status == 'processed'))) {
-              posts.push(post);
+            if (!post.voted && !post.flags) {
+              if (this.dateDiff(post.created) > (60 * 15) &&
+                this.dateDiff(post.created) < (86400 * 3)) {
+                if (post.amount >= 5) {
+                  var votes_calc = parseFloat(post.votes);
+                  if (votes_calc <= 100) {
+                    var pending = parseFloat(
+                      post.pending_payout_value.split(' ')[0]
+                    );
+                    var magic_number = (post.amount / pending) *
+                      (post.amount / votes_calc);
+                    if(magic_number >= 20){
+                      post.magic_number = magic_number;
+                      post.bot = account;
+                      posts.push(post);
+                    }
+                  }
+                }
+              }
             }
           }
         }
       }
     }
-    if (posts.length > 0) {
-      posts.sort(function(a,b) {
-        return (a.amount > b.amount) ? 1 : ((b.amount > a.amount) ? -1 : 0);
-      });
-      if (conf.env.VOTE_ACTIVE()) {
-        if (vp >= (conf.env.MIN_VOTING_POWER() * conf.env.VOTE_POWER_1_PC())) {
-          var to_vote = posts[posts.length - 1];
-          if ((to_vote.author !== undefined) && (to_vote.author !== null)
-            && (to_vote.url !== undefined) && (to_vote.url !== null)) {
-            if (!to_vote.voted) {
-              steem_api.votePost(
-                to_vote.author,
-                to_vote.url,
-                weight
-              );
-              wait.for(this.timeout_wrapper,5000);
-            }
+    return posts;
+  },
+  startVotingProcess: function(account,data,weight,voter) {
+    var vp = this.getVotingPower(voter);
+    if (conf.env.VOTE_ACTIVE()) {
+      if (vp >= (conf.env.MIN_VOTING_POWER() * conf.env.VOTE_POWER_1_PC())) {
+        var to_vote = data[data.length - 1];
+        if ((to_vote.author !== undefined) && (to_vote.author !== null)
+          && (to_vote.url !== undefined) && (to_vote.url !== null)) {
+          if (!to_vote.voted) {
+            this.debug(to_vote);
+            steem_api.votePost(
+              to_vote.author,
+              to_vote.url,
+              weight
+            );
+            wait.for(this.timeout_wrapper,5000);
           }
-        }else {
-          this.debug('VP to low to vote');
         }
       }else {
-        this.debug(
-          'Voting is not active, voting: '
-          + JSON.stringify(posts[posts.length - 1])
-        );
+        this.debug('VP to low to vote');
       }
+    }else {
+      this.debug(
+        'Voting is not active, voting: ' +
+        JSON.stringify(data[data.length - 1])
+      );
     }
   },
   startVotingDonationsProcess: function(account,data) {
@@ -175,32 +206,25 @@ module.exports = {
                 trees_total = (
                   (trees_total[0].total * ci.sbd_to_dollar) / 2
                 ).toFixed(2);
+                // Refactor this
                 if (conf.env.ACCOUNT_NAME() === 'treeplanter') {
-                  var sp = steem_api.getSteemPower(voter[0]).toFixed(2);
-                  var trees = ((data[i].amount * ci.sbd_to_dollar) / 2).toFixed(2);
                   title = 'Thanks for your donation';
-                  comment += '<center>';
-                  comment += '<h3>You just planted ' + trees + ' tree(s)!</h3>\n';
-                  comment += 'Thanks to @' + data[i].payer + ' \n';
-                  comment += '<h3>We have planted already ' + trees_total;
-                  comment += ' trees\n out of 1,000,000<h3>\n';
-                  comment += 'Let\'s save and restore Abongphen Highland';
-                  comment += ' Forest\nin Cameroonian village Kedjom-Keku!\n';
-                  comment += 'Plant trees with @treeplanter and get';
-                  comment += ' paid for it!\nMy Steem Power = ' + sp + '\n';
-                  comment += 'Thanks a lot!\n @martin.mikes';
-                  comment += ' coordinator of @kedjom-keku\n';
-                  comment += '![treeplantermessage_ok.png](https://';
-                  comment += 'steemitimages.com/DQmdeFhTevmcmLvubxMMDoYBoNSa';
-                  comment += 'z4ftt7PxktmLDmF2WGg/treeplantermessage_ok.png)';
-                  comment += '</center>';
+                  var contents_1 = fs.readFileSync('./reports/treeplanter_comment.md', 'utf8');
+                  var comment_params = {
+                    trees: ((data[i].amount * ci.sbd_to_dollar) / 2).toFixed(2),
+                    payer: data[i].payer,
+                    trees_total: trees_total,
+                    sp: steem_api.getSteemPower(voter[0]).toFixed(2),
+                  };
+                  comment = sprintf(contents_1, comment_params);
                 }else {
                   title = 'Thanks for your donation';
-                  comment = 'Congratulations @' + data[i].author + '!';
-                  comment += ' You have received a vote as ';
-                  comment += 'part of  @' + data[i].payer;
-                  comment += ' donation to this project.\n';
-                  comment += 'I will be able to help more #minnows \n';
+                  var contents_1 = fs.readFileSync('./reports/tuanis_comment.md', 'utf8');
+                  var comment_params = {
+                    author: data[i].author,
+                    payer: data[i].payer,
+                  };
+                  comment = sprintf(contents_1, comment_params);
                 }
                 // Decide how to handle this with a form and mongodb document
                 var comment_result = steem_api.commentPost(
@@ -215,12 +239,12 @@ module.exports = {
                   created: new Date(),
                 };
                 if (conf.env.SUPPORT_ACCOUNT() !== '') {
-                  wait.for(this.upsertLink,{
+                  wait.for(this.upsertModel,'Link',{
                     author: comment_result.operations[0][1].author,
                     url: comment_result.operations[0][1].permlink,
                   },link);
                 }
-                wait.for(this.timeout_wrapper,17000);
+                wait.for(this.timeout_wrapper,3000);
               }else {
                 this.debug(
                   'Commenting is not active, commenting: ' +
@@ -229,7 +253,8 @@ module.exports = {
               }
             }
             wait.for(
-              this.upsertTransfer,
+              this.upsertModel,
+              'Transfer',
               {_id: data[i]._id},
               {
                 donation: data[i].donation,
@@ -249,7 +274,8 @@ module.exports = {
         }
       }else {
         wait.for(
-          this.upsertTransfer,
+          this.upsertModel,
+          'Transfer',
           {_id: data[i]._id},
           {
             donation: data[i].amount,
@@ -276,13 +302,9 @@ module.exports = {
       );
       if (voted) {
         wait.for(
-          this.upsertTransfer,
-          {_id: data[i]._id},
-          {voted: true}
-        );
-        wait.for(
-          this.upsertTransfer,
-          {url: data[i].url},
+          this.upsertModel,
+          'Transfer',
+          {$and:[{author:data[i].author},{url:data[i].url}]},
           {voted: true}
         );
       }else {
@@ -304,6 +326,11 @@ module.exports = {
         if (refunded_urls.includes(data[i].memo)) {
           data[i].status = 'refunded';
         }else {
+          conditions = data[i].status === 'due date' ||
+            data[i].status === 'comment' ||
+            data[i].status === 'self-vote' ||
+            data[i].status === 'abuse' ||
+            data[i].status === 'refunded'; 
           if (conditions) {
             // Comment in post or comment that amount was refunded *-*
             var title = 'Thanks for your donation';
@@ -311,7 +338,7 @@ module.exports = {
             comment += '(https://steemitimages.com/DQmaCMGBXirzeFWCWD8gVadsJE1';
             comment += 'PY1pvXTECAyjGAtF5KNg/treeplanternoplant_new.png)';
             steem_api.commentPost(data[i].author, data[i].url, title,comment);
-            wait.for(this.timeout_wrapper,22000);
+            wait.for(this.timeout_wrapper,4000);
             send = data[i].amount.toFixed(3) + ' ' + data[i].currency;
             this.debug(send,account,data[i].payer,memo);
             wait.for(
@@ -322,8 +349,9 @@ module.exports = {
               memo
             );
             wait.for(
-              this.upsertTransfer,
-              {_id: data[i]._id},
+              this.upsertModel,
+              'Transfer',
+              {$and:[{author:data[i].author},{url:data[i].url}]},
               {status: 'refunded'}
             );
             refunded_urls.push(data[i].memo);
@@ -336,10 +364,11 @@ module.exports = {
               comment += 'com/DQmZsdAUXGYBH38xY4smeMtHHEiEHxaEaQmGo2pJhMNdQfX/';
               comment += 'treeplantermessage_new.png)';
               steem_api.commentPost(data[i].author, data[i].url, title,comment);
-              wait.for(this.timeout_wrapper,22000);
+              wait.for(this.timeout_wrapper,4000);
               wait.for(
-                this.upsertTransfer,
-                {_id: data[i]._id},
+                this.upsertModel,
+                'Transfer',
+                {$and:[{author:data[i].author},{url:data[i].url}]},
                 {status: 'refunded'}
               );
               refunded_urls.push(data[i].memo);
@@ -347,13 +376,9 @@ module.exports = {
           }
         }
         wait.for(
-          this.upsertTransfer,
-          {memo: data[i].memo},
-          {status: 'refunded'}
-        );
-        wait.for(
-          this.upsertTransfer,
-          {url: data[i].url},
+          this.upsertModel,
+          'Transfer',
+          {$and:[{author:data[i].author},{url:data[i].url}]},
           {status: 'refunded'}
         );
       }
@@ -378,7 +403,8 @@ module.exports = {
           memo
         );
         wait.for(
-          this.upsertTransfer,
+          this.upsertModel,
+          'Transfer',
           {_id: data[i]._id},
           {status: 'refunded'}
         );
@@ -405,7 +431,7 @@ module.exports = {
         if (account[0].post_count < 50) {
           if (this.dateDiff(created) < (86400 * 30)) {
             if (!steem_api.verifyAccountHasVoted(
-              [conf.env.ACCOUNT_NAME],posts[i]
+              [conf.env.ACCOUNT_NAME()],posts[i]
               )) {
               var sbd = account[0].sbd_balance.split(' ');
               var steem = account[0].balance.split(' ');
@@ -454,19 +480,24 @@ module.exports = {
                   created: new Date(),
                 };
                 if (conf.env.SUPPORT_ACCOUNT() !== '') {
-                  wait.for(this.upsertLink,{
-                    author: comment_result.operations[0][1].author,
-                    url: comment_result.operations[0][1].permlink,
-                  },link);
+                  wait.for(
+                    this.upsertModel,
+                    'Link',
+                    {
+                      author: comment_result.operations[0][1].author,
+                      url: comment_result.operations[0][1].permlink,
+                    },
+                    link
+                  );
                 }
-                wait.for(this.timeout_wrapper,17000);
+                wait.for(this.timeout_wrapper,4000);
               }else {
                 this.debug(
                   'Commenting is not active, commenting: ' + posts[i].author +
                   'url: ' + posts[i].permlink
                 );
                 this.debug('Comment: ' + comment);
-                wait.for(this.timeout_wrapper,5100);
+                wait.for(this.timeout_wrapper,4000);
               }
               report.push(posts[i]);
             }else {
@@ -482,6 +513,75 @@ module.exports = {
     }
     return report;
   },
+  communitySupport: function(posts,weight,donator) {
+    var report = new Array();
+    var minnows = new Array();
+    var comment = '';
+    var title = 'Welcome';
+    for (var i = 0; i < posts.length;i++) {
+      var author = posts[i].author;
+      if (minnows.indexOf(author) > -1) {
+        posts.splice(i, 1);
+        this.debug('Removing from posts array to be welcome');
+      }else {
+        minnows.push(author);
+        var account = wait.for(steem_api.steem_getAccounts_wrapper,[author]);
+        if (!steem_api.verifyAccountHasVoted(
+          [conf.env.ACCOUNT_NAME()],posts[i]
+          )) {
+          if (this.dateDiff(posts[i].created) < (86400 * 5)) {
+            if (conf.env.VOTE_ACTIVE()) {
+              steem_api.votePost(posts[i].author,posts[i].permlink,weight);
+            }else {
+              this.debug(
+                'Voting is not active, voting: ' + posts[i].author +
+                'url: ' + posts[i].permlink
+              );
+            }
+            if (conf.env.COMMENT_ACTIVE()) {
+              var coment = fs.readFileSync('./reports/community_comment.md', 'utf8');
+              var data = {
+                user: posts[i].author,
+              };
+              comment = sprintf(coment , data);
+              var comment_result = steem_api.commentPost(
+                posts[i].author,
+                posts[i].permlink,
+                title,
+                comment
+              );
+              var link = {
+                author: comment_result.operations[0][1].author,
+                url: comment_result.operations[0][1].permlink,
+                created: new Date(),
+              };
+              if (conf.env.SUPPORT_ACCOUNT() !== '') {
+                wait.for(this.upsertModel,'Link',{
+                  author: comment_result.operations[0][1].author,
+                  url: comment_result.operations[0][1].permlink,
+                },link);
+              }
+              wait.for(this.timeout_wrapper,4000);
+            }else {
+              this.debug(
+                'Commenting is not active, commenting: ' + posts[i].author +
+                'url: ' + posts[i].permlink
+              );
+              this.debug('Comment: ' + comment);
+              wait.for(this.timeout_wrapper,4000);
+            }
+            report.push(posts[i]);
+          }else {
+            this.debug('Post is too old');
+          }
+        }else {
+          this.debug('Account was already voted');
+        }
+
+      }
+    }
+    return report;
+  },
   votePostsByTag: function(posts,weight) {
     for (var i = 0; i < posts.length;i++) {
       var author = posts[i].author;
@@ -493,12 +593,11 @@ module.exports = {
       if (vp >= (
             conf.env.MIN_VOTING_POWER() * conf.env.VOTE_POWER_1_PC()
             )) {
-        if (!steem_api.verifyAccountHasVoted(
-          [conf.env.ACCOUNT_NAME],posts[i]
-          )) {
+        if (!steem_api.verifyAccountHasVoted([conf.env.ACCOUNT_NAME()],posts[i]) && 
+          !steem_api.verifyAccountHasVoted(['cheetah','steemcleaners'],posts[i])) {
           if (conf.env.VOTE_ACTIVE()) {
             steem_api.votePost(posts[i].author,posts[i].permlink,weight);
-            wait.for(this.timeout_wrapper,5100);
+            wait.for(this.timeout_wrapper,4000);
           }else {
             this.debug(
               'Voting is not active, voting: ' + posts[i].author +
@@ -528,6 +627,9 @@ module.exports = {
     obj.status = 'pending';
     obj.author = '';
     obj.url = '';
+    obj.post_created = '';
+    obj.pending_payout_value = '';
+    obj.votes = 0;
     obj.created = null;
     if (obj.memo.indexOf('/') != -1) {
       if (conf.env.COMMENT_VOTE()) {
@@ -553,6 +655,9 @@ module.exports = {
               obj.author,
               obj.url
             );
+            obj.pending_payout_value = result.pending_payout_value;
+            obj.post_created = result.created;
+            obj.votes = result.active_votes.length;
             if (!conf.env.SELF_VOTE()) {
               if (obj.payer !== obj.author) {
                 if ((result !== undefined) && (result !== null)) {
@@ -560,6 +665,10 @@ module.exports = {
                   if (this.dateDiff(obj.created) < (86400 * 4.5)) {
                     obj.voted = steem_api.verifyAccountHasVoted(
                       account,
+                      result
+                    );
+                    obj.flags = steem_api.verifyAccountHasVoted(
+                      ['cheetah','steemcleaners'],
                       result
                     );
                     obj.status = 'processed';
@@ -609,6 +718,84 @@ module.exports = {
         if (!(obj.memo.indexOf('#') == -1)) {
           obj.status = 'comment';
           obj.processed = true;
+        }else {
+          var post_url = obj.memo.split('/');
+          post_url = post_url.filter(function(e) {return e});
+          if (!(post_url[post_url.length - 2].indexOf('#') == -1)) {
+            var items = post_url[post_url.length - 2].split('#');
+            post_url.splice(
+              (post_url.length - 2),
+              1,
+              items[0],
+              items[1]
+            );
+          }
+          if (post_url[post_url.length - 2][0] === '@') {
+            obj.author = post_url[post_url.length - 2]
+            .substr(1, post_url[post_url.length - 2].length);
+            obj.url = post_url[post_url.length - 1];
+            if (obj.url !== undefined && obj.author !== undefined
+              && obj.url != null && obj.author != null) {
+              var result = wait.for(
+                steem_api.steem_getContent,
+                obj.author,
+                obj.url
+              );
+              obj.pending_payout_value = result.pending_payout_value;
+              obj.post_created = result.created;
+              obj.votes = result.active_votes.length;
+              if (!conf.env.SELF_VOTE()) {
+                if (obj.payer !== obj.author) {
+                  if ((result !== undefined) && (result !== null)) {
+                    obj.created = result.created;
+                    if (this.dateDiff(obj.created) < (86400 * 4.5)) {
+                      obj.voted = steem_api.verifyAccountHasVoted(
+                        account,
+                        result
+                      );
+                      obj.status = 'processed';
+                      obj.processed = obj.voted;
+                      obj.processed_date = new Date();
+                    }else {
+                      obj.status = 'due date';
+                      obj.processed = true;
+                    }
+                  }else {
+                    obj.status = 'content-not-found';
+                    obj.processed = true;
+                  }
+                }else {
+                  obj.status = 'self-vote';
+                  obj.processed = true;
+                }
+              }else {
+                if ((result !== undefined) && (result !== null)) {
+                  obj.created = result.created;
+                  if (this.dateDiff(obj.created) < (86400 * 4.5)) {
+                    obj.voted = steem_api.verifyAccountHasVoted(
+                      account,
+                      result
+                    );
+                    obj.status = 'processed';
+                    obj.processed = obj.voted;
+                    obj.processed_date = new Date();
+                  }else {
+                    obj.status = 'due date';
+                    obj.processed = true;
+                  }
+                }else {
+                  obj.status = 'content-not-found';
+                  obj.processed = true;
+                }
+              }
+            }else {
+              obj.status = 'url-not-found';
+              obj.processed = true;
+            }
+          }else {
+            obj.status = 'url not valid';
+            obj.processed = true;
+          }
         }
       }
     }else {
@@ -616,27 +803,6 @@ module.exports = {
       obj.processed = true;
     }
     return obj;
-  },
-  getLastVoted: function(callback) {
-    db.model('Transfer').find({voted: true}).limit(1).sort({number: -1}).exec(
-      function(err,data) {
-        callback(err,data);
-      }
-    );
-  },
-  getLastTransfer: function(callback) {
-    db.model('Transfer').find().limit(1).sort({number: -1}).exec(
-      function(err,data) {
-        callback(err,data);
-      }
-    );
-  },
-  getLastTransferRecord: function(callback) {
-    db.model('TransferRecord').find().limit(1).sort({number: -1}).exec(
-      function(err,data) {
-        callback(err,data);
-      }
-    );
   },
   getQueue: function(callback) {
     db.model('Transfer').find(
@@ -647,6 +813,21 @@ module.exports = {
         created: {$ne: null},
       }
       ).sort({number: 1}).exec(
+      function(err,data) {
+        callback(err,data);
+      }
+    );
+  },
+  getQueueForPayer: function(payer_name, callback) {
+    db.model('Transfer').find(
+      {
+        payer: payer_name,
+        voted: false,
+        processed: false,
+        status: {$in: ['pending','processed','comment']},
+        created: {$ne: null},
+      }
+      ).exec(
       function(err,data) {
         callback(err,data);
       }
@@ -664,6 +845,7 @@ module.exports = {
           'url not valid',
           'content-not-found',
           'url-not-found',
+          'abuse',
           ],},
         number: {$gt: last_refunded},
       }
@@ -694,76 +876,20 @@ module.exports = {
       }
     );
   },
-  getLastRefunded: function(callback) {
-    db.model('Transfer').find({
-        status: 'refunded',
-      }).limit(1).sort({number: -1}).exec(
+  getDataLast: function(model,query={},sort,callback) {
+    db.model(model).find(query).limit(1).sort(sort).exec(
       function(err,data) {
         callback(err,data);
       }
     );
   },
-  getLastInfo: function(callback) {
-    db.model('Information').find({}).limit(1).sort({created: -1}).exec(
-      function(err,data) {
-        callback(err,data);
-      }
-    );
+  getData: function(model,query,callback) {
+    db.model(model).find(query).exec(function(err,data) {callback(err,data)});
   },
-  getTransfer: function(query,callback) {
-    db.model('Transfer').find(query).exec(
-      function(err,data) {
-        callback(err,data);
-      }
-    );
-  },
-  getFollowers: function(callback) {
-    db.model('Follower').find(
-      {}
-      ).exec(
-      function(err,data) {
-        callback(err,data);
-      }
-    );
-  },
-  getLinks: function(callback) {
-    db.model('Link').find(
-      {}
-      ).exec(
-      function(err,data) {
-        callback(err,data);
-      }
-    );
-  },
-  upsertTransfer: function(query,doc,callback) {
-    db.model('Transfer').update(
-      query,doc,{upsert: true,new: true},
-      function(err,data) {callback(err,data);}
-    );
-  },
-  upsertTransferRecord: function(query,doc,callback) {
-    db.model('TransferRecord').update(
-      query,doc,{upsert: true,new: true},
-      function(err,data) {callback(err,data);}
-    );
-  },
-  upsertFollower: function(query,doc,callback) {
-    db.model('Follower').update(
-      query,doc,{upsert: true,new: true},
-      function(err,data) {callback(err,data);}
-    );
-  },
-  upsertStat: function(query,doc,callback) {
-    db.model('Information').update(
-      query,doc,{upsert: true,new: true},
-      function(err,data) {callback(err,data);}
-    );
-  },
-  upsertLink: function(query,doc,callback) {
-    db.model('Link').update(
-      query,doc,{upsert: true,new: true},
-      function(err,data) {callback(err,data);}
-    );
+  upsertModel: function(model,query,doc,callback) {
+    db.model(model).update(
+      query,doc,{upsert: true,new: true}
+    ).exec(function(err,data) {callback(err,data)});
   },
   getTreesTotal: function(callback) {
     var stages = [
@@ -796,12 +922,25 @@ module.exports = {
   },
   cleanFollowers: function(callback) {
     var date = new Date();
-    console.log(date);
     date.setDate(date.getDate() - 8);
-    console.log(date);
-    db.model('Link').remove(
+    db.model('Follower').remove(
       {created: {$lt: date}}
       ).exec(
+      function(err,data) {
+        callback(err,data);
+      }
+    );
+  },
+  cleanDelegators: function(callback) {
+    db.model('Delegator').remove({}
+      ).exec(
+      function(err,data) {
+        callback(err,data);
+      }
+    );
+  },
+  insertDelegators: function(records, callback) {
+    db.model('Delegator').create(records,
       function(err,data) {
         callback(err,data);
       }
@@ -901,7 +1040,37 @@ module.exports = {
     body += '\n\nMake sure to visit their profile and welcome them as well.\n';
     body += 'Long live Steemit, the social revolution platform.';
 
-    var contents_3 = fs.readFileSync('./reports/tuanis.md', 'utf8');
+    var contents_3 = fs.readFileSync('./reports/footer_tuanis.md', 'utf8');
+    body += contents_3;
+
+    this.preparePost(
+      conf.env.ACCOUNT_NAME(),
+      permlink,
+      title,
+      body,
+      tags
+    );
+  },
+  generateCommunityReport: function(posts) {
+    var when = this.getDate(new Date());
+    var permlink = conf.env.ACCOUNT_NAME() + '-report-for-' + conf.env.TAG() + '-' + when;
+    var title = 'Reporte de apoyo a comunidad ' + conf.env.TAG() + '-' + when;
+    var body = 'Como muestra de apoyo a el tag: ' + conf.env.TAG() + '\n';
+    var tags = {tags: [conf.env.TAG(),'report','bot','comunidad','spanish']}
+    var total = 0;
+    body += '\n\nEl dia de hoy he seleccionado los siguientes posts de nuestra comunidad: \n';
+    body += '<center>![steem_cr.png](https://cdn.steemitimages.com/';
+    body += 'DQmNtmJiCFVQDvqWZRtRo5uE1gaTyrtkCWjm5sREALVdcvy/steem_cr.png)</center>'
+    for (var i = 0; i < posts.length; i++) {
+      total += posts[i].fee;
+      body += '- @' + posts[i].author;
+      body += ' [post](https://steemit.com' + posts[i].url + ')';
+      body += '\n';
+    }
+    body += '\n\nApoyemonos y crezcamos juntos.\n';
+    body += 'Unidos podemos poco a poco aumentar nuestra fuerza y seguir apoyandonos';
+
+    var contents_3 = fs.readFileSync('./reports/raserrano.md', 'utf8');
     body += contents_3;
 
     this.preparePost(
@@ -967,18 +1136,19 @@ module.exports = {
     stat.trees =  ((daily_donation * ci.sbd_to_dollar) / 2).toFixed(2);
     stat.payment = developer_payment;
     stat.powerup = powerup;
-
-    var result = wait.for(this.upsertStat,{created: when},stat);
-
+    var result = wait.for(this.upsertModel,'Information',{created: when},stat);
     var pictures = JSON.parse(fs.readFileSync('./reports/pictures.json', 'utf8'));
-
-    // Random
-    var min = Math.ceil(0);
-    var max = Math.floor(pictures.pics.length);
-    var lucky = Math.floor(Math.random() * (max - min + 1)) + min;
-
-
     var contents_1 = fs.readFileSync('./reports/header.md', 'utf8');
+    // Get delegators
+    var delegators = wait.for(this.getData,'Delegator',{})
+    var delegators_table = 'Rank | Username | SP delegated | Numbers of trees planted daily'
+    delegators_table += '---|---|---|---';
+    for (var i = 0; i < delegators.length; i++) {
+      var calc_sp = ((delegators.sp * 1000) / 2).toFixed(2);
+      var calc_trees = (calc_sp / 5800).toFixed(3);
+      delegators_table += `${i + 1} | ${delegators.username} | ~${calc_sp} | ${calc_trees}`
+    }
+    contents_1 += delegators_table;
     var contents_2 = fs.readFileSync('./reports/delegation.md', 'utf8');
     var contents_3 = fs.readFileSync('./reports/treeplanter_stats.md', 'utf8');
 
@@ -986,7 +1156,7 @@ module.exports = {
       contents_1,
       stat.trees,
       total_trees,
-      pictures.pics[lucky]
+      pictures.pics[utils.getRandom(pictures.pics.length,1)]
     );
 
     var part2 = sprintf(
@@ -1041,196 +1211,6 @@ module.exports = {
     title += daily_donation.toFixed(2) + ' SBD today ' + when;
     title += ' to save Abongphen Highland Forest in Cameroon. Thank you!';
 
-    this.preparePost(
-      conf.env.ACCOUNT_NAME(),
-      permlink,
-      title,
-      body,
-      tags
-    );
-  },
-  generateStatusReport: function(status,queue) {
-    var when = this.getDate(new Date());
-    var permlink = 'treeplanter-status-' + when;
-
-    var tags = {tags: ['treeplanter','status','report','bot']};
-
-    var title = '@treeplanter status report ' + when;
-    var response_time = 0;
-    for (var i = 0;i < status.length;i++) {
-      response_time += this.dateDiff(status[i].processed_date,status[i].voted_date);
-    }
-    var avg_response = parseFloat(response_time) / 50;
-    var duration = 'The average duration for the last donations was ';
-    var days = parseInt(avg_response / (60 * 60 * 24));
-    var hours = parseInt(avg_response / (60 * 60));
-    var minutes = parseInt(avg_response / (60));
-    if (days > 0) {
-      duration += days + ' day(s) ';
-      hours -= days * 24;
-      if (hours > 0) {
-        duration += 'and ' + hours + ' hour(s) ';
-        minutes -= hours * 60;
-      }else {
-        duration += 'and ' + minutes + ' minute(s).';
-      }
-    }else {
-      if (hours > 0) {
-        if (days === 0) {
-          duration += hours + ' hour(s) ';
-          minutes -= hours * 60;
-        }else {
-          duration += 'and ' + hours + ' hour(s) ';
-          minutes -= hours * 60;
-        }
-      }else {
-        if (hours === 0) {
-          duration += minutes + ' minute(s).';
-        }else {
-          duration += 'and ' + minutes + ' minute(s).';
-        }
-      }
-    }
-    // Read file and add it to body
-    var contents_1 = fs.readFileSync('./reports/status.md', 'utf8');
-    var body = sprintf(
-      contents_1,
-      'Hello treeplanters!',
-      conf.env.MAX_DONATION(),
-      conf.env.MIN_DONATION(),
-      conf.env.VOTE_MULTIPLIER(),
-      duration,
-      queue.length,
-      '[Check the queue here](https://treeplanterv2.herokuapp.com/queue)'
-    );
-
-    // Read file and add it to body
-    var contents_2 = fs.readFileSync('./reports/treeplanter_manual.md', 'utf8');
-    var data = {
-      minimum: conf.env.MIN_DONATION(),
-      maximum: conf.env.MAX_DONATION(),
-      min_voted: (conf.env.MIN_DONATION() * conf.env.VOTE_MULTIPLIER()),
-      max_voted: (conf.env.MAX_DONATION() * conf.env.VOTE_MULTIPLIER()),
-    };
-    body += sprintf(contents_2 , data);
-
-    var contents_3 = fs.readFileSync('./reports/delegation.md', 'utf8');
-    body += contents_3;
-
-    var contents_4 = fs.readFileSync('./reports/raserrano.md', 'utf8');
-    body += contents_4;
-
-    this.preparePost(
-      conf.env.ACCOUNT_NAME(),
-      permlink,
-      title,
-      body,
-      tags
-    );
-  },
-  generateStatusReportTuanis: function(status,queue) {
-    var when = this.getDate(new Date());
-    var permlink = 'tuanis-status-' + when;
-
-    var tags = {tags: ['helpmejoin', 'status', 'report', 'bot']};
-
-    var title = '@tuanis status report ' + when;
-    var response_time = 0;
-    for (var i = 0;i < status.length;i++) {
-      response_time += this.dateDiff(status[i].processed_date,status[i].voted_date);
-    }
-    var avg_response = parseFloat(response_time) / 50;
-    var duration = 'The average duration for the last donations was ';
-    var days = parseInt(avg_response / (60 * 60 * 24));
-    var hours = parseInt(avg_response / (60 * 60));
-    var minutes = parseInt(avg_response / (60));
-    if (days > 0) {
-      duration += days + ' day(s) ';
-      hours -= days * 24;
-      if (hours > 0) {
-        duration += 'and ' + hours + ' hour(s) ';
-        minutes -= hours * 60;
-      }else {
-        duration += 'and ' + minutes + ' minute(s).';
-      }
-    }else {
-      if (hours > 0) {
-        if (days === 0) {
-          duration += hours + ' hour(s) ';
-          minutes -= hours * 60;
-        }else {
-          duration += 'and ' + hours + ' hour(s) ';
-          minutes -= hours * 60;
-        }
-      }else {
-        if (hours === 0) {
-          duration += minutes + ' minute(s).';
-        }else {
-          duration += 'and ' + minutes + ' minute(s).';
-        }
-      }
-    }
-    // Read file and add it to body
-    var contents_1 = fs.readFileSync('./reports/status.md', 'utf8');
-    var body = sprintf(
-      contents_1,
-      'Hello minnows!',
-      conf.env.MAX_DONATION(),
-      conf.env.MIN_DONATION(),
-      conf.env.VOTE_MULTIPLIER(),
-      duration,
-      queue.length,
-      ''
-    );
-
-    var contents_3 = fs.readFileSync('./reports/tuanis.md', 'utf8');
-    body += contents_3;
-
-    this.preparePost(
-      conf.env.ACCOUNT_NAME(),
-      permlink,
-      title,
-      body,
-      tags
-    );
-  },
-  generateGrowthReport: function(account) {
-    var when = this.getDate(account.created);
-    var permlink = account.username + '-growth-' + when;
-    var title = 'Growth report for ' + when;
-    var body = '<h3>Growth Report</h3>\n With your help I have grown and ';
-
-    var pictures = JSON.parse(fs.readFileSync('./reports/tuanis_pics.json', 'utf8'));
-
-    // Random
-    var min = Math.ceil(0);
-    var max = Math.floor(pictures.pics.length);
-    var lucky = Math.floor(Math.random() * (max - min + 1)) + min;
-
-    body += 'I am able to help more minnows. Thanks for your support.\n ';
-    body += '\n';
-    body += '- **Followers:** ' + account.followers + '\n';
-    body += '- **Reputation:** ' + account.reputation + '\n';
-    body += '- **Vote value:** ' + account.vote + '\n';
-    body += '- **Steem power:** ' + account.sp + '\n';
-    body += '\n\n';
-    body += pictures.pics[lucky];
-    body += '\n\n';
-    body += 'Upvote this report to keep supporting this project. \n\n';
-    body += '--- \n';
-    body += 'You can also support this project by sending a transfer and a ';
-    body += 'post or comment URL in the memo field. **Minimum is ';
-    body += conf.env.MIN_DONATION() + ' SBD/STEEM** ';
-    body += 'I will upvote it to a value of ';
-    body += conf.env.VOTE_MULTIPLIER() + ' times your donation. \n';
-    body += '**Max upvote value to ';
-    body += conf.env.MAX_DONATION() + ' SBD/STEEM**, you can always send more  ';
-    body += 'but it will be consider a donation.';
-
-    var contents_3 = fs.readFileSync('./reports/tuanis.md', 'utf8');
-    body += contents_3;
-
-    var tags = {tags: ['helpmejoin','minnowsupportproject','minnows']};
     this.preparePost(
       conf.env.ACCOUNT_NAME(),
       permlink,
@@ -1297,6 +1277,17 @@ module.exports = {
     var result = when.getMonth() + 1;
     result += '-' + when.getDate() + '-' + when.getFullYear();
     return result;
+  },
+  getRandom: function(count, limit) {
+    // Random
+    var min = Math.ceil(0);
+    var max = Math.floor(count);
+    var lucky = new Array();
+    var k = 0;
+    while (k++ < limit) {
+      lucky.push(Math.floor(Math.random() * (max - min + 1)) + min);
+    }
+    return lucky;
   },
   debug: function(message) {
     if (conf.env.DEBUG() === true) {

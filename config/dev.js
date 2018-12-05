@@ -1,4 +1,6 @@
-module.exports = {
+require('dotenv').config();
+
+const self = module.exports = {
   database: {
     options: {
       db: { native_parser: true },
@@ -29,238 +31,126 @@ module.exports = {
       return uri.toString();
     },
   },
+  setBoolean: function(attribute,value=false){
+    if(attribute!==null && attribute !== undefined){
+      value=JSON.parse(attribute);
+    }
+    return value;
+  },
+  setString: function(attribute, value=''){
+    if(attribute!==null && attribute !== undefined){
+      value=attribute;
+    }
+    return value;
+  },
+  setFloat: function(attribute,value=0){
+    if(attribute!==null && attribute !== undefined && attribute.length !== 0){
+      value=parseFloat(attribute);
+    }
+    return value;
+  },
+  setInt: function(attribute,value=0){
+    if(attribute!==null && attribute !== undefined && attribute.length !== 0){
+      value=parseInt(attribute);
+    }
+    return value;
+  },
   env: {
-    DEBUG: function() {
-      var value = false;
-      if ((process.env.DEBUG !== undefined) &&
-        (process.env.DEBUG !== null)) {
-        value = JSON.parse(process.env.DEBUG);
-      }
-      return value;
-    },
-    NODE: function() {
-      var value = 'https://api.steemit.com/';
-      if ((process.env.NODE !== undefined) &&
-        (process.env.NODE !== null)) {
-        value = process.env.NODE;
-      }
-      return value;
-    },
     ACCOUNT_NAME: function() {
-      var value = '';
-      if ((process.env.ACCOUNT_NAME !== undefined) &&
-        (process.env.ACCOUNT_NAME !== null)) {
-        value = process.env.ACCOUNT_NAME;
-      }
-      return value;
+      return self.setString(process.env.ACCOUNT_NAME);
     },
-    POSTING_KEY_PRV: function() {
-      var value = '';
-      if ((process.env.POSTING_KEY_PRV !== undefined) &&
-        (process.env.POSTING_KEY_PRV !== null)) {
-        value = process.env.POSTING_KEY_PRV;
-      }
-      return value;
-    },
-    WIF: function() {
-      var value = '';
-      if ((process.env.WIF !== undefined) &&
-        (process.env.WIF !== null)) {
-        value = process.env.WIF;
-      }
-      return value;
-    },
-    VOTING_ACCS: function() {
-      var value = '';
-      if ((process.env.VOTING_ACCS !== undefined) &&
-        (process.env.VOTING_ACCS !== null)) {
-        value = process.env.VOTING_ACCS;
-      }
-      return value;
-    },
-    VOTE_POWER_1_PC: function() {
-      var value = 100;
-      if ((process.env.VOTE_POWER_1_PC !== undefined) &&
-        (process.env.VOTE_POWER_1_PC !== null)) {
-        value = parseInt(process.env.VOTE_POWER_1_PC);
-      }
-      return value;
-    },
-    MIN_VOTING_POWER: function() {
-      var value = 80;
-      if ((process.env.MIN_VOTING_POWER !== undefined) &&
-        (process.env.MIN_VOTING_POWER !== null)) {
-        value = parseInt(process.env.MIN_VOTING_POWER);
-      }
-      return value;
-    },
-    VOTE_ACTIVE: function() {
-      var value = false;
-      if ((process.env.VOTE_ACTIVE !== undefined) &&
-        (process.env.VOTE_ACTIVE !== null)) {
-        value = JSON.parse(process.env.VOTE_ACTIVE);
-      }
-      return value;
-    },
-    COMMENT_ACTIVE: function() {
-      var value = false;
-      if ((process.env.COMMENT_ACTIVE !== undefined) &&
-        (process.env.COMMENT_ACTIVE !== null)) {
-        value = JSON.parse(process.env.COMMENT_ACTIVE);
-      }
-      return value;
-    },
-    SELF_VOTE: function() {
-      var value = false;
-      if ((process.env.SELF_VOTE !== undefined) &&
-        (process.env.SELF_VOTE !== null)) {
-        value = JSON.parse(process.env.SELF_VOTE);
-      }
-      return value;
-    },
-    COMMENT_VOTE: function() {
-      var value = false;
-      if ((process.env.COMMENT_VOTE !== undefined) &&
-        (process.env.COMMENT_VOTE !== null)) {
-        value = JSON.parse(process.env.COMMENT_VOTE);
-      }
-      return value;
-    },
-    REFUND_TEXT: function() {
-      var value = 'Sorry, I cannot do selfvoting anymore.';
-      if ((process.env.REFUND_TEXT !== undefined) &&
-        (process.env.REFUND_TEXT !== null)) {
-        value = process.env.REFUND_TEXT;
-      }
-      return value;
-    },
-    REPORT_ACTIVE: function() {
-      var value = false;
-      if ((process.env.REPORT_ACTIVE !== undefined) &&
-        (process.env.REPORT_ACTIVE !== null)) {
-        value = JSON.parse(process.env.REPORT_ACTIVE);
-      }
-      return value;
-    },
-    MIN_DONATION: function() {
-      var value = 0.1;
-      if ((process.env.MIN_DONATION !== undefined) &&
-        (process.env.MIN_DONATION !== null)) {
-        value = parseFloat(process.env.MIN_DONATION);
-      }
-      return value;
-    },
-    MAX_DONATION: function() {
-      var value = 0.25;
-      if ((process.env.MAX_DONATION !== undefined) &&
-        (process.env.MAX_DONATION !== null)) {
-        value = parseFloat(process.env.MAX_DONATION);
-      }
-      return value;
-    },
-    VOTE_MULTIPLIER: function() {
-      var value = 2;
-      if ((process.env.VOTE_MULTIPLIER !== undefined) &&
-        (process.env.VOTE_MULTIPLIER !== null)) {
-        value = parseFloat(process.env.VOTE_MULTIPLIER);
-      }
-      return value;
-    },
-    SELF_VOTE_MULTIPLIER: function() {
-      var value = 1.2;
-      if ((process.env.SELF_VOTE_MULTIPLIER !== undefined) &&
-        (process.env.SELF_VOTE_MULTIPLIER !== null)) {
-        value = parseFloat(process.env.SELF_VOTE_MULTIPLIER);
-      }
-      return value;
-    },
-    WEIGHT: function() {
-      var value = 5;
-      if ((process.env.WEIGHT !== undefined) &&
-        (process.env.WEIGHT !== null)) {
-        value = parseFloat(process.env.WEIGHT);
-      }
-      return value * 100;
-    },
-    LAST_VOTED: function() {
-      var value;
-      if ((process.env.LAST_VOTED !== undefined) &&
-        (process.env.LAST_VOTED !== null)) {
-        value = parseInt(process.env.LAST_VOTED);
-      }
-      return value;
-    },
-    LAST_REFUNDED: function() {
-      var value = 0;
-      if ((process.env.LAST_REFUNDED !== undefined) &&
-        (process.env.LAST_REFUNDED !== null)) {
-        value = parseInt(process.env.LAST_REFUNDED);
-      }
-      return value;
-    },
-    REFUNDS_ACTIVE: function() {
-      var value = false;
-      if ((process.env.REFUNDS_ACTIVE !== undefined) &&
-        (process.env.REFUNDS_ACTIVE !== null)) {
-        value = JSON.parse(process.env.REFUNDS_ACTIVE);
-      }
-      return value;
-    },
-    POWERUP_POST: function() {
-      var value = false;
-      if ((process.env.POWERUP_POST !== undefined) &&
-        (process.env.POWERUP_POST !== null)) {
-        value = JSON.parse(process.env.POWERUP_POST);
-      }
-      return value;
+    ABUSE_COUNT: function() {
+      return self.setInt(process.env.ABUSE_COUNT,5);
     },
     BENEFICIARIES: function() {
-      var value = '';
-      if ((process.env.BENEFICIARIES !== undefined) &&
-        (process.env.BENEFICIARIES !== null)) {
-        value = process.env.BENEFICIARIES;
-      }
-      return value;
+      return self.setString(process.env.BENEFICIARIES);
+    },
+    COMMENT_ACTIVE: function() {
+      return self.setBoolean(process.env.COMMENT_ACTIVE);
+    },
+    COMMENT_VOTE: function() {
+      return self.setBoolean(process.env.COMMENT_VOTE);
+    },
+    COMMENT_WAIT: function() {
+      return self.setInt(process.env.COMMENT_WAIT,5);
+    },
+    DAYS: function() {
+      return self.setString(process.env.DAYS);
+    },
+    DEBUG: function() {
+      return self.setBoolean(process.env.DEBUG);
+    },
+    LAST_REFUNDED: function() {
+      return self.setInt(process.env.LAST_REFUNDED);
+    },
+    LAST_VOTED: function() {
+      return self.setInt(process.env.LAST_VOTED);
+    },
+    MAX_DONATION: function() {
+      return self.setFloat(process.env.MAX_DONATION,0.25);
+    },
+    MIN_DONATION: function() {
+      return self.setFloat(process.env.MIN_DONATION,0.01);
+    },
+    MIN_VOTING_POWER: function() {
+      return self.setInt(process.env.MIN_VOTING_POWER,98);
+    },
+    NODE: function() {
+      return self.setString(process.env.NODE,'https://api.steemit.com/');
     },
     PAY_DEVELOPER: function() {
-      var value = 10;
-      if ((process.env.PAY_DEVELOPER !== undefined) &&
-        (process.env.PAY_DEVELOPER !== null)) {
-        value = parseFloat(process.env.PAY_DEVELOPER);
-      }
-      return value;
+      return self.setInt(process.env.PAY_DEVELOPER,10);
     },
-    SUPPORT_ACCOUNT: function() {
-      var value = '';
-      if ((process.env.SUPPORT_ACCOUNT !== undefined) &&
-        (process.env.SUPPORT_ACCOUNT !== null)) {
-        value = process.env.SUPPORT_ACCOUNT;
-      }
-      return value;
+    POSTING_KEY_PRV: function() {
+      return self.setString(process.env.POSTING_KEY_PRV);
     },
-    SUPPORT_ACCOUNT_KEY: function() {
-      var value = '';
-      if ((process.env.SUPPORT_ACCOUNT_KEY !== undefined) &&
-        (process.env.SUPPORT_ACCOUNT_KEY !== null)) {
-        value = process.env.SUPPORT_ACCOUNT_KEY;
-      }
-      return value;
+    POWERUP_POST: function() {
+      return self.setBoolean(process.env.POWERUP_POST);
+    },
+    REFUNDS_ACTIVE: function() {
+      return self.setBoolean(process.env.REFUNDS_ACTIVE);
+    },
+    REFUND_TEXT: function() {
+      return self.setString(process.env.POSTING_KEY_PRV,'Sorry, I cannot do selfvoting anymore.');
+    },
+    REPORT_ACTIVE: function() {
+      return self.setBoolean(process.env.REPORT_ACTIVE);
+    },
+    SELF_VOTE: function() {
+      return self.setBoolean(process.env.SELF_VOTE);
+    },
+    SELF_VOTE_MULTIPLIER: function() {
+      return self.setFloat(process.env.SELF_VOTE_MULTIPLIER,1.2);
     },
     SLEEPING: function() {
-      var value = false;
-      if ((process.env.SUPPORT_ACCOUNT_KEY !== undefined) &&
-        (process.env.SUPPORT_ACCOUNT_KEY !== null)) {
-        value = JSON.parse(process.env.SUPPORT_ACCOUNT_KEY);
-      }
-      return value;
+      return self.setBoolean(process.env.SLEEPING);
+    },
+    SUPPORT_ACCOUNT: function() {
+      return self.setString(process.env.SUPPORT_ACCOUNT);
+    },
+    SUPPORT_ACCOUNT_KEY: function() {
+      return self.setString(process.env.SUPPORT_ACCOUNT_KEY);
     },
     TAG: function() {
-      var value = 'dtube';
-      if ((process.env.TAG !== undefined) &&
-        (process.env.TAG !== null)) {
-        value = process.env.TAG;
-      }
-      return value;
+      return self.setString(process.env.TAG);
+    },
+    WIF: function() {
+      return self.setString(process.env.WIF);
+    },
+    VOTING_ACCS: function() {
+      return self.setString(process.env.VOTING_ACCS);
+    },
+    VOTE_POWER_1_PC: function() {
+      return self.setInt(process.env.VOTE_POWER_1_PC,100);
+    },
+    VOTE_ACTIVE: function() {
+      return self.setBoolean(process.env.VOTE_ACTIVE);
+    },
+    VOTE_MULTIPLIER: function() {
+      return self.setFloat(process.env.VOTE_MULTIPLIER,2);
+    },
+    WEIGHT: function() {
+      return self.setFloat(process.env.WEIGHT,5)*100;
     },
   },
 };

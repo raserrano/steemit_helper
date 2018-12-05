@@ -16,6 +16,8 @@ var transferSchema = new Schema({
   processed_date: { type: Date, required: false},
   voted_date: { type: Date, required: false},
   status: { type: String, required: false},
+  post_created: { type: String, required: false},
+  pending_payout_value: { type: String, required: false},
   created: { type: Date, required: false},
 });
 

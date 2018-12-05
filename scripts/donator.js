@@ -1,7 +1,7 @@
 const
   wait = require('wait.for'),
   utils = require('../model/util'),
-  conf = require('../config/dev'),
+  conf = require('../config/current'),
   steem_api = require('../model/steem_api');
 
 // Voting for donations
@@ -18,13 +18,15 @@ wait.launchFiber(function() {
   }
 
   // Find last voted post number
-  var last_voted = wait.for(utils.getLastTransfer);
+  var last_voted = wait.for(utils.getDataLast,'Transfer',{},{number: -1});
+
   if (last_voted.length !== 0) {
     last_voted = last_voted[0].number;
   }else {
     last_voted = 0;
   }
-  if (conf.env.LAST_VOTED() !== null && conf.env.LAST_VOTED() !== undefined) {
+  console.log(last_voted);
+  if (conf.env.LAST_VOTED() !== 0) {
     last_voted = conf.env.LAST_VOTED();
   }
   console.log('Last: ' + last_voted);
