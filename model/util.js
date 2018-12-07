@@ -1141,13 +1141,14 @@ module.exports = {
     var contents_1 = fs.readFileSync('./reports/header.md', 'utf8');
     // Get delegators
     var delegators = wait.for(this.getData,'Delegator',{})
-    var delegators_table = 'Rank | Username | SP delegated | Numbers of trees planted daily'
-    delegators_table += '---|---|---|---';
+    var delegators_table = '\nRank | Username | SP delegated | Numbers of trees planted daily'
+    delegators_table += '\n---|---|---|---';
     for (var i = 0; i < delegators.length; i++) {
       var calc_sp = ((delegators.sp * 1000) / 2).toFixed(2);
       var calc_trees = (calc_sp / 5800).toFixed(3);
-      delegators_table += `${i + 1} | ${delegators.username} | ~${calc_sp} | ${calc_trees}`
+      delegators_table += `\n${i + 1} | ${delegators.username} | ~${calc_sp} | ${calc_trees}`
     }
+    delegators_table +='\n---\n';
     contents_1 += delegators_table;
     var contents_2 = fs.readFileSync('./reports/delegation.md', 'utf8');
     var contents_3 = fs.readFileSync('./reports/treeplanter_stats.md', 'utf8');
