@@ -1156,7 +1156,7 @@ module.exports = {
       contents_1,
       stat.trees,
       total_trees,
-      pictures.pics[utils.getRandom(pictures.pics.length,1)]
+      pictures.pics[this.getRandom(pictures.pics.length,1)]
     );
 
     var part2 = sprintf(
