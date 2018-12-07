@@ -1141,7 +1141,7 @@ module.exports = {
     var contents_1 = fs.readFileSync('./reports/header.md', 'utf8');
     // Get delegators
     var delegators = wait.for(this.getData,'Delegator',{})
-    var delegators_table = '\nRank | Username | SP delegated | Numbers of trees planted daily'
+    var delegators_table = '\nRank | Username | SP delegated | Numbers of trees planted daily';
     delegators_table += '\n---|---|---|---';
     for (var i = 0; i < delegators.length; i++) {
       var calc_sp = ((delegators.sp * 1000) / 2).toFixed(2);

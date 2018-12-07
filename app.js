@@ -25,7 +25,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
 app.use('/robots.txt', function(req, res, next) {
-  res.type('text/plain')
+  res.type('text/plain');
   res.send('User-agent: *\nDisallow: /');
 });
 
