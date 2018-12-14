@@ -6,4 +6,5 @@
   "requireCamelCaseOrUpperCaseIdentifiers": false,
   "disallowMultipleVarDecl": false,
   "requireEarlyReturn": false,
+  "maximumLineLength": 100
 }

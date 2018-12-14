@@ -38,7 +38,7 @@ module.exports = {
       if (data[i][1].op[0] == 'transfer') {
         if (data[i][1].op[1].to == account) {
           var res = this.getContent([account],data[i]);
-          var query = {$and:[{author:res.author},{url:res.url}]};
+          var query = {$and: [{author: res.author},{url: res.url}]};
           var found = wait.for(this.getData,'Transfer',query);
           if (found.length > 0) {
             var status_ok = (found[0].status !== 'refunded') ||
@@ -98,15 +98,15 @@ module.exports = {
             if (!post.voted && !post.flags) {
               if (this.dateDiff(post.created) > (60 * 15) &&
                 this.dateDiff(post.created) < (86400 * 3)) {
-                if (post.amount >= 5) {
+                if (post.amount >= conf.env.MAX_AMOUNT()) {
                   var votes_calc = parseFloat(post.votes);
-                  if (votes_calc <= 100) {
+                  if (votes_calc <= conf.env.MAX_VOTES()) {
                     var pending = parseFloat(
                       post.pending_payout_value.split(' ')[0]
                     );
                     var magic_number = (post.amount / pending) *
                       (post.amount / votes_calc);
-                    if(magic_number >= 20){
+                    if (magic_number >= conf.env.MAGIC_NUMBER()) {
                       post.magic_number = magic_number;
                       post.bot = account;
                       posts.push(post);
@@ -304,7 +304,7 @@ module.exports = {
         wait.for(
           this.upsertModel,
           'Transfer',
-          {$and:[{author:data[i].author},{url:data[i].url}]},
+          {$and: [{author: data[i].author},{url: data[i].url}]},
           {voted: true}
         );
       }else {
@@ -330,7 +330,7 @@ module.exports = {
             data[i].status === 'comment' ||
             data[i].status === 'self-vote' ||
             data[i].status === 'abuse' ||
-            data[i].status === 'refunded'; 
+            data[i].status === 'refunded';
           if (conditions) {
             // Comment in post or comment that amount was refunded *-*
             var title = 'Thanks for your donation';
@@ -351,7 +351,7 @@ module.exports = {
             wait.for(
               this.upsertModel,
               'Transfer',
-              {$and:[{author:data[i].author},{url:data[i].url}]},
+              {$and: [{author: data[i].author},{url: data[i].url}]},
               {status: 'refunded'}
             );
             refunded_urls.push(data[i].memo);
@@ -368,7 +368,7 @@ module.exports = {
               wait.for(
                 this.upsertModel,
                 'Transfer',
-                {$and:[{author:data[i].author},{url:data[i].url}]},
+                {$and: [{author: data[i].author},{url: data[i].url}]},
                 {status: 'refunded'}
               );
               refunded_urls.push(data[i].memo);
@@ -378,7 +378,7 @@ module.exports = {
         wait.for(
           this.upsertModel,
           'Transfer',
-          {$and:[{author:data[i].author},{url:data[i].url}]},
+          {$and: [{author: data[i].author},{url: data[i].url}]},
           {status: 'refunded'}
         );
       }
@@ -593,7 +593,7 @@ module.exports = {
       if (vp >= (
             conf.env.MIN_VOTING_POWER() * conf.env.VOTE_POWER_1_PC()
             )) {
-        if (!steem_api.verifyAccountHasVoted([conf.env.ACCOUNT_NAME()],posts[i]) && 
+        if (!steem_api.verifyAccountHasVoted([conf.env.ACCOUNT_NAME()],posts[i]) &&
           !steem_api.verifyAccountHasVoted(['cheetah','steemcleaners'],posts[i])) {
           if (conf.env.VOTE_ACTIVE()) {
             steem_api.votePost(posts[i].author,posts[i].permlink,weight);
@@ -662,7 +662,7 @@ module.exports = {
               if (obj.payer !== obj.author) {
                 if ((result !== undefined) && (result !== null)) {
                   obj.created = result.created;
-                  if (this.dateDiff(obj.created) < (86400 * 4.5)) {
+                  if (this.dateDiff(obj.created) < (86400 * conf.env.MAX_DAYS_OLD())) {
                     obj.voted = steem_api.verifyAccountHasVoted(
                       account,
                       result
@@ -1146,9 +1146,9 @@ module.exports = {
     for (var i = 0; i < delegators.length; i++) {
       var calc_sp = ((delegators[i].sp * 1000) / 2).toFixed(2);
       var calc_trees = (calc_sp / 5800).toFixed(3);
-      delegators_table += `\n${i + 1} | ${delegators[i].username} | ~${calc_sp} | ${calc_trees}`
+      delegators_table += `${i + 1} | ${delegators[i].username} | ~${calc_sp} | ${calc_trees}`;
     }
-    delegators_table +='\n---\n';
+    delegators_table += '\n---\n';
     contents_1 += delegators_table;
     var contents_2 = fs.readFileSync('./reports/delegation.md', 'utf8');
     var contents_3 = fs.readFileSync('./reports/treeplanter_stats.md', 'utf8');

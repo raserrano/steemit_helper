@@ -86,8 +86,20 @@ const self = module.exports = {
     LAST_VOTED: function() {
       return self.setInt(process.env.LAST_VOTED);
     },
+    MAGIC_NUMBER: function() {
+      return self.setInt(process.env.MAGIC_NUMBER,50);
+    },
+    MAX_AMOUNT: function() {
+      return self.setInt(process.env.MAX_AMOUNT,5);
+    },
+    MAX_DAYS_OLD: function() {
+      return self.setFloat(process.env.MAX_DAYS_OLD,4.5);
+    },
     MAX_DONATION: function() {
       return self.setFloat(process.env.MAX_DONATION,0.25);
+    },
+    MAX_VOTES: function() {
+      return self.setInt(process.env.MAX_VOTES,50);
     },
     MIN_DONATION: function() {
       return self.setFloat(process.env.MIN_DONATION,0.01);
