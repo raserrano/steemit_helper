@@ -53,7 +53,7 @@ module.exports = {
       permlink
     ).toLowerCase().replace(/\./g,'');
     console.log('Comment permlink: ' + comment_permlink);
-    if(comment_permlink.length < 200){
+    if (comment_permlink.length < 200) {
       try {
         result = wait.for(
           steem.broadcast.comment,
@@ -261,7 +261,7 @@ module.exports = {
         votes.push(result.active_votes[i].voter);
       }
     }
-    // console.log(account);
+    // Console.log(account);
     // console.log('Votes: ' + votes);
     // console.log('Voted: ' + votes.some(r=> account.includes(r)));
     return votes.some(r=> account.includes(r));
