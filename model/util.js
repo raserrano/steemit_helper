@@ -1142,11 +1142,11 @@ module.exports = {
     // Get delegators
     var delegators = wait.for(this.getData,'Delegator',{})
     var delegators_table = '\nRank | Username | SP delegated | Numbers of trees planted daily';
-    delegators_table += '\n---|---|---|---';
+    delegators_table += '\n---|---|---|---\n';
     for (var i = 0; i < delegators.length; i++) {
       var calc_sp = ((delegators[i].sp * 1000) / 2).toFixed(2);
       var calc_trees = (calc_sp / 5800).toFixed(3);
-      delegators_table += `${i + 1} | ${delegators[i].username} | ~${calc_sp} | ${calc_trees}`;
+      delegators_table += `${i + 1} | ${delegators[i].username} | ~${calc_sp} | ${calc_trees}\n`;
     }
     delegators_table += '\n---\n';
     contents_1 += delegators_table;
