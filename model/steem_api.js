@@ -278,7 +278,7 @@ module.exports = {
       (
         parseFloat(vestingSharesParts[0]) + parseFloat(receivedSharesParts[0])
         ) - parseFloat(delegatedSharesParts[0]);
-    console.log('Total vests: ' + totalVests);
+    // console.log('Total vests: ' + totalVests);
     return this.getSteemPowerFromVest(globalData,totalVests);
   },
   calculateVoteWeight: function(account, vp, target_value) {
