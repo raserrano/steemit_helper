@@ -272,8 +272,8 @@ module.exports = {
               }
             );
           }else {
-            if(data[i].created !== null){
-              if (this.dateDiff(data[i].created) < (86400 * conf.env.MAX_DAYS_OLD())) {
+            if(data[i].post_created !== null){
+              if (this.dateDiff(data[i].post_created) < (86400 * conf.env.MAX_DAYS_OLD())) {
                 data[i].status = 'due date';
                 wait.for(
                   this.upsertModel,
