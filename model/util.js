@@ -40,6 +40,10 @@ module.exports = {
           var res = this.getContent([account],data[i]);
           var query = {$and: [{author: res.author},{url: res.url}]};
           var found = wait.for(this.getData,'Transfer',query);
+          this.debug('New transfer to process');
+          this.debug(res);
+          this.debug('Found within our records?');
+          this.debug(found);
           if (found.length > 0) {
             var status_ok = (found[0].status !== 'refunded') ||
             (found[0].status !== 'due date') ||
@@ -49,6 +53,8 @@ module.exports = {
               // Abuse rule
               // var abuse_count = wait.for(this.getQueueForPayer,res.payer);
               // if (abuse_count.length <= conf.env.ABUSE_COUNT()) {
+              this.debug('Upsert new transfer, found');
+              this.debug(found)
               wait.for(this.upsertModel,'Transfer',query,found);
               // }else {
               //   found[0].status = 'abuse';
@@ -63,6 +69,8 @@ module.exports = {
               // }
             }
           }else {
+            this.debug('Upsert new transfer, new')
+            this.debug(res)
             wait.for(this.upsertModel,'Transfer',query,res);
           }
         }
@@ -264,8 +272,20 @@ module.exports = {
               }
             );
           }else {
-            console.log('Finishing donation process due to low voting power');
-            break;
+            if(data[i].created !== null){
+              if (this.dateDiff(data[i].created) > (86400 * conf.env.MAX_DAYS_OLD())) {
+                data[i].status = 'due date';
+              }
+              wait.for(
+                this.upsertModel,
+                'Transfer',
+                {_id: data[i]._id},
+                {
+                  status: data[i].status,
+                  processed: true,
+                }
+              );
+            }
           }
         }else {
           this.debug(
