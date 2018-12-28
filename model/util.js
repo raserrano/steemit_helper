@@ -275,16 +275,16 @@ module.exports = {
             if(data[i].created !== null){
               if (this.dateDiff(data[i].created) > (86400 * conf.env.MAX_DAYS_OLD())) {
                 data[i].status = 'due date';
+                wait.for(
+                  this.upsertModel,
+                  'Transfer',
+                  {_id: data[i]._id},
+                  {
+                    status: data[i].status,
+                    processed: true,
+                  }
+                );
               }
-              wait.for(
-                this.upsertModel,
-                'Transfer',
-                {_id: data[i]._id},
-                {
-                  status: data[i].status,
-                  processed: true,
-                }
-              );
             }
           }
         }else {
