@@ -33,11 +33,13 @@ wait.launchFiber(function() {
           console.log(e);
           break;
         }
+        utils.debug('Found ' + results_to.length + ' possible posts to vote')
         var temp = utils.getHighCurationPosts(
           accounts_to[i],
           accounts_to,
           results_to
         );
+        utils.debug('Good options ' + temp.length)
         best_options = best_options.concat(temp);
       }
       if (best_options.length > 0) {
