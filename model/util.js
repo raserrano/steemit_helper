@@ -201,63 +201,71 @@ module.exports = {
               [account],
               result
             );
-            data[i].status = 'processed';
-            data[i].processed = data[i].voted;
-            data[i].processed_date = new Date();
-            if (!data[i].voted) {
-              steem_api.votePost(data[i].author, data[i].url, weight);
-              wait.for(this.timeout_wrapper,5500);
-              if (conf.env.COMMENT_ACTIVE()) {
-                var title = '';
-                var comment = '';
-                var trees_total = wait.for(this.getTreesTotal);
-                trees_total = (
-                  (trees_total[0].total * ci.sbd_to_dollar) / 2
-                ).toFixed(2);
-                // Refactor this
-                if (conf.env.ACCOUNT_NAME() === 'treeplanter') {
-                  title = 'Thanks for your donation';
-                  var contents_1 = fs.readFileSync('./reports/treeplanter_comment.md', 'utf8');
-                  var comment_params = {
-                    trees: ((data[i].amount * ci.sbd_to_dollar) / 2).toFixed(2),
-                    payer: data[i].payer,
-                    trees_total: trees_total,
-                    sp: steem_api.getSteemPower(voter[0]).toFixed(2),
-                  };
-                  comment = sprintf(contents_1, comment_params);
-                }else {
-                  title = 'Thanks for your donation';
-                  var contents_1 = fs.readFileSync('./reports/tuanis_comment.md', 'utf8');
-                  var comment_params = {
-                    author: data[i].author,
-                    payer: data[i].payer,
-                  };
-                  comment = sprintf(contents_1, comment_params);
-                }
-                // Decide how to handle this with a form and mongodb document
-                var comment_result = steem_api.commentPost(
-                  data[i].author,
-                  data[i].url,
-                  title,
-                  comment
-                );
-                var link = {
-                  author: comment_result.operations[0][1].author,
-                  url: comment_result.operations[0][1].permlink,
-                  created: new Date(),
-                };
-                if (conf.env.SUPPORT_ACCOUNT() !== '') {
-                  wait.for(this.upsertModel,'Link',{
+            // Verify age
+            if (this.dateDiff(data[i].post_created) < (86400 * conf.env.MAX_DAYS_OLD())) {
+              console.log('I will not vote this as it should be refunded');
+              console.log(data[i].post_created);
+              data[i].status = 'due date';
+              data[i].processed = true;
+            }else{
+              data[i].status = 'processed';
+              data[i].processed = data[i].voted;
+              data[i].processed_date = new Date();
+              if (!data[i].voted) {
+                steem_api.votePost(data[i].author, data[i].url, weight);
+                wait.for(this.timeout_wrapper,5500);
+                if (conf.env.COMMENT_ACTIVE()) {
+                  var title = '';
+                  var comment = '';
+                  var trees_total = wait.for(this.getTreesTotal);
+                  trees_total = (
+                    (trees_total[0].total * ci.sbd_to_dollar) / 2
+                  ).toFixed(2);
+                  // Refactor this
+                  if (conf.env.ACCOUNT_NAME() === 'treeplanter') {
+                    title = 'Thanks for your donation';
+                    var contents_1 = fs.readFileSync('./reports/treeplanter_comment.md', 'utf8');
+                    var comment_params = {
+                      trees: ((data[i].amount * ci.sbd_to_dollar) / 2).toFixed(2),
+                      payer: data[i].payer,
+                      trees_total: trees_total,
+                      sp: steem_api.getSteemPower(voter[0]).toFixed(2),
+                    };
+                    comment = sprintf(contents_1, comment_params);
+                  }else {
+                    title = 'Thanks for your donation';
+                    var contents_1 = fs.readFileSync('./reports/tuanis_comment.md', 'utf8');
+                    var comment_params = {
+                      author: data[i].author,
+                      payer: data[i].payer,
+                    };
+                    comment = sprintf(contents_1, comment_params);
+                  }
+                  // Decide how to handle this with a form and mongodb document
+                  var comment_result = steem_api.commentPost(
+                    data[i].author,
+                    data[i].url,
+                    title,
+                    comment
+                  );
+                  var link = {
                     author: comment_result.operations[0][1].author,
                     url: comment_result.operations[0][1].permlink,
-                  },link);
+                    created: new Date(),
+                  };
+                  if (conf.env.SUPPORT_ACCOUNT() !== '') {
+                    wait.for(this.upsertModel,'Link',{
+                      author: comment_result.operations[0][1].author,
+                      url: comment_result.operations[0][1].permlink,
+                    },link);
+                  }
+                  wait.for(this.timeout_wrapper,3000);
+                }else {
+                  this.debug(
+                    'Commenting is not active, commenting: ' +
+                    JSON.stringify(data[i])
+                  );
                 }
-                wait.for(this.timeout_wrapper,3000);
-              }else {
-                this.debug(
-                  'Commenting is not active, commenting: ' +
-                  JSON.stringify(data[i])
-                );
               }
             }
             wait.for(
@@ -272,20 +280,8 @@ module.exports = {
               }
             );
           }else {
-            if(data[i].post_created !== null){
-              if (this.dateDiff(data[i].post_created) < (86400 * conf.env.MAX_DAYS_OLD())) {
-                data[i].status = 'due date';
-                wait.for(
-                  this.upsertModel,
-                  'Transfer',
-                  {_id: data[i]._id},
-                  {
-                    status: data[i].status,
-                    processed: true,
-                  }
-                );
-              }
-            }
+            console.log('Finishing donation process due to low voting power');
+            break;
           }
         }else {
           this.debug(
