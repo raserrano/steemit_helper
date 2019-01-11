@@ -107,7 +107,7 @@ module.exports = {
             if (!post.voted && !post.flags) {
               if (this.dateDiff(post.created) > (60 * 15) &&
                 this.dateDiff(post.created) < (86400 * 3)) {
-                if (post.amount >= conf.env.MAX_AMOUNT()) {
+                if (post.amount <= conf.env.MAX_AMOUNT()) {
                   var votes_calc = parseFloat(post.votes);
                   if (votes_calc <= conf.env.MAX_VOTES()) {
                     var pending = parseFloat(
