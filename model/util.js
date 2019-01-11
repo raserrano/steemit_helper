@@ -43,7 +43,7 @@ module.exports = {
           this.debug('New transfer to process');
           this.debug(res);
           this.debug('Found within our records?');
-          this.debug(found);
+          this.debug(found.length);
           if (found.length > 0) {
             var status_ok = (found[0].status !== 'refunded') ||
             (found[0].status !== 'due date') ||
@@ -51,10 +51,11 @@ module.exports = {
             (found[0].status !== 'abuse');
             if (status_ok) {
               // Abuse rule
-              // var abuse_count = wait.for(this.getQueueForPayer,res.payer);
+              var abuse_count = wait.for(this.getQueueForPayer,res.payer);
+              this.debug('Abuse count: ' + abuse_count.length)
               // if (abuse_count.length <= conf.env.ABUSE_COUNT()) {
-              this.debug('Upsert new transfer, found');
-              this.debug(found)
+              // this.debug('Upsert new transfer, found');
+              // this.debug(found)
               wait.for(this.upsertModel,'Transfer',query,found);
               // }else {
               //   found[0].status = 'abuse';
@@ -191,7 +192,7 @@ module.exports = {
           if (vp >= (
             conf.env.MIN_VOTING_POWER() * conf.env.VOTE_POWER_1_PC()
             )) {
-            voted_ok = true;
+            voted_ok = false;
             var result = wait.for(
               steem_api.steem_getContent,
               data[i].author,
@@ -202,7 +203,11 @@ module.exports = {
               result
             );
             // Verify age
-            if (this.dateDiff(data[i].post_created) < (86400 * conf.env.MAX_DAYS_OLD())) {
+            // console.log('Post created: ' + data[i].post_created)
+            // console.log('Diff: ' + this.dateDiff(data[i].post_created))
+            // console.log('Max: ' + (86400 * conf.env.MAX_DAYS_OLD()))
+
+            if (this.dateDiff(data[i].post_created) > (86400 * conf.env.MAX_DAYS_OLD())) {
               console.log('I will not vote this as it should be refunded');
               console.log(data[i].post_created);
               data[i].status = 'due date';
@@ -213,6 +218,7 @@ module.exports = {
               data[i].processed_date = new Date();
               if (!data[i].voted) {
                 steem_api.votePost(data[i].author, data[i].url, weight);
+                voted_ok = true;
                 wait.for(this.timeout_wrapper,5500);
                 if (conf.env.COMMENT_ACTIVE()) {
                   var title = '';
@@ -1131,6 +1137,7 @@ module.exports = {
     var powerup = 0;
     if (daily_donation > 0) {
       // Transfer 5% to developer
+      // if there is enough balance
       developer_payment = (daily_donation * 0.05).toFixed(3);
       console.log('Developer payment is: ' + developer_payment);
       wait.for(
