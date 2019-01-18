@@ -282,6 +282,8 @@ module.exports = {
                 donation: data[i].donation,
                 voted: voted_ok,
                 processed: true,
+                status: data[i].status,
+                processed_date: data[i].processed_date,
                 voted_date: new Date(),
               }
             );
