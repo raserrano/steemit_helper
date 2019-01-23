@@ -33,16 +33,17 @@ wait.launchFiber(function() {
           console.log(e);
           break;
         }
-        utils.debug('Found ' + results_to.length + ' possible posts to vote')
+        utils.debug('Found ' + results_to.length + ' possible posts to vote');
         var temp = utils.getHighCurationPosts(
           accounts_to[i],
           accounts_to,
           results_to
         );
-        utils.debug('Good options ' + temp.length)
+        utils.debug('Good options ' + temp.length);
         best_options = best_options.concat(temp);
       }
       if (best_options.length > 0) {
+        utils.debug(best_options);
         best_options.sort(function(a,b) {
           return (a.magic_number > b.magic_number) ?
             1 : ((b.magic_number > a.magic_number) ? -1 : 0);

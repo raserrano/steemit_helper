@@ -53,7 +53,7 @@ module.exports = {
               // Abuse rule
               var abuse_count = wait.for(this.getQueueForPayer,res.payer);
               this.debug('Abuse count: ' + abuse_count.length)
-              // if (abuse_count.length <= conf.env.ABUSE_COUNT()) {
+              // If (abuse_count.length <= conf.env.ABUSE_COUNT()) {
               // this.debug('Upsert new transfer, found');
               // this.debug(found)
               wait.for(this.upsertModel,'Transfer',query,found);
@@ -106,7 +106,7 @@ module.exports = {
           if (post !== null) {
             if (!post.voted && !post.flags) {
               if (this.dateDiff(post.created) > (60 * 15) &&
-                this.dateDiff(post.created) < (86400 * 3)) {
+                this.dateDiff(post.created) < (86400 * conf.env.MAX_DAYS_OLD())) {
                 if (post.amount <= conf.env.MAX_AMOUNT()) {
                   var votes_calc = parseFloat(post.votes);
                   if (votes_calc <= conf.env.MAX_VOTES()) {
@@ -212,7 +212,7 @@ module.exports = {
               console.log(data[i].post_created);
               data[i].status = 'due date';
               data[i].processed = true;
-            }else{
+            }else {
               data[i].status = 'processed';
               data[i].processed = data[i].voted;
               data[i].processed_date = new Date();
@@ -713,9 +713,13 @@ module.exports = {
             }else {
               if ((result !== undefined) && (result !== null)) {
                 obj.created = result.created;
-                if (this.dateDiff(obj.created) < (86400 * 4.5)) {
+                if (this.dateDiff(obj.created) < (86400 * conf.env.MAX_DAYS_OLD())) {
                   obj.voted = steem_api.verifyAccountHasVoted(
                     account,
+                    result
+                  );
+                  obj.flags = steem_api.verifyAccountHasVoted(
+                    ['cheetah','steemcleaners'],
                     result
                   );
                   obj.status = 'processed';
