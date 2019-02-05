@@ -104,10 +104,11 @@ module.exports = {
         if (data[i][1].op[1].to == account) {
           var post = this.getContent([conf.env.ACCOUNT_NAME(),account],data[i]);
           if (post !== null) {
-            if (!post.voted && !post.flags) {
+            if (!post.voted && !post.flags && (post.max_accepted_payout !== '0.000 SBD')) {
               if (this.dateDiff(post.created) > (60 * 15) &&
                 this.dateDiff(post.created) < (86400 * conf.env.MAX_DAYS_OLD())) {
-                if (post.amount <= conf.env.MAX_AMOUNT()) {
+                if ((post.amount <= conf.env.MAX_AMOUNT()) &&
+                  (post.amount <= conf.env.MIN_AMOUNT())) {
                   var votes_calc = parseFloat(post.votes);
                   if (votes_calc <= conf.env.MAX_VOTES()) {
                     var pending = parseFloat(
@@ -653,6 +654,8 @@ module.exports = {
     obj.url = '';
     obj.post_created = '';
     obj.pending_payout_value = '';
+    obj.percent_steem_dollars = 10000;
+    obj.max_accepted_payout = '';
     obj.votes = 0;
     obj.created = null;
     if (obj.memo.indexOf('/') != -1) {
@@ -680,6 +683,8 @@ module.exports = {
               obj.url
             );
             obj.pending_payout_value = result.pending_payout_value;
+            obj.percent_steem_dollars = result.percent_steem_dollars;
+            obj.max_accepted_payout = result.max_accepted_payout;
             obj.post_created = result.created;
             obj.votes = result.active_votes.length;
             if (!conf.env.SELF_VOTE()) {
