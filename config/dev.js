@@ -90,7 +90,7 @@ const self = module.exports = {
       return self.setInt(process.env.MAGIC_NUMBER,50);
     },
     MAX_AMOUNT: function() {
-      return self.setInt(process.env.MAX_AMOUNT,5);
+      return self.setInt(process.env.MAX_AMOUNT,50);
     },
     MAX_DAYS_OLD: function() {
       return self.setFloat(process.env.MAX_DAYS_OLD,4.5);
@@ -100,6 +100,9 @@ const self = module.exports = {
     },
     MAX_VOTES: function() {
       return self.setInt(process.env.MAX_VOTES,50);
+    },
+    MIN_AMOUNT: function() {
+      return self.setFloat(process.env.MIN_AMOUNT,5);
     },
     MIN_DONATION: function() {
       return self.setFloat(process.env.MIN_DONATION,0.01);
