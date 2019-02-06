@@ -104,7 +104,7 @@ module.exports = {
         if (data[i][1].op[1].to == account) {
           var post = this.getContent([conf.env.ACCOUNT_NAME(),account],data[i]);
           if (post !== null) {
-            if (!post.voted && !post.flags && (post.max_accepted_payout !== '0.000 SBD')) {
+            if (!post.voted && !post.flags && (post.max_accepted_payout === '1,000,000.000 SBD')) {
               if (this.dateDiff(post.created) > (60 * 15) &&
                 this.dateDiff(post.created) < (86400 * conf.env.MAX_DAYS_OLD())) {
                 if ((post.amount <= conf.env.MAX_AMOUNT()) &&
