@@ -87,7 +87,7 @@ const self = module.exports = {
       return self.setInt(process.env.LAST_VOTED);
     },
     MAGIC_NUMBER: function() {
-      return self.setInt(process.env.MAGIC_NUMBER,50);
+      return self.setInt(process.env.MAGIC_NUMBER,1);
     },
     MAX_AMOUNT: function() {
       return self.setInt(process.env.MAX_AMOUNT,50);

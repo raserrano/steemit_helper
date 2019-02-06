@@ -104,11 +104,12 @@ module.exports = {
         if (data[i][1].op[1].to == account) {
           var post = this.getContent([conf.env.ACCOUNT_NAME(),account],data[i]);
           if (post !== null) {
-            if (!post.voted && !post.flags && (post.max_accepted_payout === '1,000,000.000 SBD')) {
+            if (!post.voted && !post.flags &&
+              (post.max_accepted_payout !== '0.000 SBD')) {
               if (this.dateDiff(post.created) > (60 * 15) &&
                 this.dateDiff(post.created) < (86400 * conf.env.MAX_DAYS_OLD())) {
                 if ((post.amount <= conf.env.MAX_AMOUNT()) &&
-                  (post.amount <= conf.env.MIN_AMOUNT())) {
+                  (post.amount >= conf.env.MIN_AMOUNT())) {
                   var votes_calc = parseFloat(post.votes);
                   if (votes_calc <= conf.env.MAX_VOTES()) {
                     var pending = parseFloat(
@@ -120,9 +121,17 @@ module.exports = {
                       post.magic_number = magic_number;
                       post.bot = account;
                       posts.push(post);
+                    }else{
+                      this.debug(`Magic number: ${magic_number}`);
                     }
+                  }else{
+                    this.debug(`Votes: ${votes_calc}`);
                   }
+                }else{
+                  this.debug(`Amount: ${post.amount}`);
                 }
+              }else{
+                this.debug(`Post does not match with aging criteria`);
               }
             }
           }
@@ -658,178 +667,51 @@ module.exports = {
     obj.max_accepted_payout = '';
     obj.votes = 0;
     obj.created = null;
-    if (obj.memo.indexOf('/') != -1) {
-      if (conf.env.COMMENT_VOTE()) {
-        var post_url = obj.memo.split('/');
-        post_url = post_url.filter(function(e) {return e});
-        if (!(post_url[post_url.length - 2].indexOf('#') == -1)) {
-          var items = post_url[post_url.length - 2].split('#');
-          post_url.splice(
-            (post_url.length - 2),
-            1,
-            items[0],
-            items[1]
-          );
-        }
-        if (post_url[post_url.length - 2][0] === '@') {
-          obj.author = post_url[post_url.length - 2]
-          .substr(1, post_url[post_url.length - 2].length);
-          obj.url = post_url[post_url.length - 1];
-          if (obj.url !== undefined && obj.author !== undefined
-            && obj.url != null && obj.author != null) {
-            var result = wait.for(
-              steem_api.steem_getContent,
-              obj.author,
-              obj.url
-            );
-            obj.pending_payout_value = result.pending_payout_value;
-            obj.percent_steem_dollars = result.percent_steem_dollars;
-            obj.max_accepted_payout = result.max_accepted_payout;
-            obj.post_created = result.created;
-            obj.votes = result.active_votes.length;
-            if (!conf.env.SELF_VOTE()) {
-              if (obj.payer !== obj.author) {
-                if ((result !== undefined) && (result !== null)) {
-                  obj.created = result.created;
-                  if (this.dateDiff(obj.created) < (86400 * conf.env.MAX_DAYS_OLD())) {
-                    obj.voted = steem_api.verifyAccountHasVoted(
-                      account,
-                      result
-                    );
-                    obj.flags = steem_api.verifyAccountHasVoted(
-                      ['cheetah','steemcleaners'],
-                      result
-                    );
-                    obj.status = 'processed';
-                    obj.processed = obj.voted;
-                    obj.processed_date = new Date();
-                  }else {
-                    obj.status = 'due date';
-                    obj.processed = true;
-                  }
-                }else {
-                  obj.status = 'content-not-found';
-                  obj.processed = true;
-                }
-              }else {
-                obj.status = 'self-vote';
-                obj.processed = true;
-              }
-            }else {
-              if ((result !== undefined) && (result !== null)) {
-                obj.created = result.created;
-                if (this.dateDiff(obj.created) < (86400 * conf.env.MAX_DAYS_OLD())) {
-                  obj.voted = steem_api.verifyAccountHasVoted(
-                    account,
-                    result
-                  );
-                  obj.flags = steem_api.verifyAccountHasVoted(
-                    ['cheetah','steemcleaners'],
-                    result
-                  );
-                  obj.status = 'processed';
-                  obj.processed = obj.voted;
-                  obj.processed_date = new Date();
-                }else {
-                  obj.status = 'due date';
-                  obj.processed = true;
-                }
-              }else {
-                obj.status = 'content-not-found';
-                obj.processed = true;
-              }
-            }
-          }else {
-            obj.status = 'url-not-found';
-            obj.processed = true;
-          }
-        }else {
-          obj.status = 'url not valid';
-          obj.processed = true;
-        }
+
+    var has_link = (obj.memo.indexOf('https://') != -1);
+    var has_author = (obj.memo.indexOf('@') != -1);
+
+    if (has_author) {
+      var post_url = obj.memo.split('@');
+      var post_parts = post_url[1].split('/');
+      obj.author = post_parts[0];
+      obj.url = post_parts[1];
+      var result = wait.for(
+        steem_api.steem_getContent,
+        obj.author,
+        obj.url
+      );
+      obj.pending_payout_value = result.pending_payout_value;
+      obj.percent_steem_dollars = result.percent_steem_dollars;
+      obj.max_accepted_payout = result.max_accepted_payout;
+      obj.post_created = result.created;
+      obj.votes = result.active_votes.length;
+      if (!conf.env.SELF_VOTE()){
+        obj.self_vote = obj.payer !== obj.author;
+      }
+      obj.due = (this.dateDiff(obj.created) < (86400 * conf.env.MAX_DAYS_OLD()));
+      if ((result !== undefined) && (result !== null)) {
+        obj.created = result.created;
+        obj.voted = steem_api.verifyAccountHasVoted(
+          account,
+          result
+        );
+        obj.flags = steem_api.verifyAccountHasVoted(
+          ['cheetah','steemcleaners'],
+          result
+        );
+        obj.status = 'processed';
+        obj.processed = obj.voted;
+        obj.processed_date = new Date();
       }else {
-        if (!(obj.memo.indexOf('#') == -1)) {
-          obj.status = 'comment';
-          obj.processed = true;
-        }else {
-          var post_url = obj.memo.split('/');
-          post_url = post_url.filter(function(e) {return e});
-          if (!(post_url[post_url.length - 2].indexOf('#') == -1)) {
-            var items = post_url[post_url.length - 2].split('#');
-            post_url.splice(
-              (post_url.length - 2),
-              1,
-              items[0],
-              items[1]
-            );
-          }
-          if (post_url[post_url.length - 2][0] === '@') {
-            obj.author = post_url[post_url.length - 2]
-            .substr(1, post_url[post_url.length - 2].length);
-            obj.url = post_url[post_url.length - 1];
-            if (obj.url !== undefined && obj.author !== undefined
-              && obj.url != null && obj.author != null) {
-              var result = wait.for(
-                steem_api.steem_getContent,
-                obj.author,
-                obj.url
-              );
-              obj.pending_payout_value = result.pending_payout_value;
-              obj.post_created = result.created;
-              obj.votes = result.active_votes.length;
-              if (!conf.env.SELF_VOTE()) {
-                if (obj.payer !== obj.author) {
-                  if ((result !== undefined) && (result !== null)) {
-                    obj.created = result.created;
-                    if (this.dateDiff(obj.created) < (86400 * 4.5)) {
-                      obj.voted = steem_api.verifyAccountHasVoted(
-                        account,
-                        result
-                      );
-                      obj.status = 'processed';
-                      obj.processed = obj.voted;
-                      obj.processed_date = new Date();
-                    }else {
-                      obj.status = 'due date';
-                      obj.processed = true;
-                    }
-                  }else {
-                    obj.status = 'content-not-found';
-                    obj.processed = true;
-                  }
-                }else {
-                  obj.status = 'self-vote';
-                  obj.processed = true;
-                }
-              }else {
-                if ((result !== undefined) && (result !== null)) {
-                  obj.created = result.created;
-                  if (this.dateDiff(obj.created) < (86400 * 4.5)) {
-                    obj.voted = steem_api.verifyAccountHasVoted(
-                      account,
-                      result
-                    );
-                    obj.status = 'processed';
-                    obj.processed = obj.voted;
-                    obj.processed_date = new Date();
-                  }else {
-                    obj.status = 'due date';
-                    obj.processed = true;
-                  }
-                }else {
-                  obj.status = 'content-not-found';
-                  obj.processed = true;
-                }
-              }
-            }else {
-              obj.status = 'url-not-found';
-              obj.processed = true;
-            }
-          }else {
-            obj.status = 'url not valid';
-            obj.processed = true;
-          }
-        }
+        obj.status = 'content-not-found';
+        obj.processed = true;
+      }
+      if (obj.due){
+        obj.status = 'due date';
+      }
+      if (obj.self_vote){
+        obj.status = 'self-vote';
       }
     }else {
       obj.status = 'donation';
