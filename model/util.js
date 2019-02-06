@@ -2,6 +2,7 @@ const
   wait = require('wait.for'),
   conf = require('../config/dev'),
   db = require('./db'),
+  mongoose = require('mongoose'),
   fs = require('fs'),
   sprintf = require('sprintf-js').sprintf,
   steem_api = require('./steem_api');
@@ -801,7 +802,7 @@ module.exports = {
     );
   },
   getData: function(model,query,callback) {
-    mongoose.model(model).find(query).exec(function(err,data) {callback(err,data)});
+    mongoose.model(model).find(query).exec(function(err,data) {callback(err,data);});
   },
   upsertModel: function(model,query,doc,callback) {
     mongoose.model(model).update(
