@@ -8,7 +8,8 @@ console.log(config.database.conn(config.database.options));
 var db = mongoose.connect(
   config.database.conn(
     config.database.options
-    )
+    ),
+    { useNewUrlParser: true }
   );
 
 // CONNECTION EVENTS

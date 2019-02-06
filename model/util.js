@@ -722,7 +722,7 @@ module.exports = {
     return obj;
   },
   getQueue: function(callback) {
-    db.model('Transfer').find(
+    mongoose.model('Transfer').find(
       {
         voted: false,
         processed: false,
@@ -736,7 +736,7 @@ module.exports = {
     );
   },
   getQueueForPayer: function(payer_name, callback) {
-    db.model('Transfer').find(
+    mongoose.model('Transfer').find(
       {
         payer: payer_name,
         voted: false,
@@ -751,7 +751,7 @@ module.exports = {
     );
   },
   getRefunds: function(last_refunded,callback) {
-    db.model('Transfer').find(
+    mongoose.model('Transfer').find(
       {
         voted: false,
         processed: true,
@@ -773,7 +773,7 @@ module.exports = {
     );
   },
   getRefundsSpecial: function(last_refunded,callback) {
-    db.model('Transfer').find(
+    mongoose.model('Transfer').find(
       {
         voted: true,
         processed: true,
@@ -794,17 +794,17 @@ module.exports = {
     );
   },
   getDataLast: function(model,query={},sort,callback) {
-    db.model(model).find(query).limit(1).sort(sort).exec(
+    mongoose.model(model).find(query).limit(1).sort(sort).exec(
       function(err,data) {
         callback(err,data);
       }
     );
   },
   getData: function(model,query,callback) {
-    db.model(model).find(query).exec(function(err,data) {callback(err,data)});
+    mongoose.model(model).find(query).exec(function(err,data) {callback(err,data)});
   },
   upsertModel: function(model,query,doc,callback) {
-    db.model(model).update(
+    mongoose.model(model).update(
       query,doc,{upsert: true,new: true}
     ).exec(function(err,data) {callback(err,data)});
   },
@@ -814,7 +814,7 @@ module.exports = {
       {$project: {_id: false,total: {$sum: '$amount'},},},
       {$group: {_id: 'total',total: {$sum: '$total'},},},
       ];
-    db.model('Transfer').aggregate(stages).exec(
+    mongoose.model('Transfer').aggregate(stages).exec(
       function(err,data) {
         callback(err,data);
       }
@@ -824,14 +824,14 @@ module.exports = {
     var stages = [
       {$group: {_id: 'trees',average: {$avg: '$trees'},},},
       ];
-    db.model('Information').aggregate(stages).exec(
+    mongoose.model('Information').aggregate(stages).exec(
       function(err,data) {
         callback(err,data);
       }
     );
   },
   getDonatorsTotal: function(callback) {
-    db.model('Transfer').distinct('payer').exec(
+    mongoose.model('Transfer').distinct('payer').exec(
       function(err,data) {
         callback(err,data);
       }
@@ -840,7 +840,7 @@ module.exports = {
   cleanFollowers: function(callback) {
     var date = new Date();
     date.setDate(date.getDate() - 8);
-    db.model('Follower').remove(
+    mongoose.model('Follower').remove(
       {created: {$lt: date}}
       ).exec(
       function(err,data) {
@@ -849,7 +849,7 @@ module.exports = {
     );
   },
   cleanDelegators: function(callback) {
-    db.model('Delegator').remove({}
+    mongoose.model('Delegator').remove({}
       ).exec(
       function(err,data) {
         callback(err,data);
@@ -857,7 +857,7 @@ module.exports = {
     );
   },
   insertDelegators: function(records, callback) {
-    db.model('Delegator').create(records,
+    mongoose.model('Delegator').create(records,
       function(err,data) {
         callback(err,data);
       }
@@ -865,7 +865,7 @@ module.exports = {
   },
   deleteLink: function(query,callback) {
     console.log('Deleting link');
-    db.model('Link').remove(query).exec(
+    mongoose.model('Link').remove(query).exec(
       function(err,data) {
         callback(err,data);
       }
@@ -930,7 +930,7 @@ module.exports = {
     if ((options.limit !== undefined) && (options.limit !== null)) {
       stages.push({$limit: options.limit});
     }
-    db.model('Transfer').aggregate(stages).exec(
+    mongoose.model('Transfer').aggregate(stages).exec(
       function(err,data) {
         callback(err,data);
       }
