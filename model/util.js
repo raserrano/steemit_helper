@@ -131,7 +131,8 @@ module.exports = {
                   this.debug(`Amount: ${post.amount}`);
                 }
               }else{
-                this.debug(`Post does not match with aging criteria`);
+                this.debug(`Post older than 15 mins: ${this.dateDiff(post.created) > (60 * 15)}`);
+                this.debug(`Post newer than ${(86400 * conf.env.MAX_DAYS_OLD())} mins: ${this.dateDiff(post.created) > (86400 * conf.env.MAX_DAYS_OLD())}`);
               }
             }
           }
@@ -144,17 +145,19 @@ module.exports = {
     var vp = this.getVotingPower(voter);
     if (conf.env.VOTE_ACTIVE()) {
       if (vp >= (conf.env.MIN_VOTING_POWER() * conf.env.VOTE_POWER_1_PC())) {
-        var to_vote = data[data.length - 1];
-        if ((to_vote.author !== undefined) && (to_vote.author !== null)
-          && (to_vote.url !== undefined) && (to_vote.url !== null)) {
-          if (!to_vote.voted) {
-            this.debug(to_vote);
-            steem_api.votePost(
-              to_vote.author,
-              to_vote.url,
-              weight
-            );
-            wait.for(this.timeout_wrapper,5000);
+        var to_vote = data.pop()
+        while(data.length >= 0){
+          if ((to_vote.author !== undefined) && (to_vote.author !== null)
+            && (to_vote.url !== undefined) && (to_vote.url !== null)) {
+            if (!to_vote.voted) {
+              this.debug(to_vote);
+              steem_api.votePost(
+                to_vote.author,
+                to_vote.url,
+                weight
+              );
+              wait.for(this.timeout_wrapper,5000);
+            }
           }
         }
       }else {
@@ -955,8 +958,14 @@ module.exports = {
     body += '\n\nMake sure to visit their profile and welcome them as well.\n';
     body += 'Long live Steemit, the social revolution platform.';
 
-    var contents_3 = fs.readFileSync('./reports/footer_tuanis.md', 'utf8');
-    body += contents_3;
+    var delegation = fs.readFileSync('./reports/tuanis_delegation.md', 'utf8');
+    body += delegation;
+    
+    var firma = fs.readFileSync('./reports/firma_tuanis.md', 'utf8');
+    body += firma;
+
+    var footer = fs.readFileSync('./reports/footer_tuanis.md', 'utf8');
+    body += footer;
 
     this.preparePost(
       conf.env.ACCOUNT_NAME(),
@@ -971,7 +980,7 @@ module.exports = {
     var permlink = conf.env.ACCOUNT_NAME() + '-report-for-' + conf.env.TAG() + '-' + when;
     var title = 'Reporte de apoyo a comunidad ' + conf.env.TAG() + '-' + when;
     var body = 'Como muestra de apoyo a el tag: ' + conf.env.TAG() + '\n';
-    var tags = {tags: [conf.env.TAG(),'report','bot','comunidad','spanish']}
+    var tags = {tags: [conf.env.TAG(),'report','bot','busy','spanish']}
     var total = 0;
     body += '\n\nEl dia de hoy he seleccionado los siguientes posts de nuestra comunidad: \n';
     body += '<center>![steem_cr.png](https://cdn.steemitimages.com/';
@@ -985,8 +994,11 @@ module.exports = {
     body += '\n\nApoyemonos y crezcamos juntos.\n';
     body += 'Unidos podemos poco a poco aumentar nuestra fuerza y seguir apoyandonos';
 
-    var contents_3 = fs.readFileSync('./reports/raserrano.md', 'utf8');
-    body += contents_3;
+    var delegation = fs.readFileSync('./reports/tuanis_delegation.md', 'utf8');
+    body += delegation;
+
+    var firma = fs.readFileSync('./reports/firma_tuanis.md', 'utf8');
+    body += firma;
 
     this.preparePost(
       conf.env.ACCOUNT_NAME(),
@@ -1196,13 +1208,10 @@ module.exports = {
     return result;
   },
   getRandom: function(count, limit) {
-    // Random
-    var min = Math.ceil(0);
-    var max = Math.floor(count);
     var lucky = new Array();
     var k = 0;
     while (k++ < limit) {
-      lucky.push(Math.floor(Math.random() * (max - min + 1)) + min);
+      lucky.push(Math.floor(Math.random() * count));
     }
     return lucky;
   },

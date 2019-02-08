@@ -79,7 +79,7 @@ wait.launchFiber(function() {
   var footer = '';
 
   if (conf.env.ACCOUNT_NAME() === 'tuanis') {
-    tags = {tags: ['helpmejoin', 'status', 'report', 'bot']};
+    tags = {tags: ['helpmejoin', 'report', 'busy', 'bot']};
     header = 'Hello minnows!';
     footer += fs.readFileSync('./reports/footer_tuanis.md', 'utf8');
     footer += fs.readFileSync('./reports/raserrano.md', 'utf8');
