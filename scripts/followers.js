@@ -21,7 +21,7 @@ wait.launchFiber(function() {
     wait.for(utils.cleanFollowers);
   }
   var followers_clean = wait.for(utils.getData,'Follower',{});
-  // console.log(date.getDay(),count.follower_count,followers_db.length);
+  // Console.log(date.getDay(),count.follower_count,followers_db.length);
   if (date.getDay() === 0 || (count.follower_count !== followers_db.length)) {
 
     console.log('Followers ' + count.follower_count);
@@ -42,7 +42,7 @@ wait.launchFiber(function() {
       }catch (e) {
         console.log(e);
       }
-      // console.log(followers.length);
+      // Console.log(followers.length);
       for (var current = 0; current < followers.length; current++) {
         var user = {};
         try {
@@ -52,7 +52,7 @@ wait.launchFiber(function() {
         }catch (e) {
           console.log(e);
         }
-        // console.log(followers[current])
+        // Console.log(followers[current])
         if (user[0] !== undefined) {
           var rep = utils.getReputation(user[0]);
           obj = {
@@ -80,7 +80,7 @@ wait.launchFiber(function() {
   console.log(lucky);
   var votes = 0;
   var followers_db = wait.for(utils.getData,'Follower',{});
-  // console.log(followers_db);
+  // Console.log(followers_db);
   for (var i = 0; i < lucky.length; i++) {
     console.log('Processing ' + followers_db[lucky[i]].username);
     var posts = wait.for(steem_api.steem_getPostsByAuthor,followers_db[lucky[i]].username,20);
@@ -93,7 +93,7 @@ wait.launchFiber(function() {
           if (utils.dateDiff(posts[j].created) < (86400 * 5)) {
             console.log('Found something to vote to');
             // Not voted yet
-            if(followers_db[lucky[i]].reputation >= 25){
+            if (followers_db[lucky[i]].reputation >= 25) {
               var result = wait.for(
                 steem_api.steem_getContent,
                 posts[j].author,

@@ -1,11 +1,11 @@
 module.exports = {
-  tuanis:{
+  tuanis: {
 
   },
-  treeplanter:{
+  treeplanter: {
 
   },
-  volcancr:{
-    
-  }
+  volcancr: {
+
+  },
 }

@@ -7,7 +7,10 @@ var request = require('request'),
 var delegators = 'body > div > table > tbody > tr > td:nth-child(1) > table > tbody > tr';
 
 wait.launchFiber(function() {
-  var res = wait.for(request,'http://www.steemreports.com/delegation-info/?account='+conf.env.ACCOUNT_NAME())
+  var res = wait.for(
+    request,
+    'http://www.steemreports.com/delegation-info/?account=' + conf.env.ACCOUNT_NAME()
+  );
   var $ = cheerio.load(res.body);
   const supporters = new Array();
   $(delegators).each(function(i,elem) {

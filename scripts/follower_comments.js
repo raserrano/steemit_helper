@@ -37,7 +37,7 @@ wait.launchFiber(function() {
           if (utils.dateDiff(posts[j].created) < (86400 * 5)) {
             console.log('Found something to vote to');
             // Not voted yet
-            if(followers_db[lucky[i]].reputation >= 25){
+            if (followers_db[lucky[i]].reputation >= 25) {
               var result = wait.for(
                 steem_api.steem_getContent,
                 posts[j].author,

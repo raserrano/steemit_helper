@@ -61,8 +61,12 @@ wait.launchFiber(function() {
   var contents_2 = '';
 
   if (conf.env.ACCOUNT_NAME() === 'tuanis') {
-    tags = {tags: ['helpmejoin','minnowsupportproject','minnows']};
+    tags = {tags: ['helpmejoin','minnowsupportproject','minnows','busy']};
     pictures = JSON.parse(fs.readFileSync('./reports/tuanis_pics.json', 'utf8'));
+    var delegation = fs.readFileSync('./reports/tuanis_delegation.md', 'utf8');
+    contents_2 += delegation;
+    var firma = fs.readFileSync('./reports/firma_tuanis.md', 'utf8');
+    contents_2 += firma;
     contents_2 = fs.readFileSync('./reports/footer_tuanis.md', 'utf8');
   }
 
