@@ -146,8 +146,8 @@ module.exports = {
         while (data.length > 0) {
           console.log(`Currently at: ${data.length}`);
           var to_vote = data.pop();
-          if ((to_vote.author !== undefined) && (to_vote.author !== null)
-            && (to_vote.url !== undefined) && (to_vote.url !== null)) {
+          if ((to_vote.author !== undefined) && (to_vote.author !== null) &&
+            (to_vote.url !== undefined) && (to_vote.url !== null)) {
             if (!to_vote.voted) {
               this.debug(to_vote);
               steem_api.votePost(
@@ -979,7 +979,7 @@ module.exports = {
     var permlink = conf.env.ACCOUNT_NAME() + '-report-for-' + conf.env.TAG() + '-' + when;
     var title = 'Reporte de apoyo a comunidad ' + conf.env.TAG() + '-' + when;
     var body = 'Como muestra de apoyo a el tag: ' + conf.env.TAG() + '\n';
-    var tags = {tags: [conf.env.TAG(),'report','bot','busy','spanish']}
+    var tags = {tags: [conf.env.TAG(),'report','bot','busy','spanish']};
     var total = 0;
     body += '\n\nEl dia de hoy he seleccionado los siguientes posts de nuestra comunidad: \n';
     body += '<center>![steem_cr.png](https://cdn.steemitimages.com/';
