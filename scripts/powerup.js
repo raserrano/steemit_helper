@@ -14,7 +14,7 @@ wait.launchFiber(function() {
   var last_info = wait.for(utils.getDataLast,'Information',{},{created: -1});
   console.log(last_info);
 
-  // wait.for(
+  // Wait.for(
   //   steem_api.steem_transferToVesting,
   //   [conf.env.ACCOUNT_NAME()],
   //   [conf.env.ACCOUNT_NAME()],

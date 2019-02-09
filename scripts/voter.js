@@ -42,8 +42,8 @@ wait.launchFiber(function() {
         utils.debug('Good options ' + temp.length);
         best_options = best_options.concat(temp);
       }
+      utils.debug('Total of posts ' + best_options.length);
       if (best_options.length > 0) {
-        utils.debug(best_options);
         best_options.sort(function(a,b) {
           return (a.magic_number > b.magic_number) ?
             1 : ((b.magic_number > a.magic_number) ? -1 : 0);

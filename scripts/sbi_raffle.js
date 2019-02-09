@@ -20,14 +20,14 @@ wait.launchFiber(function() {
     steem_api.steem_getAccounts_wrapper,[conf.env.ACCOUNT_NAME()]
   );
   var steem_amount = voter[0].balance.split(' ');
-  if((parseFloat(steem_amount[0]) >= 2)&&(conf.env.DAYS().includes(today.getDay().toString()))){
+  if ((parseFloat(steem_amount[0]) >= 2) && (conf.env.DAYS().includes(today.getDay().toString()))) {
     var delegators = wait.for(utils.getData,'Delegator',{})
     var lucky = utils.getRandom(delegators.length, 1);
     footer += fs.readFileSync('./reports/tuanis_delegation.md', 'utf8');
     footer += fs.readFileSync('./reports/footer_tuanis.md', 'utf8');
     footer += fs.readFileSync('./reports/firma_tuanis.md', 'utf8');
     var data = {
-      winners: delegators[lucky].username
+      winners: delegators[lucky].username,
     }
     var body = sprintf(
       template,

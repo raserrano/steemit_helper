@@ -121,18 +121,15 @@ module.exports = {
                       post.magic_number = magic_number;
                       post.bot = account;
                       posts.push(post);
-                    }else{
+                    }else {
                       this.debug(`Magic number: ${magic_number}`);
                     }
-                  }else{
+                  }else {
                     this.debug(`Votes: ${votes_calc}`);
                   }
-                }else{
+                }else {
                   this.debug(`Amount: ${post.amount}`);
                 }
-              }else{
-                this.debug(`Post older than 15 mins: ${this.dateDiff(post.created) > (60 * 15)}`);
-                this.debug(`Post newer than ${(86400 * conf.env.MAX_DAYS_OLD())} mins: ${this.dateDiff(post.created) > (86400 * conf.env.MAX_DAYS_OLD())}`);
               }
             }
           }
@@ -145,8 +142,10 @@ module.exports = {
     var vp = this.getVotingPower(voter);
     if (conf.env.VOTE_ACTIVE()) {
       if (vp >= (conf.env.MIN_VOTING_POWER() * conf.env.VOTE_POWER_1_PC())) {
-        var to_vote = data.pop()
-        while(data.length >= 0){
+        console.log(`Options to vote ${data.length}`);
+        while (data.length > 0) {
+          console.log(`Currently at: ${data.length}`);
+          var to_vote = data.pop();
           if ((to_vote.author !== undefined) && (to_vote.author !== null)
             && (to_vote.url !== undefined) && (to_vote.url !== null)) {
             if (!to_vote.voted) {
@@ -689,7 +688,7 @@ module.exports = {
       obj.max_accepted_payout = result.max_accepted_payout;
       obj.post_created = result.created;
       obj.votes = result.active_votes.length;
-      if (!conf.env.SELF_VOTE()){
+      if (!conf.env.SELF_VOTE()) {
         obj.self_vote = obj.payer !== obj.author;
       }
       obj.due = (this.dateDiff(obj.created) < (86400 * conf.env.MAX_DAYS_OLD()));
@@ -710,10 +709,10 @@ module.exports = {
         obj.status = 'content-not-found';
         obj.processed = true;
       }
-      if (obj.due){
+      if (obj.due) {
         obj.status = 'due date';
       }
-      if (obj.self_vote){
+      if (obj.self_vote) {
         obj.status = 'self-vote';
       }
     }else {
@@ -960,7 +959,7 @@ module.exports = {
 
     var delegation = fs.readFileSync('./reports/tuanis_delegation.md', 'utf8');
     body += delegation;
-    
+
     var firma = fs.readFileSync('./reports/firma_tuanis.md', 'utf8');
     body += firma;
 
@@ -1074,7 +1073,8 @@ module.exports = {
     for (var i = 0; i < delegators.length; i++) {
       var calc_sp = ((delegators[i].sp * 1000) / 2).toFixed(2);
       var calc_trees = (calc_sp / 5800).toFixed(3);
-      delegators_table += `${i + 1} | ${delegators[i].username} | ~${calc_sp} | ${calc_trees}\n`;
+      delegators_table += `${i + 1} | ${delegators[i].username} | ~${calc_sp} | ${calc_trees}
+`;
     }
     delegators_table += '\n---\n';
     contents_1 += delegators_table;

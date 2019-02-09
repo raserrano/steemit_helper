@@ -33,7 +33,7 @@ wait.launchFiber(function() {
     }else {
       utils.debug('Nothing to claim');
     }
-  }else{
+  }else {
     console.log('ACCOUNT_NAME is not set');
   }
   console.log('Finish claiming rewards');

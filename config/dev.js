@@ -31,27 +31,27 @@ const self = module.exports = {
       return uri.toString();
     },
   },
-  setBoolean: function(attribute,value=false){
-    if(attribute!==null && attribute !== undefined){
-      value=JSON.parse(attribute);
+  setBoolean: function(attribute,value=false) {
+    if (attribute !== null && attribute !== undefined) {
+      value = JSON.parse(attribute);
     }
     return value;
   },
-  setString: function(attribute, value=''){
-    if(attribute!==null && attribute !== undefined){
-      value=attribute;
+  setString: function(attribute, value='') {
+    if (attribute !== null && attribute !== undefined) {
+      value = attribute;
     }
     return value;
   },
-  setFloat: function(attribute,value=0){
-    if(attribute!==null && attribute !== undefined && attribute.length !== 0){
-      value=parseFloat(attribute);
+  setFloat: function(attribute,value=0) {
+    if (attribute !== null && attribute !== undefined && attribute.length !== 0) {
+      value = parseFloat(attribute);
     }
     return value;
   },
-  setInt: function(attribute,value=0){
-    if(attribute!==null && attribute !== undefined && attribute.length !== 0){
-      value=parseInt(attribute);
+  setInt: function(attribute,value=0) {
+    if (attribute !== null && attribute !== undefined && attribute.length !== 0) {
+      value = parseInt(attribute);
     }
     return value;
   },
@@ -165,7 +165,7 @@ const self = module.exports = {
       return self.setFloat(process.env.VOTE_MULTIPLIER,2);
     },
     WEIGHT: function() {
-      return self.setFloat(process.env.WEIGHT,5)*100;
+      return self.setFloat(process.env.WEIGHT,5) * 100;
     },
   },
 };
