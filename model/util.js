@@ -143,16 +143,15 @@ module.exports = {
     if (conf.env.VOTE_ACTIVE()) {
       if (vp >= (conf.env.MIN_VOTING_POWER() * conf.env.VOTE_POWER_1_PC())) {
         console.log(`Options to vote ${data.length}`);
-        while (data.length > 0) {
-          console.log(`Currently at: ${data.length}`);
-          var to_vote = data.pop();
-          if ((to_vote.author !== undefined) && (to_vote.author !== null) &&
-            (to_vote.url !== undefined) && (to_vote.url !== null)) {
-            if (!to_vote.voted) {
-              this.debug(to_vote);
+        for (var i=0; i < data.length; i++) {
+          console.log(`Currently at: ${i}`);
+          if ((data[i].author !== undefined) && (data[i].author !== null) &&
+            (data[i].url !== undefined) && (data[i].url !== null)) {
+            if (!data[i].voted) {
+              this.debug(data[i]);
               steem_api.votePost(
-                to_vote.author,
-                to_vote.url,
+                data[i].author,
+                data[i].url,
                 weight
               );
               wait.for(this.timeout_wrapper,5000);
