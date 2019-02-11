@@ -956,13 +956,6 @@ module.exports = {
     body += '\n\n## Total sent in fees: ' + total.toFixed(3) + ' ##';
     body += '\n\nMake sure to visit their profile and welcome them as well.\n';
     body += 'Long live Steemit, the social revolution platform.';
-
-    var delegation = fs.readFileSync('./reports/tuanis_delegation.md', 'utf8');
-    body += delegation;
-
-    var firma = fs.readFileSync('./reports/firma_tuanis.md', 'utf8');
-    body += firma;
-
     var footer = fs.readFileSync('./reports/footer_tuanis.md', 'utf8');
     body += footer;
 
