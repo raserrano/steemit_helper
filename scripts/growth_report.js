@@ -67,9 +67,9 @@ wait.launchFiber(function() {
     contents_2 += delegation;
     var firma = fs.readFileSync('./reports/firma_tuanis.md', 'utf8');
     contents_2 += firma;
-    contents_2 = fs.readFileSync('./reports/footer_tuanis.md', 'utf8');
+    var footer = fs.readFileSync('./reports/footer_tuanis.md', 'utf8');
+    contents_2 += footer;
   }
-
   var data = {
     followers: account.followers,
     reputation: account.reputation,
@@ -80,7 +80,8 @@ wait.launchFiber(function() {
     maximum: conf.env.MAX_DONATION(),
     multiplier: conf.env.VOTE_MULTIPLIER(),
   };
-  var body = sprintf(contents_1 + contents_2, data);
+  var body = sprintf(contents_1, data);
+  body += contents_2;
   if (conf.env.DAYS().includes(account.created.getDay().toString())) {
     utils.preparePost(
       conf.env.ACCOUNT_NAME(),
