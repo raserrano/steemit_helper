@@ -143,7 +143,7 @@ module.exports = {
     if (conf.env.VOTE_ACTIVE()) {
       if (vp >= (conf.env.MIN_VOTING_POWER() * conf.env.VOTE_POWER_1_PC())) {
         console.log(`Options to vote ${data.length}`);
-        for (var i=0; i < data.length; i++) {
+        for (var i = 0; i < data.length; i++) {
           console.log(`Currently at: ${i}`);
           if ((data[i].author !== undefined) && (data[i].author !== null) &&
             (data[i].url !== undefined) && (data[i].url !== null)) {
