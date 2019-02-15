@@ -76,7 +76,7 @@ wait.launchFiber(function() {
   }
   // Verify if follower has active posts
 
-  var lucky = utils.getRandom(count.follower_count, 10);
+  var lucky = utils.getRandom(count.follower_count, 50);
   console.log(lucky);
   var votes = 0;
   var followers_db = wait.for(utils.getData,'Follower',{});
