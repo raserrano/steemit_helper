@@ -765,7 +765,7 @@ module.exports = {
           ],},
         number: {$gt: last_refunded},
       }
-    ).sort({number: 1}).exec(
+    ).sort({number: -1}).exec(
       function(err,data) {
         callback(err,data);
       }
