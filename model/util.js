@@ -985,11 +985,8 @@ module.exports = {
     body += '\n\nApoyemonos y crezcamos juntos.\n';
     body += 'Unidos podemos poco a poco aumentar nuestra fuerza y seguir apoyandonos';
 
-    var delegation = fs.readFileSync('./reports/tuanis_delegation.md', 'utf8');
-    body += delegation;
-
-    var firma = fs.readFileSync('./reports/firma_tuanis.md', 'utf8');
-    body += firma;
+    var footer = fs.readFileSync('./reports/footer_tuanis.md', 'utf8');
+    body += footer;
 
     this.preparePost(
       conf.env.ACCOUNT_NAME(),
