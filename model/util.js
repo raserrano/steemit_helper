@@ -765,7 +765,7 @@ module.exports = {
           ],},
         number: {$gt: last_refunded},
       }
-    ).sort({number: 1}).exec(
+    ).sort({number: -1}).exec(
       function(err,data) {
         callback(err,data);
       }
@@ -975,7 +975,8 @@ module.exports = {
     var total = 0;
     body += '\n\nEl dia de hoy he seleccionado los siguientes posts de nuestra comunidad: \n';
     body += '<center>![steem_cr.png](https://cdn.steemitimages.com/';
-    body += 'DQmNtmJiCFVQDvqWZRtRo5uE1gaTyrtkCWjm5sREALVdcvy/steem_cr.png)</center>'
+    body += 'DQmNtmJiCFVQDvqWZRtRo5uE1gaTyrtkCWjm5sREALVdcvy/steem_cr.png)</center>';
+    body += '\n';
     for (var i = 0; i < posts.length; i++) {
       total += posts[i].fee;
       body += '- @' + posts[i].author;
@@ -985,11 +986,8 @@ module.exports = {
     body += '\n\nApoyemonos y crezcamos juntos.\n';
     body += 'Unidos podemos poco a poco aumentar nuestra fuerza y seguir apoyandonos';
 
-    var delegation = fs.readFileSync('./reports/tuanis_delegation.md', 'utf8');
-    body += delegation;
-
-    var firma = fs.readFileSync('./reports/firma_tuanis.md', 'utf8');
-    body += firma;
+    var footer = fs.readFileSync('./reports/footer_tuanis.md', 'utf8');
+    body += footer;
 
     this.preparePost(
       conf.env.ACCOUNT_NAME(),

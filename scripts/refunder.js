@@ -18,10 +18,9 @@ wait.launchFiber(function() {
     process.exit();
   }
   // Get not voted posts from DB
-  var last_refunded = wait.for(utils.getDataLast,'Transfer',{status: 'refunded'},{number: -1});
-  if (last_refunded.length === 0) {
-    last_refunded = conf.env.LAST_REFUNDED();
-  }else {
+  var last_refunded = conf.env.LAST_REFUNDED();
+  if (last_refunded === 0) {
+    last_refunded = wait.for(utils.getDataLast,'Transfer',{status: 'refunded'},{number: -1});
     last_refunded = last_refunded[0].number;
   }
   console.log('Last refunded: ' + last_refunded);
