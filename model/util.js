@@ -391,7 +391,7 @@ module.exports = {
             );
             refunded_urls.push(data[i].memo);
           }else {
-            if (data[i].status === 'min amount') {
+            if (data[i].status === 'min amount' && data[i].url !== "") {
               // Verify if it was a valid post and comment post/comment with
               var title = 'Thanks for your donation';
               var comment = '![treeplantermessage_new.png]';
