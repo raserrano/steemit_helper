@@ -949,7 +949,7 @@ module.exports = {
       body += ' [' + posts[i].title + '](https://steemit.com' + posts[i].url + ')';
       if (posts[i].fee !== 0) {
         body += ' transfered fee\n';
-      }posts[i].url
+      }
       body += '\n';
     }
     body += '\n\n## Total sent in fees: ' + total.toFixed(3) + ' ##';
