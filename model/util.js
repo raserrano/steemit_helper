@@ -391,7 +391,7 @@ module.exports = {
             );
             refunded_urls.push(data[i].memo);
           }else {
-            if (data[i].status === 'min amount' && data[i].url !== "") {
+            if (data[i].status === 'min amount' && data[i].url !== '') {
               // Verify if it was a valid post and comment post/comment with
               var title = 'Thanks for your donation';
               var comment = '![treeplantermessage_new.png]';
@@ -946,10 +946,10 @@ module.exports = {
     for (var i = 0; i < posts.length; i++) {
       total += posts[i].fee;
       body += '- @' + posts[i].author;
-      body += ' [post](https://steemit.com' + posts[i].url + ')';
+      body += ' [' + posts[i].title + '](https://steemit.com' + posts[i].url + ')';
       if (posts[i].fee !== 0) {
         body += ' transfered fee\n';
-      }
+      }posts[i].url
       body += '\n';
     }
     body += '\n\n## Total sent in fees: ' + total.toFixed(3) + ' ##';
@@ -980,7 +980,7 @@ module.exports = {
     for (var i = 0; i < posts.length; i++) {
       total += posts[i].fee;
       body += '- @' + posts[i].author;
-      body += ' [post](https://steemit.com' + posts[i].url + ')';
+      body += ' [' + posts[i].title + '](https://steemit.com' + posts[i].url + ')';
       body += '\n';
     }
     body += '\n\nApoyemonos y crezcamos juntos.\n';
@@ -1064,7 +1064,7 @@ module.exports = {
       var calc_sp = ((delegators[i].sp * 1000) / 2).toFixed(2);
       var calc_trees = (calc_sp / 5800).toFixed(3);
       delegators_table += `${i + 1} | ${delegators[i].username} | ~${calc_sp} | ${calc_trees}`;
-      delegators_table += '\n';      
+      delegators_table += '\n';
     }
     delegators_table += '\n---\n';
     contents_1 += delegators_table;
