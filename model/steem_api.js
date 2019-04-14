@@ -48,7 +48,7 @@ module.exports = {
   commentPost: function(author, permlink, title, comment) {
     var result = '';
     console.log('Commenting post: ' + permlink);
-    if(permlink.lenth > 0){
+    if(permlink.lenth > 0 || permlink !== null){
       var comment_permlink = steem.formatter.commentPermlink(
         author,
         permlink
