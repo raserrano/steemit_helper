@@ -48,26 +48,28 @@ module.exports = {
   commentPost: function(author, permlink, title, comment) {
     var result = '';
     console.log('Commenting post: ' + permlink);
-    var comment_permlink = steem.formatter.commentPermlink(
-      author,
-      permlink
-    ).toLowerCase().replace(/\./g,'');
-    console.log('Comment permlink: ' + comment_permlink);
-    if (comment_permlink.length < 200) {
-      try {
-        result = wait.for(
-          steem.broadcast.comment,
-          conf.env.POSTING_KEY_PRV(),
-          author,
-          permlink,
-          conf.env.ACCOUNT_NAME(),
-          comment_permlink,
-          title,
-          comment,
-          {}
-        );
-      }catch (e) {
-        console.log(e);
+    if(permlink.lenth > 0 || permlink !== null){
+      var comment_permlink = steem.formatter.commentPermlink(
+        author,
+        permlink
+      ).toLowerCase().replace(/\./g,'');
+      console.log('Comment permlink: ' + comment_permlink);
+      if (comment_permlink.length < 200) {
+        try {
+          result = wait.for(
+            steem.broadcast.comment,
+            conf.env.POSTING_KEY_PRV(),
+            author,
+            permlink,
+            conf.env.ACCOUNT_NAME(),
+            comment_permlink,
+            title,
+            comment,
+            {}
+          );
+        }catch (e) {
+          console.log(e);
+        }
       }
     }
     return result;
