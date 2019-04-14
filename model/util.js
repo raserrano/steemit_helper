@@ -372,7 +372,7 @@ module.exports = {
             var comment = '![treeplanternoplant_new.png]';
             comment += '(https://steemitimages.com/DQmaCMGBXirzeFWCWD8gVadsJE1';
             comment += 'PY1pvXTECAyjGAtF5KNg/treeplanternoplant_new.png)';
-            steem_api.commentPost(data[i].author, data[i].url, title,comment);
+            steem_api.commentPost(data[i].author, data[i].url, title, comment);
             wait.for(this.timeout_wrapper,4000);
             send = data[i].amount.toFixed(3) + ' ' + data[i].currency;
             this.debug(send,account,data[i].payer,memo);
@@ -391,14 +391,14 @@ module.exports = {
             );
             refunded_urls.push(data[i].memo);
           }else {
-            if (data[i].status === 'min amount' && data[i].url !== '') {
+            if (data[i].status === 'min amount') {
               // Verify if it was a valid post and comment post/comment with
               var title = 'Thanks for your donation';
               var comment = '![treeplantermessage_new.png]';
               comment += '(https://steemitimages.';
               comment += 'com/DQmZsdAUXGYBH38xY4smeMtHHEiEHxaEaQmGo2pJhMNdQfX/';
               comment += 'treeplantermessage_new.png)';
-              steem_api.commentPost(data[i].author, data[i].url, title,comment);
+              steem_api.commentPost(data[i].author, data[i].url, title, comment);
               wait.for(this.timeout_wrapper,4000);
               wait.for(
                 this.upsertModel,
