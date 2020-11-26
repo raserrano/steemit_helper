@@ -11,7 +11,7 @@ wait.launchFiber(function() {
   console.log('Links to vote: ' + links.length);
   for (var i = 0; i < links.length;i++) {
     var voter = wait.for(
-       steem_api.steem_getAccounts_wrapper,[conf.env.SUPPORT_ACCOUNT()]
+      steem_api.steem_getAccounts_wrapper,[conf.env.SUPPORT_ACCOUNT()]
     );
     var vp = utils.getVotingPower(voter[0]);
     if (vp >= conf.env.MIN_VOTING_POWER()) {

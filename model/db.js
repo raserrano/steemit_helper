@@ -8,9 +8,9 @@ console.log(config.database.conn(config.database.options));
 var db = mongoose.connect(
   config.database.conn(
     config.database.options
-    ),
-  {useMongoClient: true}
-  );
+  ),
+  {useNewUrlParser: true, useUnifiedTopology: true}
+);
 
 // CONNECTION EVENTS
 // When successfully connected

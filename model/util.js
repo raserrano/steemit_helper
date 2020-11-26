@@ -52,7 +52,7 @@ module.exports = {
             if (status_ok) {
               // Abuse rule
               var abuse_count = wait.for(this.getQueueForPayer,res.payer);
-              this.debug('Abuse count: ' + abuse_count.length)
+              this.debug('Abuse count: ' + abuse_count.length);
               // If (abuse_count.length <= conf.env.ABUSE_COUNT()) {
               // this.debug('Upsert new transfer, found');
               // this.debug(found)
@@ -70,8 +70,8 @@ module.exports = {
               // }
             }
           }else {
-            this.debug('Upsert new transfer, new')
-            this.debug(res)
+            this.debug('Upsert new transfer, new');
+            this.debug(res);
             wait.for(this.upsertModel,'Transfer',query,res);
           }
         }
@@ -91,7 +91,7 @@ module.exports = {
           to: data[i][1].op[1].to,
           amount: data[i][1].op[1].amount,
           memo: data[i][1].op[1].memo,
-        }
+        };
         wait.for(this.upsertModel,'TransferRecord',query,res);
       }
       i++;
@@ -202,7 +202,7 @@ module.exports = {
           this.debug('VP is :' + vp);
           if (vp >= (
             conf.env.MIN_VOTING_POWER() * conf.env.VOTE_POWER_1_PC()
-            )) {
+          )) {
             voted_ok = false;
             var result = wait.for(
               steem_api.steem_getContent,
@@ -467,7 +467,7 @@ module.exports = {
           if (this.dateDiff(created) < (86400 * 30)) {
             if (!steem_api.verifyAccountHasVoted(
               [conf.env.ACCOUNT_NAME()],posts[i]
-              )) {
+            )) {
               var sbd = account[0].sbd_balance.split(' ');
               var steem = account[0].balance.split(' ');
               sbd = parseFloat(sbd[0]);
@@ -563,7 +563,7 @@ module.exports = {
         var account = wait.for(steem_api.steem_getAccounts_wrapper,[author]);
         if (!steem_api.verifyAccountHasVoted(
           [conf.env.ACCOUNT_NAME()],posts[i]
-          )) {
+        )) {
           if (this.dateDiff(posts[i].created) < (86400 * 5)) {
             if (conf.env.VOTE_ACTIVE()) {
               steem_api.votePost(posts[i].author,posts[i].permlink,weight);
@@ -626,8 +626,8 @@ module.exports = {
       );
       var vp = this.getVotingPower(account[0]);
       if (vp >= (
-            conf.env.MIN_VOTING_POWER() * conf.env.VOTE_POWER_1_PC()
-            )) {
+        conf.env.MIN_VOTING_POWER() * conf.env.VOTE_POWER_1_PC()
+      )) {
         if (!steem_api.verifyAccountHasVoted([conf.env.ACCOUNT_NAME()],posts[i]) &&
           !steem_api.verifyAccountHasVoted(['cheetah','steemcleaners'],posts[i])) {
           if (conf.env.VOTE_ACTIVE()) {
@@ -728,7 +728,7 @@ module.exports = {
         status: {$in: ['pending','processed','comment']},
         created: {$ne: null},
       }
-      ).sort({number: 1}).exec(
+    ).sort({number: 1}).exec(
       function(err,data) {
         callback(err,data);
       }
@@ -743,7 +743,7 @@ module.exports = {
         status: {$in: ['pending','processed','comment']},
         created: {$ne: null},
       }
-      ).exec(
+    ).exec(
       function(err,data) {
         callback(err,data);
       }
@@ -757,11 +757,11 @@ module.exports = {
         author: {$ne: null},
         status: {
           $in: [
-          'due date',
-          'url not valid',
-          'content-not-found',
-          'url-not-found',
-          'abuse',
+            'due date',
+            'url not valid',
+            'content-not-found',
+            'url-not-found',
+            'abuse',
           ],},
         number: {$gt: last_refunded},
       }
@@ -779,10 +779,10 @@ module.exports = {
         author: {$ne: null},
         status: {
           $in: [
-          'due date',
-          'url not valid',
-          'content-not-found',
-          'url-not-found',
+            'due date',
+            'url not valid',
+            'content-not-found',
+            'url-not-found',
           ],},
         number: {$gt: last_refunded},
       }
@@ -800,19 +800,19 @@ module.exports = {
     );
   },
   getData: function(model,query,callback) {
-    db.model(model).find(query).exec(function(err,data) {callback(err,data)});
+    db.model(model).find(query).exec(function(err,data) {callback(err,data);});
   },
   upsertModel: function(model,query,doc,callback) {
     db.model(model).update(
       query,doc,{upsert: true,new: true}
-    ).exec(function(err,data) {callback(err,data)});
+    ).exec(function(err,data) {callback(err,data);});
   },
   getTreesTotal: function(callback) {
     var stages = [
       {$match: {status: {$ne: 'refunded'}}},
       {$project: {_id: false,total: {$sum: '$amount'},},},
       {$group: {_id: 'total',total: {$sum: '$total'},},},
-      ];
+    ];
     db.model('Transfer').aggregate(stages).exec(
       function(err,data) {
         callback(err,data);
@@ -822,7 +822,7 @@ module.exports = {
   getTreesAverage: function(callback) {
     var stages = [
       {$group: {_id: 'trees',average: {$avg: '$trees'},},},
-      ];
+    ];
     db.model('Information').aggregate(stages).exec(
       function(err,data) {
         callback(err,data);
@@ -841,7 +841,7 @@ module.exports = {
     date.setDate(date.getDate() - 8);
     db.model('Follower').remove(
       {created: {$lt: date}}
-      ).exec(
+    ).exec(
       function(err,data) {
         callback(err,data);
       }
@@ -849,7 +849,7 @@ module.exports = {
   },
   cleanDelegators: function(callback) {
     db.model('Delegator').remove({}
-      ).exec(
+    ).exec(
       function(err,data) {
         callback(err,data);
       }
@@ -887,20 +887,20 @@ module.exports = {
     }
 
     var project = {$project: {
-        number: '$number',
-        payer: '$payer',
-        memo: '$memo',
-        author: '$author',
-        donation: '$donation',
-        amount: amount_calc,
-        currency: '$currency',
-        voted: '$voted',
-        processed: '$processed',
-        processed_date: '$processed_date',
-        voted_date: '$voted_date',
-        status: '$status',
-        created: '$created',
-      },
+      number: '$number',
+      payer: '$payer',
+      memo: '$memo',
+      author: '$author',
+      donation: '$donation',
+      amount: amount_calc,
+      currency: '$currency',
+      voted: '$voted',
+      processed: '$processed',
+      processed_date: '$processed_date',
+      voted_date: '$voted_date',
+      status: '$status',
+      created: '$created',
+    },
     };
     stages.push(project);
 
@@ -940,7 +940,7 @@ module.exports = {
     var permlink = 'tuanis-report-' + when;
     var title = 'Welcome report for ' + when;
     var body = 'Starting my duty report. \n';
-    var tags = {tags: ['helpmejoin','minnowsupportproject']}
+    var tags = {tags: ['helpmejoin','minnowsupportproject']};
     var total = 0;
     body += '\n\nToday, I\'ve welcome the following users: \n';
     for (var i = 0; i < posts.length; i++) {
@@ -1057,7 +1057,7 @@ module.exports = {
     var pictures = JSON.parse(fs.readFileSync('./reports/pictures.json', 'utf8'));
     var contents_1 = fs.readFileSync('./reports/header.md', 'utf8');
     // Get delegators
-    var delegators = wait.for(this.getData,'Delegator',{})
+    var delegators = wait.for(this.getData,'Delegator',{});
     var delegators_table = '\nRank | Username | SP delegated | Numbers of trees planted daily';
     delegators_table += '\n---|---|---|---\n';
     for (var i = 0; i < delegators.length; i++) {
@@ -1215,4 +1215,4 @@ module.exports = {
       callback(null, true);
     }, delay);
   },
-}
+};

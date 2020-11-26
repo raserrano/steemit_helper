@@ -10,8 +10,8 @@ var express = require('express'),
 router.get('/', function(req, res, next) {
 
   mongoose.model('Transfer').find(
-      {created: {$ne: null}}
-    ).limit(500).sort({number: -1}).exec(
+    {created: {$ne: null}}
+  ).limit(500).sort({number: -1}).exec(
     function(err, transfers) {
       if (err) {
         return console.error(err);

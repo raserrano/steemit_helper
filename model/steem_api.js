@@ -3,7 +3,7 @@ const steem = require('steem'),
   request = require('request'),
   conf = require('../config/dev');
 
-var ci = new Object()
+var ci = new Object();
 steem.api.setOptions({ url: conf.env.NODE() });
 module.exports = {
   getTransfers: function(name, max, limit, callback) {
@@ -279,7 +279,7 @@ module.exports = {
     var totalVests =
       (
         parseFloat(vestingSharesParts[0]) + parseFloat(receivedSharesParts[0])
-        ) - parseFloat(delegatedSharesParts[0]);
+      ) - parseFloat(delegatedSharesParts[0]);
     // Console.log('Total vests: ' + totalVests);
     return this.getSteemPowerFromVest(globalData,totalVests);
   },
@@ -308,7 +308,7 @@ module.exports = {
     ci.rewardfund_info = wait.for(
       this.steem_getRewardFund_wrapper,
       'post'
-      );
+    );
 
     ci.price_info = wait.for(
       this.steem_getCurrentMedianHistoryPrice_wrapper

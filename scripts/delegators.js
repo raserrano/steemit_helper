@@ -1,8 +1,8 @@
 var request = require('request'),
-    cheerio = require('cheerio'),
-    wait = require('wait.for'),
-    utils = require('../model/util'),
-    conf = require('../config/current');
+  cheerio = require('cheerio'),
+  wait = require('wait.for'),
+  utils = require('../model/util'),
+  conf = require('../config/current');
 
 var delegators = 'body > div > table > tbody > tr > td:nth-child(1) > table > tbody > tr';
 
